@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Werewolf GM Dashboard</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans Thai', 'sans-serif'],
+                        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', "Liberation Mono", "Courier New", 'monospace'],
+                    },
+                    colors: {
+                        slate: {
+                            850: '#151e2e',
+                            950: '#0b0f19',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0b0f19; /* slate-950 */
+            color: #e2e8f0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Custom Scrollbar for Logs & Modals */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569; 
+            border-radius: 4px;
+        }
+
+        /* Player Card Status Borders */
+        .player-card {
+            transition: all 0.2s ease-in-out;
+            border-top-width: 4px;
+        }
+        @media (min-width: 768px) {
+            .player-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            }
+        }
+        
+        /* Role Group Colors */
+        .default-card { border-top-color: #475569; }
+        .wolf-card { border-top-color: #ef4444; }
+        .villager-card { border-top-color: #3b82f6; }
+        .special-card { border-top-color: #a855f7; }
+        .gm-card { border-top-color: #64748b; }
+
+        /* Dead State */
+        .is-dead {
+            opacity: 0.6;
+            filter: grayscale(80%);
+            border-top-color: #52525b !important;
+            background-color: #18181b !important;
+        }
+
+        /* Custom Select Styling */
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 1em 1em;
+            padding-right: 2rem !important;
+        }
+
+        /* Modal Backdrop */
+        .modal-backdrop {
+            display: none;
+            backdrop-filter: blur(4px);
+        }
+        .modal-backdrop.active {
+            display: flex;
+        }
+
+        /* Mobile Menu Setup */
+        #mobile-menu {
+            transition: transform 0.3s ease-in-out;
+            transform: translateY(-100%);
+        }
+        #mobile-menu.open {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen pt-16 md:pt-20"> <!-- Added padding top for fixed nav -->
+
+    <!-- Navigation Bar -->
+    <nav class="fixed top-0 w-full z-40 bg-slate-950/80 backdrop-blur-lg border-b border-slate-800/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16 md:h-20">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center gap-2 md:gap-3 group">
+                    <div class="bg-indigo-500/10 p-2 rounded-xl border border-indigo-500/20 group-hover:bg-indigo-500/20 transition-colors">
+                        <i class="ph-fill ph-book-open text-2xl md:text-3xl text-indigo-400"></i>
+                    </div>
+                    <span class="font-bold text-lg md:text-xl tracking-tight text-white group-hover:text-indigo-300 transition-colors">Wolf Book</span>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="text-slate-300 font-medium hover:text-indigo-400 transition-colors">Home</a>
+                    <a href="roles.html" class="text-slate-300 font-medium hover:text-indigo-400 transition-colors">Roles</a>
+                    <a href="how-to-play.html" class="text-slate-300 font-medium hover:text-indigo-400 transition-colors">How to play</a>
+                    <span class="text-indigo-400 font-bold border-b-2 border-indigo-400 pb-1">Dashboard</span>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-slate-300 hover:text-white p-2">
+                        <i class="ph ph-list text-3xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-xl pt-24 px-6 flex flex-col gap-6 md:hidden">
+        <a href="index.html" class="text-2xl font-bold text-slate-300 hover:text-white border-b border-slate-800 pb-4">Home</a>
+        <a href="roles.html" class="text-2xl font-bold text-slate-300 hover:text-white border-b border-slate-800 pb-4">Roles</a>
+        <a href="how-to-play.html" class="text-2xl font-bold text-slate-300 hover:text-white border-b border-slate-800 pb-4">How to play</a>
+        <a href="#" class="text-2xl font-bold text-indigo-400 border-b border-slate-800 pb-4">Dashboard (กำลังใช้งาน)</a>
+        
+        <button id="close-mobile-menu" class="absolute top-6 right-6 text-slate-400 hover:text-white p-2">
+            <i class="ph ph-x text-3xl"></i>
+        </button>
+    </div>
+
+    <!-- Main Dashboard Container -->
+    <div class="max-w-7xl mx-auto space-y-4 md:space-y-6 relative p-2 sm:p-4 md:p-8">
+        
+        <!-- Header Section (Sticky Controller) -->
+        <header class="sticky top-[72px] md:top-24 z-30 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-900/95 backdrop-blur-md p-4 md:p-6 rounded-xl border border-slate-700/50 shadow-xl shadow-black/20 gap-3 md:gap-4 mt-2">
+            <div class="flex items-center gap-2">
+                <i class="ph-fill ph-game-controller text-indigo-500 text-2xl md:text-3xl"></i>
+                <div>
+                    <h1 class="text-lg md:text-xl font-bold text-white leading-tight">กระดานควบคุมเกม (GM)</h1>
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-between w-full sm:w-auto gap-2 md:gap-3">
+                <div class="bg-slate-800 px-3 py-2 md:px-4 md:py-2 rounded-lg border border-slate-700 flex items-center gap-2 flex-shrink-0">
+                    <span class="relative flex h-2.5 w-2.5 md:h-3 md:w-3">
+                      <span id="phase-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                      <span id="phase-dot" class="relative inline-flex rounded-full h-2.5 w-2.5 md:h-3 md:w-3 bg-yellow-500"></span>
+                    </span>
+                    <span id="game-status" class="font-semibold text-white text-sm md:text-base tracking-wide whitespace-nowrap">คืนที่ 1</span>
+                </div>
+
+                <div class="flex gap-2 w-full sm:w-auto">
+                    <button onclick="nextTurn()" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-3 md:px-4 rounded-lg transition-colors flex items-center justify-center gap-1 md:gap-2 shadow-lg shadow-indigo-900/20">
+                        <i class="ph ph-moon-stars text-lg"></i> <span id="btn-next-phase-text" class="text-sm md:text-base">เปลี่ยนช่วงเวลา</span>
+                    </button>
+                    <button onclick="openResetModal()" class="bg-rose-900/50 text-rose-400 hover:bg-rose-900 hover:text-rose-300 font-medium py-2 px-3 rounded-lg transition-colors border border-rose-800/50 flex items-center justify-center flex-shrink-0" title="รีเซ็ตเกมใหม่ทั้งหมด">
+                        <i class="ph ph-arrow-counter-clockwise text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
+            
+            <!-- 1. Stats Card -->
+            <div class="lg:col-span-4 lg:col-start-1 lg:row-start-1 order-1 h-fit bg-slate-900 p-4 md:p-5 rounded-xl border border-slate-800 shadow-md">
+                <h2 class="text-xs md:text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3 md:mb-4 flex items-center gap-2">
+                    <i class="ph ph-chart-bar text-base md:text-lg"></i> ภาพรวม
+                </h2>
+                <div class="grid grid-cols-3 gap-2 md:gap-3 text-center">
+                    <div class="bg-slate-800 p-2 md:p-3 rounded-lg border border-slate-700">
+                        <div class="text-xl md:text-2xl font-bold text-white" id="total-players">0</div>
+                        <div class="text-[10px] md:text-xs text-slate-400 mt-0.5 md:mt-1">ทั้งหมด</div>
+                    </div>
+                    <div class="bg-emerald-900/30 p-2 md:p-3 rounded-lg border border-emerald-800/50">
+                        <div class="text-xl md:text-2xl font-bold text-emerald-400" id="alive-players">0</div>
+                        <div class="text-[10px] md:text-xs text-emerald-500 mt-0.5 md:mt-1">รอดชีวิต</div>
+                    </div>
+                    <div class="bg-rose-900/30 p-2 md:p-3 rounded-lg border border-rose-800/50">
+                        <div class="text-xl md:text-2xl font-bold text-rose-400" id="dead-players">0</div>
+                        <div class="text-[10px] md:text-xs text-rose-500 mt-0.5 md:mt-1">เสียชีวิต</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Timer Card -->
+            <div class="lg:col-span-4 lg:col-start-1 lg:row-start-2 order-2 h-fit bg-slate-900 p-4 md:p-5 rounded-xl border border-slate-800 shadow-md">
+                <h2 class="text-xs md:text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3 md:mb-4 flex items-center gap-2">
+                    <i class="ph ph-timer text-base md:text-lg"></i> จับเวลา
+                </h2>
+                
+                <div class="bg-slate-950 border border-slate-800 rounded-lg p-4 md:p-6 mb-3 md:mb-4 flex justify-center items-center">
+                    <span id="timer-display" class="font-mono text-4xl md:text-5xl font-bold tracking-tight text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">10:00</span>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2 mb-3 md:mb-4">
+                    <button onclick="setTimer(60)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs md:text-sm font-medium py-2 rounded-md transition-colors border border-slate-700">1 นาที</button>
+                    <button onclick="setTimer(180)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs md:text-sm font-medium py-2 rounded-md transition-colors border border-slate-700">3 นาที</button>
+                    <button onclick="setTimer(600)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs md:text-sm font-medium py-2 rounded-md transition-colors border border-slate-700">10 นาที</button>
+                </div>
+
+                <div class="flex gap-2">
+                    <button onclick="startTimer()" id="start-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-sm md:text-base font-medium py-2 rounded-md transition-colors flex items-center justify-center gap-1">
+                        <i class="ph-fill ph-play"></i> เริ่ม
+                    </button>
+                    <button onclick="pauseTimer()" id="pause-btn" class="flex-1 bg-amber-600 hover:bg-amber-500 text-white text-sm md:text-base font-medium py-2 rounded-md transition-colors flex items-center justify-center gap-1">
+                        <i class="ph-fill ph-pause"></i> พัก
+                    </button>
+                    <button onclick="resetTimer()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white text-sm md:text-base font-medium py-2 rounded-md transition-colors flex items-center justify-center gap-1">
+                        <i class="ph-fill ph-stop"></i> รีเซ็ต
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3. Players Area -->
+            <div class="lg:col-span-8 lg:col-start-5 lg:row-start-1 lg:row-span-3 order-3 h-fit bg-slate-900 p-4 md:p-6 rounded-xl border border-slate-800 shadow-md">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 md:mb-6 gap-3">
+                    <h2 class="text-base md:text-lg font-semibold text-white flex items-center gap-1.5 md:gap-2">
+                        <i class="ph ph-users-three text-lg md:text-xl text-indigo-400"></i> จัดการผู้เล่น
+                    </h2>
+                    
+                    <!-- Buttons Group -->
+                    <div class="flex gap-2 w-full sm:w-auto">
+                        <button onclick="openInGameRolesModal()" class="flex-1 sm:flex-none bg-purple-600 hover:bg-purple-500 text-white text-sm md:text-base font-medium py-2 px-3 md:px-4 rounded-lg transition-colors flex items-center justify-center gap-1.5 md:gap-2 shadow-sm" title="ดูความสามารถเฉพาะบทบาทที่ถูกเลือกเล่น">
+                            <i class="ph ph-book-open-text text-base md:text-lg"></i> <span class="hidden sm:inline">บทบาทในเกม</span>
+                        </button>
+                        <button onclick="openAddPlayerModal()" class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white text-sm md:text-base font-medium py-2 px-3 md:px-4 rounded-lg transition-colors flex items-center justify-center gap-1.5 md:gap-2 shadow-sm">
+                            <i class="ph ph-user-plus text-base md:text-lg"></i> <span class="hidden sm:inline">เพิ่มผู้เล่น</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Player Grid -->
+                <div id="player-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-4">
+                    <!-- Cards inject here -->
+                </div>
+            </div>
+
+            <!-- 4. Game Log Card -->
+            <div class="lg:col-span-4 lg:col-start-1 lg:row-start-3 order-4 h-fit bg-slate-900 p-4 md:p-5 rounded-xl border border-slate-800 shadow-md flex flex-col">
+                <h2 class="text-xs md:text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3 md:mb-4 flex items-center gap-2">
+                    <i class="ph ph-terminal-window text-base md:text-lg"></i> บันทึกเหตุการณ์
+                </h2>
+                
+                <div id="game-log" class="bg-slate-950 border border-slate-800 rounded-lg p-3 h-32 md:h-48 overflow-y-auto space-y-2 mb-3 md:mb-4 font-mono text-xs md:text-sm">
+                    <!-- Logs inject here -->
+                </div>
+
+                <div class="flex gap-2">
+                    <input type="text" id="log-input" placeholder="พิมพ์บันทึก..." class="flex-1 bg-slate-800 border border-slate-700 text-white text-sm px-3 py-2 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" onkeypress="handleLogEnter(event)">
+                    <button onclick="addLogEntry()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-lg transition-colors flex items-center justify-center">
+                        <i class="ph ph-paper-plane-right text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal: Add Player -->
+    <div id="add-player-modal" class="modal-backdrop fixed inset-0 z-50 bg-black/70 items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 md:p-6 w-full max-w-md shadow-2xl transform transition-all">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="text-lg md:text-xl font-bold text-white flex items-center gap-2">
+                    <i class="ph ph-user-plus text-indigo-400"></i> เพิ่มผู้เล่นใหม่
+                </h3>
+                <button onclick="closeAddPlayerModal()" class="text-slate-400 hover:text-white transition-colors p-1">
+                    <i class="ph ph-x text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-slate-400 mb-2">ชื่อผู้เล่น</label>
+                <input type="text" id="new-player-name-input" placeholder="ระบุชื่อ (เช่น ผู้เล่น 1, นัท, บอม)" class="w-full bg-slate-800 border border-slate-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" onkeypress="handleNewPlayerEnter(event)">
+                <p id="modal-error" class="text-rose-400 text-sm mt-2 hidden">กรุณาระบุชื่อผู้เล่น</p>
+            </div>
+
+            <div class="flex gap-2 md:gap-3 justify-end">
+                <button onclick="closeAddPlayerModal()" class="flex-1 sm:flex-none px-4 py-2.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors font-medium text-sm md:text-base border border-slate-700">ยกเลิก</button>
+                <button onclick="addPlayer()" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-lg transition-colors font-medium text-sm md:text-base">บันทึก</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Confirm Reset -->
+    <div id="confirm-reset-modal" class="modal-backdrop fixed inset-0 z-50 bg-black/70 items-center justify-center p-4">
+        <div class="bg-slate-900 border border-rose-800/50 rounded-xl p-5 md:p-6 w-full max-w-sm shadow-2xl transform transition-all text-center">
+            <div class="mb-4 md:mb-5 flex justify-center">
+                <div class="bg-rose-900/30 p-4 rounded-full text-rose-500">
+                    <i class="ph ph-warning-circle text-4xl"></i>
+                </div>
+            </div>
+            <h3 class="text-lg md:text-xl font-bold text-white mb-2">ยืนยันการรีเซ็ตเกม?</h3>
+            <p class="text-slate-400 text-xs md:text-sm mb-6">ระบบจะเคลียร์บทบาทและสถานะของผู้เล่นทุกคนกลับไปเริ่มคืนแรก (รายชื่อผู้เล่นจะยังคงอยู่)</p>
+            <div class="flex gap-2 md:gap-3 justify-center">
+                <button onclick="closeResetModal()" class="flex-1 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors font-medium text-sm md:text-base border border-slate-700">ยกเลิก</button>
+                <button onclick="executeReset()" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white px-4 py-2.5 rounded-lg transition-colors font-medium text-sm md:text-base">ยืนยันรีเซ็ต</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: In-Game Roles Viewer -->
+    <div id="in-game-roles-modal" class="modal-backdrop fixed inset-0 z-50 bg-black/80 items-center justify-center p-2 sm:p-4">
+        <div class="bg-slate-900 border border-slate-700/50 rounded-xl w-full max-w-2xl max-h-[90vh] shadow-2xl transform transition-all flex flex-col mt-16 md:mt-0"> <!-- Added mt-16 for mobile to clear nav -->
+            <!-- Modal Header -->
+            <div class="flex justify-between items-center p-4 md:p-6 border-b border-slate-800 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="bg-purple-500/20 p-2 rounded-lg text-purple-400">
+                        <i class="ph-fill ph-book-open-text text-2xl md:text-3xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg md:text-xl font-bold text-white">บทบาทในเกมกระดานนี้</h3>
+                        <p class="text-slate-400 text-xs md:text-sm mt-0.5">สรุปความสามารถเฉพาะตัวละครที่ถูกเลือกไว้</p>
+                    </div>
+                </div>
+                <button onclick="closeInGameRolesModal()" class="text-slate-400 hover:text-white transition-colors bg-slate-800 hover:bg-slate-700 p-2 rounded-lg">
+                    <i class="ph ph-x text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Modal Body (Scrollable) -->
+            <div class="p-4 md:p-6 overflow-y-auto flex-grow scroll-smooth" id="in-game-roles-container">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </div>
+
+<script>
+    // --- Mobile Navbar Toggle ---
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const closeMenuBtn = document.getElementById('close-mobile-menu');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    menuBtn.addEventListener('click', () => {
+        mobileMenu.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    });
+
+    closeMenuBtn.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        document.body.style.overflow = '';
+    });
+
+    // --- Data Configuration ---
+    let players = [
+        { name: "ผู้เล่น 1", role: "➖ เลือกบทบาท", status: "รอด" },
+        { name: "ผู้เล่น 2", role: "➖ เลือกบทบาท", status: "รอด" },
+        { name: "ผู้เล่น 3", role: "➖ เลือกบทบาท", status: "รอด" },
+        { name: "ผู้เล่น 4", role: "➖ เลือกบทบาท", status: "รอด" },
+        { name: "ผู้เล่น 5", role: "➖ เลือกบทบาท", status: "รอด" }
+    ];
+    
+    let dayCount = 1;
+    let isNight = true;
+    let timerInterval;
+    let timeRemaining = 600;
+
+    // Roles Mapping
+    const rolesData = {
+        "➖ เลือกบทบาท": { group: "default", desc: "-", side: "-" },
+        // Villager
+        "🧑‍🌾 ชาวบ้าน": { group: "villager", desc: "บทบาทพื้นฐาน ไม่มีพลังพิเศษ", side: "Village Side" },
+        "🔮 เทพพยากรณ์": { group: "villager", desc: "สามารถตรวจสอบได้ว่าผู้เล่นที่เลือกเป็นมนุษย์หมาป่าหรือไม่", side: "Village Side" },
+        "👁️ ญาณทิพย์": { group: "villager", desc: "ตรวจสอบ 1 คน ว่าเป็นตัวละครพิเศษที่ไม่ใช่หมาป่า/ชาวบ้านธรรมดาหรือไม่", side: "Village Side" },
+        "🔥 ผู้เผยตัวตน": { group: "villager", desc: "ชี้ 1 คนเพื่อเปิดการ์ด ถ้าเป็นหมาป่า หมาป่าตาย แต่ถ้าไม่ใช่ ตัวเองตายแทน", side: "Village Side" },
+        "🙏 นักบวช": { group: "villager", desc: "ให้พร 1 คน หากคนนั้นถูกโหวตประหารครั้งแรก จะรอดตาย (ต่อชีวิต 1 ครั้ง)", side: "Village Side" },
+        "🕵️ นักสืบลึกลับ": { group: "villager", desc: "ชี้ 1 คน (เช็ค 3 คนรวมคนซ้าย-ขวา) ดูว่ามีใครคนใดคนหนึ่งเป็นหมาป่าไหม", side: "Village Side" },
+        "👵 แม่เฒ่า": { group: "villager", desc: "เลือกผู้เล่น 1 คนให้ต้องออกจากหมู่บ้านในวันรุ่งขึ้น", side: "Village Side" },
+        "🌗 ลูกครึ่งมนุษย์หมาป่า": { group: "villager", desc: "อยู่ฝั่งชาวบ้าน แต่ถ้าเทพพยากรณ์เช็คจะเห็นว่าเป็นมนุษย์หมาป่า", side: "Village Side" },
+        "😜 ตัวป่วน": { group: "villager", desc: "ให้สัญญาณ GM เพื่อให้รอบถัดไป โหวตกำจัดได้ 2 คน", side: "Village Side" },
+        "🤦 ไอทึม": { group: "villager", desc: "โหวต 'ฆ่า' อย่างเดียวเสมอ (ตรงข้ามกับผู้รักสันติ)", side: "Village Side" },
+        "🛡️ บอดี้การ์ด": { group: "villager", desc: "ปกป้องผู้เล่น 1 คน จากการถูกหมาป่าฆ่า (ห้ามซ้ำคนเดิม, ห้ามป้องกันตัวเอง)", side: "Village Side" },
+        "🧪 แม่มด": { group: "villager", desc: "มียาชุบชีวิต 1 ขวด และ ยาพิษ 1 ขวด (ใช้ได้อย่างละครั้งตลอดเกม)", side: "Village Side" },
+        "✨ จอมเวท": { group: "villager", desc: "เลือกปิดปาก 1 คน คนนั้นวันต่อมาห้ามพูดเด็ดขาด", side: "Village Side" },
+        "💪 หนุ่มถึก": { group: "villager", desc: "เมื่อโดนหมาป่ากัด จะยังไม่ตาย แต่จะไปตายในวันถัดไปแทน (ทนได้ 1 วัน)", side: "Village Side" },
+        "👑 เจ้าชาย": { group: "villager", desc: "ถ้าถูกโหวตประหารครั้งแรก เมื่อเปิดตัวแล้วจะไม่โดนกำจัด", side: "Village Side" },
+        "🕊️ ผู้รักสันติ": { group: "villager", desc: "โหวต 'ไม่ฆ่า' อย่างเดียวเสมอ (ตรงข้ามกับไอทึม)", side: "Village Side" },
+        "🤢 ผู้ป่วยติดเชื้อ": { group: "villager", desc: "ถ้าหมาป่ากิน จะทำให้หมาป่าท้องเสีย คืนถัดไปหมาป่าฆ่าใครไม่ได้", side: "Village Side" },
+        "😴 คนอดนอน": { group: "villager", desc: "เช็คได้ว่าคนซ้าย-ขวาของตัวเอง มีใครตื่นขึ้นมาใช้ความสามารถตอนกลางคืนไหม", side: "Village Side" },
+        "🧿 ตาทิพย์": { group: "villager", desc: "ในคืนแรก จะได้รู้ว่าใครคือ เทพพยากรณ์", side: "Village Side" },
+        "🎓 ลูกศิษย์ของเทพพยากรณ์": { group: "villager", desc: "ถ้าเทพพยากรณ์ถูกกำจัด จะขึ้นมาเป็นเทพพยากรณ์แทน", side: "Village Side" },
+        "💘 กามเทพ": { group: "villager", desc: "ยิงศรจับคู่ 2 คนเป็นคู่รัก หากคนใดคนหนึ่งตาย อีกคนจะตายตาม", side: "Village Side" },
+        "🏹 นายพรานหญิง": { group: "villager", desc: "ในช่วงกลางคืน สามารถชี้กำจัดผู้เล่นได้ 1 คน (ใช้ได้ 1 ครั้งต่อเกม)", side: "Village Side" },
+        "🎯 นายพรานธรรมดา": { group: "villager", desc: "ถ้าโดนหมาป่ากัด เช้าวันถัดมาจะสามารถลากใครก็ได้ไปตายด้วย 1 คน", side: "Village Side" },
+        "🤝 พาราดอนแห่งเมสัน": { group: "villager", desc: "เป็นแฝดกัน ในคืนแรกจะได้ลืมตามามองหน้าและไว้ใจกันได้", side: "Village Side" },
+        // Wolves
+        "🐺 มนุษย์หมาป่า": { group: "wolf", desc: "บทบาทพื้นฐาน ตื่นพร้อมกันและเลือกเหยื่อ 1 คนเพื่อกำจัด", side: "Werewolf Side" },
+        "🐶 ลูกมนุษย์หมาป่า": { group: "wolf", desc: "ถ้าลูกหมาป่าตาย คืนถัดมามนุษย์หมาป่าที่เหลือจะฆ่าผู้เล่นได้ 2 คน", side: "Werewolf Side" },
+        "👤 หมาป่ามนุษย์": { group: "wolf", desc: "อยู่ทีมหมาป่า แต่ถ้าเทพพยากรณ์เช็ค จะมองเห็นว่าเป็นมนุษย์ธรรมดา", side: "Werewolf Side" },
+        "🔥🐺 หมาป่าโลกันต์": { group: "wolf", desc: "ต้องผูกชะตากับ 1 คน ถ้าคนนั้นตาย หมาป่าโลกันต์จะตายตามไปด้วย", side: "Werewolf Side" },
+        "😈 สมุนรับใช้": { group: "wolf", desc: "ช่วยหมาป่าให้ชนะ (แต่หมาป่าไม่รู้ว่าเป็นใคร) ชนะถ้าหมาป่าชนะ", side: "Werewolf Side" },
+        "🌑 แม่หมอมนต์ดำ": { group: "wolf", desc: "สามารถตามหาได้ว่าใครคือ เทพพยากรณ์ ในเวลากลางคืน", side: "Werewolf Side" },
+        // Specials
+        "👺 ยาจก": { group: "special", desc: "ชนะก็ต่อเมื่อ ตัวเองถูกกำจัด (โดนหมาป่ากิน หรือชาวบ้านโหวต)", side: "Neutral" },
+        "🐺🩶 หมาป่าเดียวดาย": { group: "special", desc: "ชนะก็ต่อเมื่อ เป็นหมาป่าเพียงแค่ตัวเดียวที่เหลือรอดอยู่", side: "Neutral" },
+        "👊 อันธพาล": { group: "special", desc: "เลือกผู้เล่นไว้เท่ากับจำนวนหมาป่า ถ้าคนเหล่านั้นตายหมด อันธพาลจะชนะ", side: "Neutral" },
+        "🐐 ชูปาคาบา": { group: "special", desc: "ช่วงแรกจะฆ่าหมาป่าก่อน ถ้าหมาป่าตายหมดจะไล่ฆ่าคน และต้องเหลือเป็นคนสุดท้ายถึงจะชนะ", side: "Neutral" },
+        "🛐 เจ้าลัทธิ": { group: "special", desc: "ชนะเมื่อทุกคนที่เหลืออยู่ในเกมเข้าลัทธิของเขา (ชักชวนเวลากลางคืน)", side: "Neutral" },
+        "👻 ผู้ต้องคำสาป": { group: "special", desc: "เริ่มเป็นชาวบ้าน แต่ถ้าโดนหมาป่ากัด จะกลายเป็นหมาป่าทันที", side: "Mixed" },
+        "🎭 ผู้จำแลง": { group: "special", desc: "เลือก 1 คนไว้ ถ้าคนนั้นตาย จะรับสืบทอดบทบาทของคนนั้น", side: "Mixed" },
+        "🍺 คนเมา": { group: "special", desc: "บทบาทจริงคือการ์ดที่คว่ำไว้ (จะรู้บทบาทจริงหลังผ่านไป 3 รอบ)", side: "Mixed" },
+        // GM
+        "🎲 ผู้ดำเนินเกม": { group: "gm", desc: "คอยควบคุมเกม ประกาศผล และดูแลช่วงกลางคืน", side: "GM" },
+    };
+    
+    const allRoles = Object.keys(rolesData);
+
+    // --- DOM Elements ---
+    const DOM = {
+        grid: document.getElementById('player-cards-grid'),
+        log: document.getElementById('game-log'),
+        logInput: document.getElementById('log-input'),
+        statTotal: document.getElementById('total-players'),
+        statAlive: document.getElementById('alive-players'),
+        statDead: document.getElementById('dead-players'),
+        statusLabel: document.getElementById('game-status'),
+        statusPing: document.getElementById('phase-ping'),
+        statusDot: document.getElementById('phase-dot'),
+        btnNextPhaseText: document.getElementById('btn-next-phase-text'),
+        timerDisplay: document.getElementById('timer-display'),
+        modal: document.getElementById('add-player-modal'),
+        modalInput: document.getElementById('new-player-name-input'),
+        modalError: document.getElementById('modal-error'),
+        resetModal: document.getElementById('confirm-reset-modal'),
+        rolesModal: document.getElementById('in-game-roles-modal'),
+        rolesContainer: document.getElementById('in-game-roles-container')
+    };
+
+    // --- UI Render Functions ---
+    function renderPlayerCards() {
+        DOM.grid.innerHTML = '';
+        players.forEach((player, index) => {
+            const groupInfo = rolesData[player.role] || { group: 'default' };
+            const isDead = player.status === 'ตาย';
+            
+            let borderClass = 'default-card';
+            let selectBgClass = 'bg-slate-800 hover:bg-slate-700';
+            
+            if (groupInfo.group === 'wolf') { borderClass = 'wolf-card'; selectBgClass = 'bg-rose-950/40 hover:bg-rose-900/50 text-rose-200'; }
+            if (groupInfo.group === 'villager') { borderClass = 'villager-card'; selectBgClass = 'bg-blue-950/40 hover:bg-blue-900/50 text-blue-200'; }
+            if (groupInfo.group === 'special') { borderClass = 'special-card'; selectBgClass = 'bg-purple-950/40 hover:bg-purple-900/50 text-purple-200'; }
+            if (groupInfo.group === 'gm') { borderClass = 'gm-card'; }
+
+            let statusBadgeColor = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+            if (player.status === 'ตาย') statusBadgeColor = 'bg-rose-500/10 text-rose-400 border-rose-500/20';
+            if (player.status === 'ปกป้อง') statusBadgeColor = 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+            if (player.status === 'คู่รัก') statusBadgeColor = 'bg-pink-500/10 text-pink-400 border-pink-500/20';
+
+            const card = document.createElement('div');
+            card.className = `player-card bg-slate-800 rounded-xl p-3 md:p-4 border border-slate-700 relative flex flex-col gap-2 md:gap-3 ${isDead ? 'is-dead' : ''} ${borderClass}`;
+            
+            card.innerHTML = `
+                <div class="flex justify-between items-center gap-2 mb-1">
+                    <input type="text" value="${player.name}" class="bg-transparent border-b border-transparent focus:border-indigo-500 hover:border-slate-600 outline-none text-white font-semibold text-base w-full transition-colors pb-1" onchange="updatePlayerName(${index}, this.value)" placeholder="ชื่อผู้เล่น">
+                    <button onclick="removePlayer(${index})" class="text-slate-500 hover:text-rose-400 transition-colors p-1.5 -mr-1" title="ลบผู้เล่น">
+                        <i class="ph ph-trash text-lg md:text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-2 mt-auto">
+                    <select onchange="updatePlayerRole(${index}, this.value)" class="w-full text-xs md:text-sm border border-slate-700 rounded-lg py-2 px-2 outline-none focus:ring-1 focus:ring-indigo-500 transition-colors cursor-pointer ${selectBgClass}">
+                        ${allRoles.map(r => `<option value="${r}" class="bg-slate-800 text-white" ${player.role === r ? 'selected' : ''}>${r}</option>`).join('')}
+                    </select>
+                    
+                    <select onchange="updatePlayerStatus(${index}, this.value)" class="w-full text-xs md:text-sm border rounded-lg py-2 px-2 outline-none transition-colors cursor-pointer ${statusBadgeColor}">
+                        <option value="รอด" class="bg-slate-800 text-white" ${player.status === 'รอด' ? 'selected' : ''}>✅ รอด</option>
+                        <option value="ตาย" class="bg-slate-800 text-white" ${player.status === 'ตาย' ? 'selected' : ''}>💀 ตาย</option>
+                        <option value="ปกป้อง" class="bg-slate-800 text-white" ${player.status === 'ปกป้อง' ? 'selected' : ''}>🛡️ ปกป้อง</option>
+                        <option value="คู่รัก" class="bg-slate-800 text-white" ${player.status === 'คู่รัก' ? 'selected' : ''}>❤️ คู่รัก</option>
+                    </select>
+                </div>
+            `;
+            DOM.grid.appendChild(card);
+        });
+        updateStats();
+    }
+
+    function updateStats() {
+        DOM.statTotal.textContent = players.length;
+        DOM.statAlive.textContent = players.filter(p => p.status !== 'ตาย').length;
+        DOM.statDead.textContent = players.filter(p => p.status === 'ตาย').length;
+    }
+
+    // --- Actions ---
+    function updatePlayerName(index, newName) {
+        if(!newName.trim()) return;
+        const oldName = players[index].name;
+        players[index].name = newName;
+        addLog(`เปลี่ยนชื่อ [${oldName}] ➔ [${newName}]`);
+    }
+
+    function updatePlayerRole(index, newRole) {
+        players[index].role = newRole;
+        renderPlayerCards();
+        addLog(`[${players[index].name}] รับบท ${newRole}`);
+    }
+
+    function updatePlayerStatus(index, newStatus) {
+        players[index].status = newStatus;
+        renderPlayerCards();
+        addLog(`[${players[index].name}] สถานะ: ${newStatus}`);
+    }
+
+    function removePlayer(index) {
+        const name = players[index].name;
+        players.splice(index, 1);
+        renderPlayerCards();
+        addLog(`ลบผู้เล่น: ${name}`);
+    }
+
+    // --- Modals Control ---
+    function openAddPlayerModal() {
+        DOM.modal.classList.add('active');
+        DOM.modalInput.value = '';
+        DOM.modalError.classList.add('hidden');
+        setTimeout(() => DOM.modalInput.focus(), 100);
+    }
+    function closeAddPlayerModal() { DOM.modal.classList.remove('active'); }
+
+    function addPlayer() {
+        const name = DOM.modalInput.value.trim();
+        if (name) {
+            players.push({ name: name, role: "➖ เลือกบทบาท", status: "รอด" });
+            renderPlayerCards();
+            addLog(`เพิ่มผู้เล่น: ${name}`);
+            closeAddPlayerModal();
+            setTimeout(() => {
+                const playersArea = document.getElementById('player-cards-grid');
+                playersArea.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        } else {
+            DOM.modalError.classList.remove('hidden');
+        }
+    }
+    function handleNewPlayerEnter(e) { if (e.key === 'Enter') addPlayer(); }
+
+    function openResetModal() { DOM.resetModal.classList.add('active'); }
+    function closeResetModal() { DOM.resetModal.classList.remove('active'); }
+    function executeReset() {
+        dayCount = 1; isNight = true; DOM.log.innerHTML = '';
+        players.forEach(p => { p.role = "➖ เลือกบทบาท"; p.status = "รอด"; });
+        renderPlayerCards(); updateGamePhaseUI(); addLog("รีเซ็ตกระดานเริ่มคืนที่ 1");
+        resetTimer(); closeResetModal(); window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // --- In-Game Roles Modal ---
+    function openInGameRolesModal() {
+        const roleMap = {};
+        let unassignedCount = 0;
+
+        players.forEach(p => {
+            if (p.role === "➖ เลือกบทบาท") {
+                unassignedCount++;
+            } else {
+                if (!roleMap[p.role]) roleMap[p.role] = [];
+                roleMap[p.role].push(p.name);
+            }
+        });
+
+        DOM.rolesContainer.innerHTML = '';
+
+        if (unassignedCount > 0) {
+            DOM.rolesContainer.innerHTML += `
+                <div class="bg-amber-900/30 border border-amber-500/30 text-amber-400 px-4 py-3 rounded-lg mb-5 text-sm flex items-center gap-2">
+                    <i class="ph-fill ph-warning-circle text-xl"></i>
+                    <span>มีผู้เล่น <strong>${unassignedCount} คน</strong> ที่ยังไม่ได้กำหนดบทบาท</span>
+                </div>
+            `;
+        }
+
+        const rolesInPlay = Object.keys(roleMap);
+
+        if (rolesInPlay.length === 0) {
+            DOM.rolesContainer.innerHTML += `
+                <div class="text-center py-10 flex flex-col items-center justify-center opacity-60">
+                    <i class="ph-fill ph-ghost text-5xl text-slate-500 mb-3"></i>
+                    <p class="text-slate-400">ยังไม่มีบทบาทในเกมขณะนี้</p>
+                    <p class="text-xs text-slate-500 mt-1">กรุณากำหนดบทบาทให้ผู้เล่นก่อน</p>
+                </div>
+            `;
+        } else {
+            const gridContainer = document.createElement('div');
+            gridContainer.className = 'grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4';
+
+            rolesInPlay.sort((a, b) => {
+                const groupA = rolesData[a]?.group || '';
+                const groupB = rolesData[b]?.group || '';
+                if (groupA === groupB) return 0;
+                if (groupA === 'wolf') return -1;
+                if (groupB === 'wolf') return 1;
+                return 0;
+            });
+
+            rolesInPlay.forEach(roleName => {
+                const data = rolesData[roleName];
+                const holders = roleMap[roleName].join(', ');
+                
+                const firstSpaceIndex = roleName.indexOf(' ');
+                const emoji = roleName.substring(0, firstSpaceIndex);
+                const name = roleName.substring(firstSpaceIndex + 1);
+
+                let cardStyle = 'border-slate-700 bg-slate-800/50';
+                let tagStyle = 'bg-slate-500/10 text-slate-400 border-slate-500/20';
+                
+                if (data.group === 'wolf') { cardStyle = 'border-rose-500/30 bg-rose-950/20'; tagStyle = 'bg-rose-500/10 text-rose-400 border-rose-500/20'; }
+                if (data.group === 'villager') { cardStyle = 'border-blue-500/30 bg-blue-950/20'; tagStyle = 'bg-blue-500/10 text-blue-400 border-blue-500/20'; }
+                if (data.group === 'special') { cardStyle = 'border-purple-500/30 bg-purple-950/20'; tagStyle = 'bg-purple-500/10 text-purple-400 border-purple-500/20'; }
+
+                const card = document.createElement('div');
+                card.className = `p-3 md:p-4 rounded-xl border ${cardStyle} flex gap-3 md:gap-4`;
+                card.innerHTML = `
+                    <div class="text-2xl md:text-3xl bg-slate-900/50 p-2 rounded-lg border border-slate-700/50 flex-shrink-0 flex items-center justify-center w-12 h-12 md:w-14 md:h-14">
+                        ${emoji}
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <div class="flex justify-between items-start gap-2 mb-1">
+                            <h4 class="font-bold text-white text-base md:text-lg truncate">${name}</h4>
+                            <span class="text-[10px] md:text-xs px-2 py-0.5 rounded border whitespace-nowrap ${tagStyle}">${data.side}</span>
+                        </div>
+                        <p class="text-xs md:text-sm text-slate-400 leading-snug mb-2">${data.desc}</p>
+                        <div class="text-xs bg-slate-900/60 border border-slate-700/50 rounded-md px-2 py-1.5 text-indigo-300 flex items-center gap-1.5">
+                            <i class="ph-fill ph-user font-bold"></i> <span class="truncate">ผู้เล่น: ${holders}</span>
+                        </div>
+                    </div>
+                `;
+                gridContainer.appendChild(card);
+            });
+            DOM.rolesContainer.appendChild(gridContainer);
+        }
+
+        DOM.rolesModal.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent scrolling background
+    }
+    
+    function closeInGameRolesModal() {
+        DOM.rolesModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // --- Game Logic ---
+    function updateGamePhaseUI() {
+        DOM.statusLabel.textContent = isNight ? `คืนที่ ${dayCount}` : `วันที่ ${dayCount}`;
+        if (isNight) {
+            DOM.statusPing.classList.replace('bg-sky-400', 'bg-yellow-400');
+            DOM.statusDot.classList.replace('bg-sky-500', 'bg-yellow-500');
+            DOM.btnNextPhaseText.innerHTML = `ไปช่วงกลางวัน`;
+            DOM.statusLabel.classList.remove('text-sky-400'); DOM.statusLabel.classList.add('text-yellow-400');
+        } else {
+            DOM.statusPing.classList.replace('bg-yellow-400', 'bg-sky-400');
+            DOM.statusDot.classList.replace('bg-yellow-500', 'bg-sky-500');
+            DOM.btnNextPhaseText.innerHTML = `เข้าสู่กลางคืน`;
+            DOM.statusLabel.classList.remove('text-yellow-400'); DOM.statusLabel.classList.add('text-sky-400');
+        }
+    }
+
+    function nextTurn() {
+        isNight = !isNight; if (isNight) dayCount++;
+        updateGamePhaseUI(); addLog(`-- เข้าสู่${isNight ? 'กลางคืน' : 'กลางวัน'} ที่ ${dayCount} --`);
+    }
+
+    // --- Log System ---
+    function addLog(message) {
+        const now = new Date();
+        const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        const entry = document.createElement('div');
+        entry.className = 'text-slate-300 py-1.5 border-b border-slate-800/50 last:border-0';
+        entry.innerHTML = `<span class="text-slate-500 mr-1 md:mr-2">[${time}]</span> ${message}`;
+        DOM.log.appendChild(entry); DOM.log.scrollTop = DOM.log.scrollHeight;
+    }
+    function addLogEntry() {
+        const text = DOM.logInput.value.trim();
+        if (text) { addLog(text); DOM.logInput.value = ''; DOM.logInput.blur(); }
+    }
+    function handleLogEnter(e) { if (e.key === 'Enter') addLogEntry(); }
+
+    // --- Timer System ---
+    function formatTime(seconds) {
+        const m = Math.floor(seconds / 60); const s = seconds % 60;
+        return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+    function setTimer(seconds) {
+        timeRemaining = seconds; DOM.timerDisplay.textContent = formatTime(timeRemaining);
+        DOM.timerDisplay.classList.remove('text-rose-500'); pauseTimer();
+    }
+    function startTimer() {
+        if (timerInterval) return;
+        timerInterval = setInterval(() => {
+            if (timeRemaining > 0) {
+                timeRemaining--; DOM.timerDisplay.textContent = formatTime(timeRemaining);
+                if (timeRemaining <= 10) DOM.timerDisplay.classList.add('text-rose-500');
+            } else { pauseTimer(); addLog("⏰ หมดเวลา!"); }
+        }, 1000);
+    }
+    function pauseTimer() { clearInterval(timerInterval); timerInterval = null; }
+    function resetTimer() { pauseTimer(); setTimer(600); }
+
+    // --- Init ---
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimer(600); renderPlayerCards(); updateGamePhaseUI(); addLog("เริ่มเซสชั่นเกม");
+    });
+</script>
+</body>
+</html>
