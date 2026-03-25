@@ -33,17 +33,6 @@
             }
         }
     </script>
-    <script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./service-worker.js')
-                .then(reg => console.log('Service Worker registered!', reg))
-                .catch(err => console.error('Service Worker registration failed:', err));
-        });
-    }
-</script>
-
-หลังจากทำเสร็จครบทั้งหมด (มี manifest.json, service-worker.js, ใส่ลิงก์ใน HTML และมีไอคอน) หน้าเว็บของคุณก็จะกลายเป็นแอป PWA สมบูรณ์แบบที่สามารถกด **"Add to Home Screen"** ได้แล้วครับ!
 
     <style>
         body {
@@ -326,5 +315,16 @@
         document.body.style.overflow = '';
     });
 </script>
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./service-worker.js')
+                .then(reg => console.log('Service Worker registered!', reg))
+                .catch(err => console.error('Service Worker registration failed:', err));
+        });
+    }
+</script>
+
+หลังจากทำเสร็จครบทั้งหมด (มี manifest.json, service-worker.js, ใส่ลิงก์ใน HTML และมีไอคอน) หน้าเว็บของคุณก็จะกลายเป็นแอป PWA สมบูรณ์แบบที่สามารถกด **"Add to Home Screen"** ได้แล้วครับ!
 </body>
 </html>
