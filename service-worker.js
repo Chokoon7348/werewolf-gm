@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wolf-book-v2';
+const CACHE_NAME = 'wolf-book-v4';
 
 // รายชื่อไฟล์ทั้งหมดที่ต้องการให้บันทึกไว้ใช้งานตอนออฟไลน์
 const ASSETS_TO_CACHE = [
@@ -8,7 +8,9 @@ const ASSETS_TO_CACHE = [
   './roles.html',
   './how-to-play.html',
   './manifest.json',
-  './hero-logo.png'
+  './hero-logo.png',
+  './icon-192.png',
+  './icon-512.png',
   // หากคุณมีไฟล์รูปไอคอน (icon-192.png, icon-512.png) ให้เพิ่มชื่อไฟล์ลงในบรรทัดถัดไปด้วยครับ
 ];
 
