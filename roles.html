@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Werewolf Roles Reference</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans Thai', 'sans-serif'],
+                        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', "Liberation Mono", "Courier New", 'monospace'],
+                    },
+                    colors: {
+                        slate: {
+                            850: '#151e2e',
+                            950: '#0b0f19',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0b0f19; /* slate-950 */
+            color: #e2e8f0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569; 
+            border-radius: 4px;
+        }
+
+        /* Card Borders & Hover */
+        .role-card {
+            transition: all 0.2s ease-in-out;
+            border-top-width: 4px;
+        }
+        @media (min-width: 768px) {
+            .role-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.4);
+            }
+        }
+
+        /* Role Group Colors */
+        .wolf-card { border-top-color: #ef4444; } /* Red */
+        .villager-card { border-top-color: #3b82f6; } /* Blue */
+        .special-card { border-top-color: #a855f7; } /* Purple */
+        .gm-card { border-top-color: #64748b; } /* Slate */
+
+        /* Mobile Menu Setup */
+        #mobile-menu {
+            transition: transform 0.3s ease-in-out;
+            transform: translateY(-100%);
+        }
+        #mobile-menu.open {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen pt-16 md:pt-20">
+
+    <!-- Navigation Bar -->
+    <nav class="fixed top-0 w-full z-40 bg-slate-950/80 backdrop-blur-lg border-b border-slate-800/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16 md:h-20">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center gap-2 md:gap-3 group">
+                    <div class="bg-indigo-500/10 p-2 rounded-xl border border-indigo-500/20 group-hover:bg-indigo-500/20 transition-colors">
+                        <i class="ph-fill ph-book-open text-2xl md:text-3xl text-indigo-400"></i>
+                    </div>
+                    <span class="font-bold text-lg md:text-xl tracking-tight text-white group-hover:text-indigo-300 transition-colors">Wolf Book</span>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="text-slate-300 font-medium hover:text-indigo-400 transition-colors">Home</a>
+                    <span class="text-indigo-400 font-bold border-b-2 border-indigo-400 pb-1">Roles</span>
+                    <a href="how-to-play.html" class="text-slate-300 font-medium hover:text-indigo-400 transition-colors">How to play</a>
+                    <a href="dashboard.html" class="text-slate-300 font-medium hover:text-indigo-400 transition-colors">Dashboard</a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-slate-300 hover:text-white p-2">
+                        <i class="ph ph-list text-3xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-xl pt-24 px-6 flex flex-col gap-6 md:hidden">
+        <a href="index.html" class="text-2xl font-bold text-slate-300 hover:text-white border-b border-slate-800 pb-4">Home</a>
+        <a href="#" class="text-2xl font-bold text-indigo-400 border-b border-slate-800 pb-4">Roles (กำลังใช้งาน)</a>
+        <a href="how-to-play.html" class="text-2xl font-bold text-slate-300 hover:text-white border-b border-slate-800 pb-4">How to play</a>
+        <a href="dashboard.html" class="text-2xl font-bold text-slate-300 hover:text-white border-b border-slate-800 pb-4">Dashboard</a>
+        
+        <button id="close-mobile-menu" class="absolute top-6 right-6 text-slate-400 hover:text-white p-2">
+            <i class="ph ph-x text-3xl"></i>
+        </button>
+    </div>
+
+    <!-- Roles Page Container -->
+    <div class="max-w-7xl mx-auto space-y-4 md:space-y-6 relative p-2 sm:p-4 md:p-8">
+        
+        <!-- Header Section -->
+        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-900/95 backdrop-blur-md p-4 md:p-6 rounded-xl border border-slate-700/50 shadow-xl shadow-black/20 gap-3 md:gap-4 mt-2">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-500/20 p-2 md:p-3 rounded-lg text-indigo-400">
+                    <i class="ph-fill ph-book-bookmark text-2xl md:text-3xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg md:text-2xl font-bold text-white leading-tight">คู่มือบทบาท (Roles)</h1>
+                    <p class="text-slate-400 text-xs md:text-sm mt-0.5">ข้อมูลความสามารถและเงื่อนไขการชนะของแต่ละตัวละคร</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main id="roles-list" class="space-y-8 md:space-y-10 pb-10">
+            <!-- Role categories and cards will be populated by JavaScript -->
+        </main>
+    </div>
+
+<script>
+    // --- Mobile Navbar Toggle ---
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const closeMenuBtn = document.getElementById('close-mobile-menu');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    menuBtn.addEventListener('click', () => {
+        mobileMenu.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    });
+
+    closeMenuBtn.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        document.body.style.overflow = '';
+    });
+
+    const rolesListContainer = document.getElementById('roles-list');
+
+    // --- Role Definitions ---
+    const wolfRoles = [
+        "🐺 มนุษย์หมาป่า", "🐶 ลูกมนุษย์หมาป่า", "👤 หมาป่ามนุษย์", 
+        "🔥🐺 หมาป่าโลกันต์", "😈 สมุนรับใช้", "🌑 แม่หมอมนต์ดำ"
+    ];
+    const villagerRoles = [
+        "🧑‍🌾 ชาวบ้าน", "🔮 เทพพยากรณ์", "👁️ ญาณทิพย์", "🔥 ผู้เผยตัวตน", 
+        "🙏 นักบวช", "🕵️ นักสืบลึกลับ", "👵 แม่เฒ่า", "🌗 ลูกครึ่งมนุษย์หมาป่า", 
+        "😜 ตัวป่วน", "🤦 ไอทึม", "🛡️ บอดี้การ์ด", "🧪 แม่มด", "✨ จอมเวท", 
+        "💪 หนุ่มถึก", "👑 เจ้าชาย", "🕊️ ผู้รักสันติ", "🤢 ผู้ป่วยติดเชื้อ", 
+        "😴 คนอดนอน", "🧿 ตาทิพย์", "🎓 ลูกศิษย์ของเทพพยากรณ์", "💘 กามเทพ", 
+        "🏹 นายพรานหญิง", "🎯 นายพรานธรรมดา", "🤝 พาราดอนแห่งเมสัน"
+    ];
+    const specialRoles = [
+        "👺 ยาจก", "🐺🩶 หมาป่าเดียวดาย", "👊 อันธพาล", "🐐 ชูปาคาบา", 
+        "🛐 เจ้าลัทธิ", "👻 ผู้ต้องคำสาป", "🎭 ผู้จำแลง", "🍺 คนเมา"
+    ];
+    const gmRole = ["🎲 ผู้ดำเนินเกม"];
+    
+    // --- Role Data (Descriptions and Sides) ---
+    const rolesData = {
+        // Villager Roles
+        "🧑‍🌾 ชาวบ้าน": { group: "villager", desc: "บทบาทพื้นฐาน ไม่มีพลังพิเศษ", side: "Village Side" },
+        "🔮 เทพพยากรณ์": { group: "villager", desc: "สามารถตรวจสอบได้ว่าผู้เล่นที่เลือกเป็นมนุษย์หมาป่าหรือไม่", side: "Village Side" },
+        "👁️ ญาณทิพย์": { group: "villager", desc: "สามารถเช็คได้ว่าผู้เล่นที่เลือกเป็นตัวละครพิเศษอื่น ๆ ที่ไม่ใช่มนุษย์หมาป่าหรือชาวบ้านธรรมดาหรือไม่", side: "Village Side" },
+        "🔥 ผู้เผยตัวตน": { group: "villager", desc: "ชี้ 1 คน เปิดการ์ด ถ้าเป็น Werewolf ฝั่งนั้นตาย แต่ถ้าไม่ใช่ ตัวเองตายแทน", side: "Village Side" },
+        "🙏 นักบวช": { group: "villager", desc: "สามารถให้พร 1 คน ถ้าคนนั้นถูกโหวตกำจัดครั้งแรก จะรอดจากการโหวตนั้น (ได้ต่อชีวิต 1 ครั้ง)", side: "Village Side" },
+        "🕵️ นักสืบลึกลับ": { group: "villager", desc: "เลือกเช็ค 1 คน เพื่อดูว่าคนนั้น หรือคนซ้าย-ขวา มีใครคนใดคนหนึ่งเป็นหมาป่าหรือไม่ (เช็ค 3 คน)", side: "Village Side" },
+        "👵 แม่เฒ่า": { group: "villager", desc: "สามารถเลือกผู้เล่น 1 คนให้ออกจากหมู่บ้านในวันรุ่งขึ้น", side: "Village Side" },
+        "🌗 ลูกครึ่งมนุษย์หมาป่า": { group: "villager", desc: "เป็นทีมชาวบ้าน แต่ถ้าเทพพยากรณ์เช็คจะเห็นว่าเป็นมนุษย์หมาป่า", side: "Village Side" },
+        "😜 ตัวป่วน": { group: "villager", desc: "ให้สัญญาณ Moderator เพื่อให้รอบถัดไปโหวตกำจัดได้ 2 คน", side: "Village Side" },
+        "🤦 ไอทึม": { group: "villager", desc: "โหวตฆ่าอย่างเดียวเสมอ (ตรงข้ามกับผู้รักสันติ)", side: "Village Side" },
+        "🛡️ บอดี้การ์ด": { group: "villager", desc: "ปกป้องผู้เล่น 1 คน จากการถูกหมาป่าฆ่าในคืนนั้น (ห้ามซ้ำ, ห้ามปกป้องตัวเอง)", side: "Village Side" },
+        "🧪 แม่มด": { group: "villager", desc: "มียาชุบชีวิต และยาพิษ อย่างละ 1 ขวด ใช้ได้แค่อย่างละครั้งเดียวตลอดเกม", side: "Village Side" },
+        "✨ จอมเวท": { group: "villager", desc: "ในตอนกลางคืน เลือกปิดปาก 1 คน คนนั้นวันต่อมาจะห้ามพูด", side: "Village Side" },
+        "💪 หนุ่มถึก": { group: "villager", desc: "เมื่อโดนหมาป่ากัด จะไม่ตายในวันรุ่งขึ้น แต่จะไปตายในวันถัดไปแทน (ทนได้ 1 วัน)", side: "Village Side" },
+        "👑 เจ้าชาย": { group: "villager", desc: "ถ้าถูกโหวตประหารครั้งแรก เมื่อเปิดตัวแล้วจะไม่โดนกำจัดจากการโหวตนั้น", side: "Village Side" },
+        "🕊️ ผู้รักสันติ": { group: "villager", desc: "โหวตไม่ฆ่าอย่างเดียวเสมอ (ตรงข้ามกับไอทึม)", side: "Village Side" },
+        "🤢 ผู้ป่วยติดเชื้อ": { group: "villager", desc: "ถ้าหมาป่ากิน จะทำให้หมาป่าท้องเสีย และคืนถัดไปหมาป่าจะฆ่าใครไม่ได้", side: "Village Side" },
+        "😴 คนอดนอน": { group: "villager", desc: "สามารถเช็คได้ว่าคนซ้ายขวาของตัวเอง มีใครตื่นมาใช้ความสามารถพิเศษตอนกลางคืนหรือไม่", side: "Village Side" },
+        "🧿 ตาทิพย์": { group: "villager", desc: "ในคืนแรก จะรู้เลยว่าใครคือเทพพยากรณ์", side: "Village Side" },
+        "🎓 ลูกศิษย์ของเทพพยากรณ์": { group: "villager", desc: "ถ้าเทพพยากรณ์ถูกกำจัดออกไป จะขึ้นมาทำหน้าที่เป็นเทพพยากรณ์แทน", side: "Village Side" },
+        "💘 กามเทพ": { group: "villager", desc: "ยิงศรใส่ผู้เล่น 2 คนให้เป็นคู่รัก ถ้าคนใดคนหนึ่งตาย อีกคนจะตรอมใจตายตามไปด้วย", side: "Village Side" },
+        "🏹 นายพรานหญิง": { group: "villager", desc: "ในช่วงกลางคืน กำจัดผู้เล่นได้เลย 1 คน (ใช้ได้ 1 ครั้งต่อเกม)", side: "Village Side" },
+        "🎯 นายพรานธรรมดา": { group: "villager", desc: "ถ้าโดนหมาป่ากัด เช้าวันถัดมาจะยิงปืนลากใครก็ได้ไปตายด้วย 1 คน", side: "Village Side" },
+        "🤝 พาราดอนแห่งเมสัน": { group: "villager", desc: "เป็นแฝดกัน (เมสัน 2-3 คน) ในคืนแรกจะได้ลืมตามามองหน้าและไว้ใจกันได้", side: "Village Side" },
+        
+        // Wolf Roles
+        "🐺 มนุษย์หมาป่า": { group: "wolf", desc: "บทบาทพื้นฐาน ตื่นพร้อมกันและเลือกเหยื่อ 1 คนเพื่อกำจัดในแต่ละคืน", side: "Werewolf Side" },
+        "🐶 ลูกมนุษย์หมาป่า": { group: "wolf", desc: "ถ้าลูกหมาป่าตาย คืนถัดมามนุษย์หมาป่าที่เหลือจะคลั่งและฆ่าผู้เล่นได้ 2 คน", side: "Werewolf Side" },
+        "👤 หมาป่ามนุษย์": { group: "wolf", desc: "อยู่ทีมหมาป่า แต่ถ้าเทพพยากรณ์เช็ค จะมองเห็นว่าเป็นมนุษย์ธรรมดา", side: "Werewolf Side" },
+        "🔥🐺 หมาป่าโลกันต์": { group: "wolf", desc: "ต้องผูกชะตากับผู้เล่น 1 คน ถ้าคนนั้นถูกกำจัดออก หมาป่าโลกันต์จะตายตามไปด้วย", side: "Werewolf Side" },
+        "😈 สมุนรับใช้": { group: "wolf", desc: "มีหน้าที่ช่วยหมาป่า (แต่หมาป่าไม่รู้ว่าเป็นใคร) ชนะก็ต่อเมื่อหมาป่าชนะ", side: "Werewolf Side" },
+        "🌑 แม่หมอมนต์ดำ": { group: "wolf", desc: "สามารถตามหาได้ว่าใครคือเทพพยากรณ์ในเวลากลางคืน", side: "Werewolf Side" },
+        
+        // Special Roles
+        "👺 ยาจก": { group: "special", desc: "ชนะก็ต่อเมื่อ ตัวเองถูกกำจัด (ไม่ว่าจะโดนหมาป่ากิน หรือโดนชาวบ้านโหวตออก)", side: "Neutral / Tanner" },
+        "🐺🩶 หมาป่าเดียวดาย": { group: "special", desc: "ชนะก็ต่อเมื่อ เป็นหมาป่าเพียงแค่ตัวเดียวที่เหลือรอดอยู่", side: "Neutral / Lone Wolf" },
+        "👊 อันธพาล": { group: "special", desc: "เลือกผู้เล่นเท่าจำนวนหมาป่า ถ้าคนเหล่านั้นออกจากเกม อันธพาลจะเป็นฝ่ายชนะ", side: "Neutral / Bruiser" },
+        "🐐 ชูปาคาบา": { group: "special", desc: "ช่วงแรกจะฆ่าหมาป่าก่อน ถ้าหมาป่าหมดจะไล่ฆ่าคน และต้องเหลือรอดเป็นคนสุดท้ายถึงจะชนะ", side: "Neutral / Chupa." },
+        "🛐 เจ้าลัทธิ": { group: "special", desc: "ชนะก็ต่อเมื่อทุกคนที่เหลืออยู่เข้ากับลัทธิของเขา (ชักชวน/เปลี่ยนฝ่ายในเวลากลางคืน)", side: "Neutral / Cult" },
+        "👻 ผู้ต้องคำสาป": { group: "special", desc: "เริ่มเป็นชาวบ้าน แต่ถ้าโดนหมาป่ากัด จะกลายเป็นหมาป่าทันทีแทนที่จะตาย", side: "Mixed / Cursed" },
+        "🎭 ผู้จำแลง": { group: "special", desc: "เลือกผู้เล่น 1 คนไว้ในคืนแรก ถ้าคนนั้นตาย จะรับสืบทอดบทบาทของคนนั้น", side: "Mixed / Doppel." },
+        "🍺 คนเมา": { group: "special", desc: "ตอนเริ่มได้การ์ดคนเมา แต่บทบาทจริงคือการ์ดที่คว่ำไว้ตรงกลาง (จะรู้บทบาทจริงหลังผ่านไป 3 รอบ)", side: "Mixed / Drunk" },
+        
+        // GM Role
+        "🎲 ผู้ดำเนินเกม": { group: "gm", desc: "คอยควบคุมเกม ประกาศผล และดำเนินการเรียกบทบาทต่าง ๆ ในช่วงเวลากลางคืน", side: "GM / Control" },
+    };
+
+    /**
+     * Dynamically generates and populates the roles page with categories and role cards.
+     */
+    function populateRolesPage() {
+        const categories = [
+            { 
+                title: "ฝ่ายมนุษย์หมาป่า", 
+                subtitle: "The Werewolf Team", 
+                icon: "ph-moon-stars", 
+                roles: wolfRoles, 
+                cardClass: 'wolf-card',
+                headerText: 'text-rose-400',
+                headerBorder: 'border-rose-500/20'
+            },
+            { 
+                title: "ฝ่ายชาวบ้าน", 
+                subtitle: "The Village Team", 
+                icon: "ph-house", 
+                roles: villagerRoles, 
+                cardClass: 'villager-card',
+                headerText: 'text-blue-400',
+                headerBorder: 'border-blue-500/20'
+            },
+            { 
+                title: "ฝ่ายอิสระและพิเศษ", 
+                subtitle: "Neutral & Special Teams", 
+                icon: "ph-sparkle", 
+                roles: specialRoles, 
+                cardClass: 'special-card',
+                headerText: 'text-purple-400',
+                headerBorder: 'border-purple-500/20'
+            },
+            { 
+                title: "ผู้ดำเนินเกม", 
+                subtitle: "Game Moderator", 
+                icon: "ph-gavel", 
+                roles: gmRole, 
+                cardClass: 'gm-card',
+                headerText: 'text-slate-400',
+                headerBorder: 'border-slate-500/20'
+            },
+        ];
+        
+        rolesListContainer.innerHTML = '';
+        
+        categories.forEach(category => {
+            // Category Header
+            const headerWrapper = document.createElement('div');
+            headerWrapper.className = `flex items-center gap-3 mb-4 mt-8 pb-3 border-b ${category.headerBorder}`;
+            
+            headerWrapper.innerHTML = `
+                <div class="bg-slate-800 p-2 rounded-lg ${category.headerText}">
+                    <i class="ph-fill ${category.icon} text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl md:text-2xl font-bold text-white">${category.title}</h2>
+                    <p class="text-sm text-slate-400">${category.subtitle}</p>
+                </div>
+            `;
+            rolesListContainer.appendChild(headerWrapper);
+
+            // Cards Grid
+            const roleCardsGrid = document.createElement('div');
+            roleCardsGrid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4';
+            
+            category.roles.forEach(roleName => {
+                const roleData = rolesData[roleName] || { group: 'gm', desc: '-', side: '-' };
+                
+                // Extract emoji and name
+                const firstSpaceIndex = roleName.indexOf(' ');
+                const emoji = roleName.substring(0, firstSpaceIndex);
+                const name = roleName.substring(firstSpaceIndex + 1);
+                
+                // Define badge styles based on group
+                let badgeColor = 'bg-slate-500/10 text-slate-400 border-slate-500/20';
+                if (roleData.group === 'wolf') badgeColor = 'bg-rose-500/10 text-rose-400 border-rose-500/20';
+                if (roleData.group === 'villager') badgeColor = 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+                if (roleData.group === 'special') badgeColor = 'bg-purple-500/10 text-purple-400 border-purple-500/20';
+
+                const roleCard = document.createElement('div');
+                roleCard.className = `role-card bg-slate-800 rounded-xl p-4 border border-slate-700 h-full flex flex-col ${category.cardClass}`;
+                
+                roleCard.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="text-3xl bg-slate-900/50 p-2 rounded-lg border border-slate-700/50 shadow-inner flex items-center justify-center w-14 h-14">
+                            ${emoji}
+                        </div>
+                        <span class="text-[10px] md:text-xs font-semibold px-2 py-1 rounded-md border ${badgeColor}">
+                            ${roleData.side}
+                        </span>
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-bold text-lg md:text-xl text-white mb-1">${name}</h3>
+                        <p class="text-xs md:text-sm text-slate-400 leading-relaxed">${roleData.desc}</p>
+                    </div>
+                `;
+                roleCardsGrid.appendChild(roleCard);
+            });
+
+            rolesListContainer.appendChild(roleCardsGrid);
+        });
+    }
+
+    // --- Initial Setup ---
+    document.addEventListener('DOMContentLoaded', () => {
+        populateRolesPage();
+    });
+</script>
+</body>
+</html>
