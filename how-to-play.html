@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Werewolf - วิธีการเล่น (How to Play)</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans Thai', 'sans-serif'],
+                        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', "Liberation Mono", "Courier New", 'monospace'],
+                    },
+                    colors: {
+                        slate: {
+                            850: '#151e2e',
+                            950: '#0b0f19',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0b0f19; /* slate-950 */
+            color: #e2e8f0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569; 
+            border-radius: 4px;
+        }
+
+        /* Number Circle */
+        .step-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* Night Order List */
+        .night-order-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .night-order-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #6366f1; /* Indigo */
+            font-weight: bold;
+        }
+
+        /* Info Box */
+        .info-box {
+            background-color: rgba(59, 130, 246, 0.1); /* Blue tint */
+            border-left: 4px solid #3b82f6;
+        }
+
+        /* Mobile Menu Setup */
+        #mobile-menu {
+            transition: transform 0.3s ease-in-out;
+            transform: translateY(-100%);
+        }
+        #mobile-menu.open {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen pt-16 md:pt-20">
+
+    <!-- Navigation Bar -->
+    <nav class="fixed top-0 w-full z-40 bg-slate-950/80 backdrop-blur-lg border-b border-slate-800/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16 md:h-20">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center gap-2 md:gap-3 group">
+                    <div class="bg-indigo-500/10 p-2 rounded-xl border border-indigo-500/20 group-hover:bg-indigo-500/20 transition-colors">
+                        <i class="ph-fill ph-book-open text-2xl md:text-3xl text-indigo-400"></i>
+                    </div>
+                    <span class="font-bold text-lg md:text-xl tracking-tight text-white group-hover:text-indigo-300 transition-colors">Wolf Book</span>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="text-slate-300 font-medium hover:text-indigo-400 transition-colors">Home</a>
+                    <a href="roles.html" class="text-slate-300 font-medium hover:text-indigo-400 transition-colors">Roles</a>
+                    <span class="text-indigo-400 font-bold border-b-2 border-indigo-400 pb-1">How to play</span>
+                    <a href="dashboard.html" class="text-slate-300 font-medium hover:text-indigo-400 transition-colors">Dashboard</a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-slate-300 hover:text-white p-2">
+                        <i class="ph ph-list text-3xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-xl pt-24 px-6 flex flex-col gap-6 md:hidden">
+        <a href="index.html" class="text-2xl font-bold text-slate-300 hover:text-white border-b border-slate-800 pb-4">Home</a>
+        <a href="roles.html" class="text-2xl font-bold text-slate-300 hover:text-white border-b border-slate-800 pb-4">Roles</a>
+        <a href="#" class="text-2xl font-bold text-indigo-400 border-b border-slate-800 pb-4">How to play (กำลังใช้งาน)</a>
+        <a href="dashboard.html" class="text-2xl font-bold text-slate-300 hover:text-white border-b border-slate-800 pb-4">Dashboard</a>
+        
+        <button id="close-mobile-menu" class="absolute top-6 right-6 text-slate-400 hover:text-white p-2">
+            <i class="ph ph-x text-3xl"></i>
+        </button>
+    </div>
+
+    <!-- Container -->
+    <div class="max-w-4xl mx-auto space-y-4 md:space-y-6 relative p-2 sm:p-4 md:p-8">
+        
+        <!-- Header Section -->
+        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-900/95 backdrop-blur-md p-4 md:p-6 rounded-xl border border-slate-700/50 shadow-xl shadow-black/20 gap-3 md:gap-4 mt-2">
+            <div class="flex items-center gap-3">
+                <div class="bg-emerald-500/20 p-2 md:p-3 rounded-lg text-emerald-400">
+                    <i class="ph-fill ph-question text-2xl md:text-3xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg md:text-2xl font-bold text-white leading-tight">วิธีการเล่น (How to Play)</h1>
+                    <p class="text-slate-400 text-xs md:text-sm mt-0.5">กติกา ลำดับการเรียก และการใช้ระบบจัดการ</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="space-y-6 md:space-y-8 pb-10">
+
+            <!-- Section 1: กติกาพื้นฐาน -->
+            <section class="bg-slate-900 rounded-xl p-5 md:p-8 border border-slate-800 shadow-md">
+                <h2 class="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-2 border-b border-slate-800 pb-3">
+                    <i class="ph-fill ph-book-open text-indigo-400"></i> กติกาพื้นฐาน
+                </h2>
+                
+                <p class="text-slate-300 text-sm md:text-base leading-relaxed mb-6">
+                    เกม <strong>Werewolf</strong> เป็นเกมบลัฟและจับโกหก ผู้เล่นจะถูกสุ่มแบ่งเป็น 2 ฝ่ายหลักคือ <span class="text-blue-400 font-semibold">ฝ่ายชาวบ้าน (Village)</span> และ <span class="text-rose-400 font-semibold">ฝ่ายหมาป่า (Werewolf)</span> (อาจมีฝ่ายอิสระเพิ่มเข้ามา) ผู้เล่นทุกคนจะไม่รู้บทบาทของคนอื่นยกเว้นฝ่ายหมาป่าที่จะรู้จักกันเอง
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700/50">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="ph-fill ph-house text-blue-400 text-xl"></i>
+                            <h3 class="font-bold text-blue-400">เงื่อนไขชนะ: ฝ่ายชาวบ้าน</h3>
+                        </div>
+                        <p class="text-slate-400 text-sm">หาตัวมนุษย์หมาป่าให้เจอ และโหวตกำจัดมนุษย์หมาป่าออกจากหมู่บ้านให้หมด</p>
+                    </div>
+                    
+                    <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700/50">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="ph-fill ph-moon-stars text-rose-400 text-xl"></i>
+                            <h3 class="font-bold text-rose-400">เงื่อนไขชนะ: ฝ่ายหมาป่า</h3>
+                        </div>
+                        <p class="text-slate-400 text-sm">หลอกลวงชาวบ้าน และกำจัดชาวบ้านในตอนกลางคืนจนจำนวนหมาป่าเท่ากับหรือมากกว่าจำนวนชาวบ้านที่เหลืออยู่</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: ลำดับการเล่น (Phases) -->
+            <section class="bg-slate-900 rounded-xl p-5 md:p-8 border border-slate-800 shadow-md">
+                <h2 class="text-xl md:text-2xl font-bold text-white mb-6 flex items-center gap-2 border-b border-slate-800 pb-3">
+                    <i class="ph-fill ph-clock-counter-clockwise text-amber-400"></i> ลำดับการเล่นใน 1 รอบ (Phases)
+                </h2>
+
+                <div class="space-y-6">
+                    <!-- Phase: Night -->
+                    <div class="flex gap-4 items-start">
+                        <div class="step-number bg-indigo-900 text-indigo-300 text-lg border border-indigo-700">1</div>
+                        <div>
+                            <h3 class="text-lg font-bold text-white mb-1">ช่วงกลางคืน (Night Phase)</h3>
+                            <p class="text-slate-400 text-sm md:text-base mb-3">
+                                ผู้ดำเนินเกม (GM) จะสั่งให้ <strong>"ทุกคนหลับตา"</strong> จากนั้น GM จะเรียกตัวละครที่มีพลังพิเศษ (รวมถึงหมาป่า) ให้ลืมตาขึ้นมาทีละบทบาท เพื่อใช้ความสามารถตามลำดับอย่างเงียบๆ (ดูหัวข้อลำดับการเรียกด้านล่าง)
+                            </p>
+                            <div class="info-box p-3 md:p-4 rounded-lg text-sm text-blue-200">
+                                <i class="ph-fill ph-info mr-1"></i> <strong>สำหรับ GM:</strong> ให้ใช้ระบบจัดการเพื่อเปลี่ยนสถานะของผู้เล่นที่ถูกกระทำในคืนนี้ เช่น กดเปลี่ยนสถานะเป็น "ตาย" (โดนหมาป่ากัด), "ปกป้อง" (บอดี้การ์ดกันไว้) หรือ "คู่รัก"
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase: Day -->
+                    <div class="flex gap-4 items-start">
+                        <div class="step-number bg-amber-900 text-amber-300 text-lg border border-amber-700">2</div>
+                        <div>
+                            <h3 class="text-lg font-bold text-white mb-1">ช่วงกลางวัน (Day Phase)</h3>
+                            <p class="text-slate-400 text-sm md:text-base">
+                                GM สั่งให้ <strong>"ทุกคนลืมตา"</strong> และประกาศว่าใครคือผู้เสียชีวิตในคืนที่ผ่านมา (คนตายห้ามพูดและต้องออกจากวง) จากนั้นให้เวลาผู้เล่นที่รอดชีวิตปรึกษาหารือกันเพื่อหาตัวหมาป่า (ใช้ปุ่ม "จับเวลา" ในระบบจัดการ)
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Phase: Vote -->
+                    <div class="flex gap-4 items-start">
+                        <div class="step-number bg-rose-900 text-rose-300 text-lg border border-rose-700">3</div>
+                        <div>
+                            <h3 class="text-lg font-bold text-white mb-1">ช่วงโหวต (Voting Phase)</h3>
+                            <p class="text-slate-400 text-sm md:text-base">
+                                เมื่อหมดเวลาปรึกษา ผู้เล่นจะทำการโหวตชี้ตัวผู้ต้องสงสัย (สามารถโหวตข้าม/ไม่โหวตใครได้) ผู้ที่ได้รับเสียงโหวตมากที่สุดจะถูก "ประหาร" และต้องออกจากเกมไป จากนั้นเกมจะวนกลับเข้าสู่ช่วงกลางคืนอีกครั้ง
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: ลำดับการเรียกตอนกลางคืน (Night Order) -->
+            <section class="bg-slate-900 rounded-xl p-5 md:p-8 border border-slate-800 shadow-md">
+                <h2 class="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-2 border-b border-slate-800 pb-3">
+                    <i class="ph-fill ph-list-numbers text-emerald-400"></i> ลำดับการเรียกตอนกลางคืน (Night Order)
+                </h2>
+                <p class="text-slate-400 text-sm mb-4">
+                    GM ควรอ่านสคริปต์เรียกบทบาทตามลำดับนี้ <em>(หากในเกมรอบนั้นไม่มีบทบาทใด ให้แกล้งเรียกชื่อบทบาทนั้นและเว้นจังหวะไว้เสมอ เพื่อไม่ให้ผู้เล่นรู้ว่ามีหรือไม่มีตัวละครนั้นอยู่)</em>
+                </p>
+
+                <div class="bg-slate-950 p-4 md:p-6 rounded-lg border border-slate-800">
+                    
+                    <h3 class="text-rose-400 font-bold mb-2 border-b border-rose-900/50 pb-1">เฉพาะคืนแรก (First Night Only)</h3>
+                    <ul class="night-order-list text-slate-300 text-sm md:text-base mb-6">
+                        <li><strong>กามเทพ (Cupid):</strong> ลืมตา ชี้เลือกคน 2 คนให้เป็นคู่รักกัน หลับตา (จากนั้น GM สะกิดให้คู่รักลืมตามามองหน้ากัน แล้วหลับตา)</li>
+                        <li><strong>ตาทิพย์:</strong> ลืมตา (GM ชี้ให้ดูว่าใครคือเทพพยากรณ์) หลับตา</li>
+                        <li><strong>ผู้จำแลง (Doppelgänger):</strong> ลืมตา เลือกจำแลงร่างใคร 1 คน หลับตา</li>
+                        <li><strong>พาราดอนแห่งเมสัน:</strong> ลืมตา มองหน้ากันว่าใครเป็นฝาแฝด หลับตา</li>
+                    </ul>
+
+                    <h3 class="text-indigo-400 font-bold mb-2 border-b border-indigo-900/50 pb-1">เรียกทุกคืน (Every Night)</h3>
+                    <ul class="night-order-list text-slate-300 text-sm md:text-base">
+                        <li><strong>บอดี้การ์ด (Bodyguard):</strong> ลืมตา ชี้ 1 คนเพื่อปกป้องในคืนนี้ (ห้ามซ้ำคนเดิม ห้ามป้องกันตัวเอง) หลับตา</li>
+                        <li><strong>มนุษย์หมาป่า (Werewolves) / ลูกหมาป่า / หมาป่าโลกันต์ / แม่หมอมนต์ดำ:</strong> ฝั่งหมาป่าลืมตาขึ้นมาพร้อมกัน ปรึกษากันเงียบๆ และชี้เป้า 1 คนเพื่อฆ่า หลับตา</li>
+                        <li><strong>แม่หมอมนต์ดำ (เช็คต่างหาก):</strong> (ถ้าหมาป่าหลับตาแล้ว) ลืมตา ชี้ 1 คนถามว่าเป็นเทพพยากรณ์ไหม (GM พยักหน้า/ส่ายหน้า) หลับตา</li>
+                        <li><strong>เทพพยากรณ์ (Seer):</strong> ลืมตา ชี้ 1 คน (GM สัญลักษณ์ว่าใช่หมาป่าหรือไม่) หลับตา</li>
+                        <li><strong>ญาณทิพย์:</strong> ลืมตา ชี้ 1 คน (GM สัญลักษณ์ว่าเป็นบทพิเศษที่ไม่ใช่หมาป่าหรือชาวบ้านธรรมดาหรือไม่) หลับตา</li>
+                        <li><strong>แม่มด (Witch):</strong> ลืมตา (GM ชี้บอกว่าคืนนี้ใครโดนหมาป่ากัด) ถามว่าจะใช้ยาชุบชีวิตไหม? / จะใช้ยาพิษฆ่าใครเพิ่มไหม? หลับตา</li>
+                        <li><strong>นักสืบลึกลับ:</strong> ลืมตา ชี้ 1 คน (GM สัญลักษณ์ว่า 3 คนตรงนั้นมีหมาป่าแฝงอยู่ไหม) หลับตา</li>
+                        <li><strong>จอมเวท:</strong> ลืมตา ชี้ 1 คนเพื่อสั่งปิดปากในวันพรุ่งนี้ หลับตา</li>
+                        <li><strong>คนอดนอน:</strong> ลืมตา (GM สัญลักษณ์ว่าคนซ้าย-ขวามีใครแอบตื่นขึ้นมาใช้พลังไหม) หลับตา</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 4: วิธีใช้ GM Dashboard -->
+            <section class="bg-slate-900 rounded-xl p-5 md:p-8 border border-slate-800 shadow-md">
+                <h2 class="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-2 border-b border-slate-800 pb-3">
+                    <i class="ph-fill ph-desktop text-purple-400"></i> การใช้งาน GM Dashboard
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700/50">
+                        <div class="text-purple-400 font-bold mb-2"><i class="ph-fill ph-users-three mr-1"></i> เตรียมการเล่น</div>
+                        <p class="text-slate-300 text-sm">เพิ่มชื่อผู้เล่นทุกคน และตั้งค่าบทบาท (Role) ของผู้เล่นแต่ละคน โดยให้สถานะทุกคนเป็น "✅ รอดชีวิต"</p>
+                    </div>
+
+                    <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700/50">
+                        <div class="text-blue-400 font-bold mb-2"><i class="ph-fill ph-moon-stars mr-1"></i> ตอนกลางคืน</div>
+                        <p class="text-slate-300 text-sm">เมื่อมีการกระทำเกิดขึ้น ให้ GM ปรับสถานะทันที เช่น หากบอดี้การ์ดชี้ใคร ให้ปรับคนนั้นเป็น "🛡️ ปกป้อง" หากหมาป่ากัด ให้ปรับเป็น "💀 ตาย" (ถ้าคนตายมีคนปกป้อง ให้เปลี่ยนกลับเป็นรอด)</p>
+                    </div>
+
+                    <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700/50">
+                        <div class="text-amber-400 font-bold mb-2"><i class="ph-fill ph-sun mr-1"></i> ตอนกลางวัน</div>
+                        <p class="text-slate-300 text-sm">กดปุ่ม <strong>"เปลี่ยนช่วงเวลา"</strong> เพื่อขึ้นวันใหม่ และเริ่มใช้ปุ่มจับเวลา (1, 3, 10 นาที) เพื่อจับเวลาสนทนาของผู้เล่น</p>
+                    </div>
+
+                    <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700/50">
+                        <div class="text-emerald-400 font-bold mb-2"><i class="ph-fill ph-terminal-window mr-1"></i> บันทึกเหตุการณ์ (Logs)</div>
+                        <p class="text-slate-300 text-sm">ทุกการเปลี่ยนสถานะจะถูกบันทึกอัตโนมัติ แต่ GM สามารถพิมพ์โน้ตส่วนตัวลงในช่องพิมพ์บันทึกได้ เช่น "กามเทพจับคู่ A กับ B"</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+<script>
+    // --- Mobile Navbar Toggle ---
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const closeMenuBtn = document.getElementById('close-mobile-menu');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    menuBtn.addEventListener('click', () => {
+        mobileMenu.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    });
+
+    closeMenuBtn.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        document.body.style.overflow = '';
+    });
+</script>
+</body>
+</html>
