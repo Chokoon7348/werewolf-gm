@@ -111,11 +111,25 @@
                     <a href="how-to-play.html" class="text-slate-300 font-medium hover:text-indigo-400 transition-colors">How to play</a>
                     <a href="dashboard.html" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-lg shadow-indigo-900/20">
                         GM Dashboard
+                    <!-- ปุ่มติดตั้งบน Navbar Desktop -->
+                    <button class="install-app-btn bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ml-2">
+                        <i class="ph-bold ph-download-simple text-lg"></i> Install App
+                    </button>
                     </a>
                 </div>
 
                 <!-- Mobile Menu Button -->
                 <div class="md:hidden flex items-center">
+                <!-- Mobile Menu Button & Install Icon -->
+                <div class="md:hidden flex items-center gap-1">
+                    <!-- ไอคอนติดตั้งบน Navbar Mobile -->
+                    <button class="install-app-btn text-emerald-400 hover:text-emerald-300 p-2 bg-emerald-500/10 rounded-lg border border-emerald-500/20 mr-2">
+                        <i class="ph-bold ph-download-simple text-2xl"></i>
+                    </button>
+                    <button id="mobile-menu-btn" class="text-slate-300 hover:text-white p-2">
+                        <i class="ph ph-list text-3xl"></i>
+                    </button>
+                </div>
                     <button id="mobile-menu-btn" class="text-slate-300 hover:text-white p-2">
                         <i class="ph ph-list text-3xl"></i>
                     </button>
@@ -169,6 +183,16 @@
                 <a href="how-to-play.html" class="bg-slate-800/80 hover:bg-slate-700/80 backdrop-blur-md text-white border border-slate-700 font-medium text-lg px-8 py-4 rounded-xl transition-all hover:-translate-y-1 flex items-center justify-center gap-2">
                     <i class="ph ph-info text-2xl text-slate-400"></i> วิธีการใช้งาน
                 </a>
+                <!-- ปุ่ม ติดตั้งแอป พร้อมข้อความอธิบายด้านล่าง -->
+                <div class="w-full sm:w-auto flex flex-col items-center">
+                    <button class="install-app-btn w-full sm:w-auto bg-emerald-600/90 hover:bg-emerald-500 backdrop-blur-md text-white border border-emerald-400 font-bold text-lg px-6 py-4 rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:-translate-y-1 flex items-center justify-center gap-2">
+                        <i class="ph-bold ph-download-simple text-2xl"></i> ติดตั้งแอป
+                    </button>
+                    <!-- ข้อความอธิบายด้านล่างปุ่ม -->
+                    <span class="text-emerald-400 text-[13px] mt-2 font-medium bg-emerald-900/30 px-3 py-1 rounded-full border border-emerald-500/20 flex items-center gap-1">
+                        <i class="ph-bold ph-wifi-slash"></i> ติดตั้งเพื่อใช้งานแบบออฟไลน์
+                    </span>
+                </div>
             </div>
         </div>
     </main>
