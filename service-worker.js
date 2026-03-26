@@ -57,3 +57,35 @@ self.addEventListener('activate', (event) => {
   );
   self.clients.claim();
 });
+// 3. ระบบติดตั้ง PWA ขั้นสูง (พร้อมระบบ Alert อธิบายวิธีติดตั้งเอง)
+        let deferredPrompt;
+        const installBtns = document.querySelectorAll('.install-app-btn');
+
+        // ดักจับ Event หากเบราว์เซอร์พร้อมให้ติดตั้งอัตโนมัติ
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            console.log('PWA Install prompt is ready.');
+        });
+
+        // เมื่อคลิกปุ่ม "ติดตั้งแอป" ใดๆ ในหน้าจอ
+        installBtns.forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    // ถ้าระบบพร้อม ให้เด้งหน้าต่างติดตั้งอัตโนมัติ
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        deferredPrompt = null;
+                    }
+                } else {
+                    // ถ้าระบบไม่รองรับอัตโนมัติ (เช่น iOS หรือติดตั้งไปแล้ว) ให้ขึ้นข้อความสอน
+                    alert("💡 เบราว์เซอร์ของคุณไม่รองรับการติดตั้งอัตโนมัติ หรือคุณได้ติดตั้งแอปนี้ไปแล้ว\n\n📌 สำหรับ iOS (Safari): แตะปุ่ม 'แชร์' ด้านล่าง แล้วเลือก 'เพิ่มไปยังหน้าจอโฮม'\n\n📌 สำหรับ Android (Chrome): แตะเมนู 3 จุดมุมขวาบน แล้วเลือก 'เพิ่มลงในหน้าจอหลัก'");
+                }
+            });
+        });
+
+        window.addEventListener('appinstalled', () => {
+            deferredPrompt = null;
+            console.log('PWA was installed successfully');
+        });
