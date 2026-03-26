@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wolf-book-v7';
+const CACHE_NAME = 'wolf-book-v9';
 
 // รายชื่อไฟล์ทั้งหมดที่ต้องการให้บันทึกไว้ใช้งานตอนออฟไลน์
 const ASSETS_TO_CACHE = [
