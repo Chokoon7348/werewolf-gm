@@ -1,6 +1,6 @@
 {
-  "name": "Wolf Book GM Dashboard",
-  "short_name": "Wolf Book",
+  "name": "Wolf Note GM Dashboard",
+  "short_name": "Wolf Note",
   "description": "ระบบจัดการบอร์ดเกม Werewolf",
   "start_url": "./index.html",
   "display": "standalone",
