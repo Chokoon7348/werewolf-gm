@@ -112,6 +112,13 @@
                         <p class="text-emerald-400 text-sm font-medium">รอผู้เล่นเข้าห้อง... <span id="player-count" class="text-white font-bold ml-1">0</span> คน</p>
                     </div>
                 </div>
+                <div class="bg-slate-950/50 rounded-xl p-5 border border-slate-800 text-left max-w-2xl mx-auto">
+                        <h3 class="text-slate-300 font-semibold mb-3 border-b border-slate-800 pb-2">ผู้เล่นที่เข้ามาแล้ว</h3>
+                        <div id="player-list-container" class="flex flex-wrap gap-2 justify-center md:justify-start min-h-[50px] items-center">
+                            <span class="text-slate-500 text-sm">ยังไม่มีผู้เล่น...</span>
+                        </div>
+                    </div>
+            </div>
 
                 <button id="create-room-btn" class="mt-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-8 rounded-xl transition-all hover:-translate-y-1 shadow-[0_10px_20px_-10px_rgba(79,70,229,0.5)] flex items-center gap-2 mx-auto">
                     <i class="ph-bold ph-plus-circle text-xl"></i> สร้างห้องใหม่
@@ -500,34 +507,60 @@
 
         console.log("🔥 เชื่อมต่อ Firebase สำเร็จแล้ว!");
 </script>
-<script type="module">
-        // รอให้โหลดหน้าเว็บเสร็จก่อน
+<!-- 🧠 สคริปต์ควบคุมการสร้างห้องและดักฟังผู้เล่น -->
+    <script type="module">
         document.addEventListener('DOMContentLoaded', () => {
             const createBtn = document.getElementById('create-room-btn');
             const roomDisplay = document.getElementById('room-display');
             const roomPinText = document.getElementById('room-pin');
+            const playerCountText = document.getElementById('player-count');
+            const playerListContainer = document.getElementById('player-list-container');
 
             createBtn.addEventListener('click', () => {
-                // 1. สุ่มเลข 4 หลัก (1000 - 9999)
+                // 1. สุ่มเลข 4 หลัก
                 const pin = Math.floor(1000 + Math.random() * 9000).toString();
                 
-                // 2. เปลี่ยนหน้าจอ (ซ่อนปุ่มสร้างห้อง -> โชว์รหัส PIN)
+                // 2. เปลี่ยนหน้าจอโชว์รหัส
                 createBtn.classList.add('hidden');
                 roomDisplay.classList.remove('hidden');
                 roomPinText.innerText = pin;
 
-                // 3. ส่งข้อมูลไปสร้างห้องใน Firebase
+                // 3. ส่งข้อมูลไปสร้างห้อง
                 const roomRef = window.ref(window.db, 'rooms/' + pin);
                 window.set(roomRef, {
                     status: 'waiting_for_players',
                     createdAt: new Date().toISOString()
                 }).then(() => {
                     console.log("✅ สร้างห้องสำเร็จ รหัส: " + pin);
+                    
+                    // 4. ⭐ ระบบดักฟัง Real-time: เวลามีคนเข้าห้อง ให้ทำสิ่งนี้!
+                    const playersRef = window.ref(window.db, `rooms/${pin}/players`);
+                    window.onValue(playersRef, (snapshot) => {
+                        const data = snapshot.val();
+                        if (data) {
+                            // ดึงรายชื่อทั้งหมดออกมา
+                            const players = Object.values(data);
+                            
+                            // อัปเดตตัวเลขจำนวนคนบนหน้าจอ
+                            playerCountText.innerText = players.length;
+                            
+                            // สร้างป้ายชื่อให้แต่ละคน
+                            playerListContainer.innerHTML = players.map(p => `
+                                <div class="bg-indigo-500/20 border border-indigo-500/50 text-indigo-300 px-4 py-2 rounded-xl flex items-center gap-2 font-medium shadow-lg animate-[pulse_2s_ease-in-out_1]">
+                                    <i class="ph-fill ph-user"></i> ${p.name}
+                                </div>
+                            `).join('');
+                        } else {
+                            playerCountText.innerText = "0";
+                            playerListContainer.innerHTML = '<span class="text-slate-500 text-sm">ยังไม่มีผู้เล่น...</span>';
+                        }
+                    });
+
                 }).catch((error) => {
                     alert("❌ เกิดข้อผิดพลาดในการสร้างห้อง: " + error.message);
                 });
             });
         });
-</script>
+    </script>
 </body>
 </html>
