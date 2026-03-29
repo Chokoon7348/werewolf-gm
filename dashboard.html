@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Werewolf GM Dashboard</title>
+    <title>Wolf Note - Werewolf GM Dashboard</title>
     
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
@@ -94,42 +94,49 @@
         <button id="close-mobile-menu" class="absolute top-6 right-6 text-slate-400 hover:text-white p-2"><i class="ph ph-x text-3xl"></i></button>
     </div>
 
+    <!-- Main Content -->
     <div class="max-w-7xl mx-auto space-y-4 md:space-y-6 relative p-2 sm:p-4 md:p-8">
-    <div class="max-w-7xl mx-auto mt-8 px-4 relative z-10">
-            <div class="bg-slate-900/90 backdrop-blur-md border border-indigo-500/30 rounded-2xl p-6 text-center shadow-2xl">
-                <h2 class="text-xl md:text-2xl font-bold text-white mb-2 flex items-center justify-center gap-2">
-                    <i class="ph-fill ph-monitor-play text-indigo-400"></i> กระดานควบคุมเกม (Real-time)
-                </h2>
-                
-                <div id="room-display" class="hidden my-6">
-                    <p class="text-slate-400 text-sm md:text-base mb-1">ให้ผู้เล่นเข้าเว็บและกรอกรหัส (PIN)</p>
-                    <div class="text-6xl md:text-7xl font-black text-amber-400 tracking-widest drop-shadow-[0_0_20px_rgba(251,191,36,0.3)] my-4" id="room-pin">----</div>
-                    <div class="inline-flex items-center gap-2 bg-slate-800 px-4 py-2 rounded-full border border-slate-700">
-                        <span class="relative flex h-3 w-3">
-                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                          <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-                        </span>
-                        <p class="text-emerald-400 text-sm font-medium">รอผู้เล่นเข้าห้อง... <span id="player-count" class="text-white font-bold ml-1">0</span> คน</p>
+        
+        <!-- ระบบสร้างห้องและแจกบทบาท (Real-time) -->
+        <div class="bg-slate-900/90 backdrop-blur-md border border-indigo-500/30 rounded-2xl p-6 text-center shadow-2xl mt-4">
+            <h2 class="text-xl md:text-2xl font-bold text-white mb-2 flex items-center justify-center gap-2">
+                <i class="ph-fill ph-monitor-play text-indigo-400"></i> ศูนย์ควบคุมผู้เล่น (Real-time)
+            </h2>
+            
+            <div id="room-display" class="hidden my-6">
+                <p class="text-slate-400 text-sm md:text-base mb-1">ให้ผู้เล่นเข้าเว็บแล้วเลือก "เข้าร่วมเกม" และกรอกรหัส (PIN)</p>
+                <div class="text-6xl md:text-7xl font-black text-amber-400 tracking-widest drop-shadow-[0_0_20px_rgba(251,191,36,0.3)] my-4" id="room-pin">----</div>
+                <div class="inline-flex items-center gap-2 bg-slate-800 px-4 py-2 rounded-full border border-slate-700 mb-6">
+                    <span class="relative flex h-3 w-3">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                    </span>
+                    <p class="text-emerald-400 text-sm font-medium">รอผู้เล่นเข้าห้อง... <span id="player-count" class="text-white font-bold ml-1">0</span> คน</p>
+                </div>
+
+                <div class="bg-slate-950/50 rounded-xl p-5 border border-slate-800 text-left max-w-2xl mx-auto mb-6">
+                    <h3 class="text-slate-300 font-semibold mb-3 border-b border-slate-800 pb-2">ผู้เล่นที่เข้ามาแล้ว</h3>
+                    <div id="player-list-container" class="flex flex-wrap gap-2 justify-center md:justify-start min-h-[50px] items-center">
+                        <span class="text-slate-500 text-sm">ยังไม่มีผู้เล่น...</span>
                     </div>
                 </div>
-                <div class="bg-slate-950/50 rounded-xl p-5 border border-slate-800 text-left max-w-2xl mx-auto">
-                        <h3 class="text-slate-300 font-semibold mb-3 border-b border-slate-800 pb-2">ผู้เล่นที่เข้ามาแล้ว</h3>
-                        <div id="player-list-container" class="flex flex-wrap gap-2 justify-center md:justify-start min-h-[50px] items-center">
-                            <span class="text-slate-500 text-sm">ยังไม่มีผู้เล่น...</span>
-                        </div>
-                    </div>
-            </div>
 
-                <button id="create-room-btn" class="mt-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-8 rounded-xl transition-all hover:-translate-y-1 shadow-[0_10px_20px_-10px_rgba(79,70,229,0.5)] flex items-center gap-2 mx-auto">
-                    <i class="ph-bold ph-plus-circle text-xl"></i> สร้างห้องใหม่
+                <!-- 🌟 ปุ่มแจกบทบาท -->
+                <button id="start-game-btn" class="hidden mx-auto bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold py-3 px-8 rounded-xl shadow-[0_0_20px_rgba(245,158,11,0.4)] transition-all hover:scale-105 items-center gap-2">
+                    <i class="ph-bold ph-cards text-xl"></i> แจกบทบาท & โหลดเข้ากระดาน!
                 </button>
             </div>
-    </div>    
+
+            <button id="create-room-btn" class="mt-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-8 rounded-xl transition-all hover:-translate-y-1 shadow-[0_10px_20px_-10px_rgba(79,70,229,0.5)] flex items-center gap-2 mx-auto">
+                <i class="ph-bold ph-plus-circle text-xl"></i> สร้างห้องเกมใหม่
+            </button>
+        </div> 
+        
         <!-- Header Controls -->
         <header class="sticky top-[72px] md:top-24 z-30 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-900/95 backdrop-blur-md p-4 md:p-6 rounded-xl border border-slate-700/50 shadow-xl shadow-black/20 gap-3 md:gap-4 mt-2">
             <div class="flex items-center gap-2">
                 <i class="ph-fill ph-game-controller text-indigo-500 text-2xl md:text-3xl"></i>
-                <div><h1 class="text-lg md:text-xl font-bold text-white leading-tight">กระดานควบคุมเกม (GM)</h1></div>
+                <div><h1 class="text-lg md:text-xl font-bold text-white leading-tight">กระดาน GM</h1></div>
             </div>
             <div class="flex items-center justify-between w-full sm:w-auto gap-2 md:gap-3">
                 <div class="bg-slate-800 px-3 py-2 md:px-4 md:py-2 rounded-lg border border-slate-700 flex items-center gap-2 flex-shrink-0">
@@ -186,7 +193,7 @@
                     <h2 class="text-base md:text-lg font-semibold text-white flex items-center gap-1.5 md:gap-2"><i class="ph ph-users-three text-lg md:text-xl text-indigo-400"></i> จัดการผู้เล่น</h2>
                     <div class="flex gap-2 w-full sm:w-auto">
                         <button onclick="openInGameRolesModal()" class="flex-1 sm:flex-none bg-purple-600 hover:bg-purple-500 text-white text-sm md:text-base font-medium py-2 px-3 md:px-4 rounded-lg transition-colors flex items-center justify-center gap-1.5 md:gap-2 shadow-sm"><i class="ph ph-book-open-text text-base md:text-lg"></i> <span class="hidden sm:inline">บทบาทในเกม</span></button>
-                        <button onclick="openAddPlayerModal()" class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white text-sm md:text-base font-medium py-2 px-3 md:px-4 rounded-lg transition-colors flex items-center justify-center gap-1.5 md:gap-2 shadow-sm"><i class="ph ph-user-plus text-base md:text-lg"></i> <span class="hidden sm:inline">เพิ่มผู้เล่น</span></button>
+                        <button onclick="openAddPlayerModal()" class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white text-sm md:text-base font-medium py-2 px-3 md:px-4 rounded-lg transition-colors flex items-center justify-center gap-1.5 md:gap-2 shadow-sm"><i class="ph ph-user-plus text-base md:text-lg"></i> <span class="hidden sm:inline">เพิ่มผู้เล่นแบบแมนนวล</span></button>
                     </div>
                 </div>
                 
@@ -255,12 +262,11 @@
 
 <script>
     // --- Data Setup ---
-    let players = [
+    // เปลี่ยนจาก let players เป็น window.players เพื่อให้เชื่อมกับ Firebase ได้
+    window.players = [
         { name: "ผู้เล่น 1", role: "➖ เลือกบทบาท", status: "รอด" },
         { name: "ผู้เล่น 2", role: "➖ เลือกบทบาท", status: "รอด" },
-        { name: "ผู้เล่น 3", role: "➖ เลือกบทบาท", status: "รอด" },
-        { name: "ผู้เล่น 4", role: "➖ เลือกบทบาท", status: "รอด" },
-        { name: "ผู้เล่น 5", role: "➖ เลือกบทบาท", status: "รอด" }
+        { name: "ผู้เล่น 3", role: "➖ เลือกบทบาท", status: "รอด" }
     ];
     let dayCount = 1;
     let isNight = true;
@@ -311,20 +317,19 @@
     };
     const allRoles = Object.keys(rolesData);
 
-    // --- DOM Reference & Functions ---
     let DOM = {};
     
     window.updateStats = function() {
         if(!DOM.statTotal) return;
-        DOM.statTotal.textContent = players.length;
-        DOM.statAlive.textContent = players.filter(p => p.status !== 'ตาย').length;
-        DOM.statDead.textContent = players.filter(p => p.status === 'ตาย').length;
+        DOM.statTotal.textContent = window.players.length;
+        DOM.statAlive.textContent = window.players.filter(p => p.status !== 'ตาย').length;
+        DOM.statDead.textContent = window.players.filter(p => p.status === 'ตาย').length;
     };
 
     window.renderPlayerCards = function() {
         if(!DOM.grid) return;
         DOM.grid.innerHTML = '';
-        players.forEach((player, index) => {
+        window.players.forEach((player, index) => {
             const groupInfo = rolesData[player.role] || { group: 'default' };
             const isDead = player.status === 'ตาย';
             
@@ -362,17 +367,17 @@
         window.updateStats();
     };
 
-    window.updatePlayerName = function(index, newName) { if(!newName.trim()) return; const oldName = players[index].name; players[index].name = newName; window.addLog(`เปลี่ยนชื่อ [${oldName}] ➔ [${newName}]`); };
-    window.updatePlayerRole = function(index, newRole) { players[index].role = newRole; window.renderPlayerCards(); window.addLog(`[${players[index].name}] รับบท ${newRole}`); };
-    window.updatePlayerStatus = function(index, newStatus) { players[index].status = newStatus; window.renderPlayerCards(); window.addLog(`[${players[index].name}] สถานะ: ${newStatus}`); };
-    window.removePlayer = function(index) { const name = players[index].name; players.splice(index, 1); window.renderPlayerCards(); window.addLog(`ลบผู้เล่น: ${name}`); };
+    window.updatePlayerName = function(index, newName) { if(!newName.trim()) return; const oldName = window.players[index].name; window.players[index].name = newName; window.addLog(`เปลี่ยนชื่อ [${oldName}] ➔ [${newName}]`); };
+    window.updatePlayerRole = function(index, newRole) { window.players[index].role = newRole; window.renderPlayerCards(); window.addLog(`[${window.players[index].name}] รับบท ${newRole}`); };
+    window.updatePlayerStatus = function(index, newStatus) { window.players[index].status = newStatus; window.renderPlayerCards(); window.addLog(`[${window.players[index].name}] สถานะ: ${newStatus}`); };
+    window.removePlayer = function(index) { const name = window.players[index].name; window.players.splice(index, 1); window.renderPlayerCards(); window.addLog(`ลบผู้เล่น: ${name}`); };
 
     window.openAddPlayerModal = function() { DOM.modal.classList.add('active'); DOM.modalInput.value = ''; DOM.modalError.classList.add('hidden'); setTimeout(() => DOM.modalInput.focus(), 100); };
     window.closeAddPlayerModal = function() { DOM.modal.classList.remove('active'); };
     window.addPlayer = function() {
         const name = DOM.modalInput.value.trim();
         if (name) {
-            players.push({ name: name, role: "➖ เลือกบทบาท", status: "รอด" }); window.renderPlayerCards(); window.addLog(`เพิ่มผู้เล่น: ${name}`); window.closeAddPlayerModal();
+            window.players.push({ name: name, role: "➖ เลือกบทบาท", status: "รอด" }); window.renderPlayerCards(); window.addLog(`เพิ่มผู้เล่น: ${name}`); window.closeAddPlayerModal();
             setTimeout(() => { if(DOM.grid.lastElementChild) DOM.grid.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 100);
         } else { DOM.modalError.classList.remove('hidden'); }
     };
@@ -382,13 +387,13 @@
     window.closeResetModal = function() { DOM.resetModal.classList.remove('active'); };
     window.executeReset = function() {
         dayCount = 1; isNight = true; DOM.log.innerHTML = '';
-        players.forEach(p => { p.role = "➖ เลือกบทบาท"; p.status = "รอด"; });
+        window.players.forEach(p => { p.role = "➖ เลือกบทบาท"; p.status = "รอด"; });
         window.renderPlayerCards(); window.updateGamePhaseUI(); window.addLog("รีเซ็ตกระดานเริ่มคืนที่ 1"); window.resetTimer(); window.closeResetModal(); window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     window.openInGameRolesModal = function() {
         const roleMap = {}; let unassignedCount = 0;
-        players.forEach(p => { if (p.role === "➖ เลือกบทบาท") { unassignedCount++; } else { if (!roleMap[p.role]) roleMap[p.role] = []; roleMap[p.role].push(p.name); } });
+        window.players.forEach(p => { if (p.role === "➖ เลือกบทบาท") { unassignedCount++; } else { if (!roleMap[p.role]) roleMap[p.role] = []; roleMap[p.role].push(p.name); } });
         DOM.rolesContainer.innerHTML = '';
         if (unassignedCount > 0) DOM.rolesContainer.innerHTML += `<div class="bg-amber-900/30 border border-amber-500/30 text-amber-400 px-4 py-3 rounded-lg mb-5 text-sm flex items-center gap-2"><i class="ph-fill ph-warning-circle text-xl"></i><span>มีผู้เล่น <strong>${unassignedCount} คน</strong> ที่ยังไม่ได้กำหนดบทบาท</span></div>`;
         const rolesInPlay = Object.keys(roleMap);
@@ -478,89 +483,145 @@
         }
     });
 </script>
+
+<!-- 🔥 Firebase Setup & Logic สุ่มไพ่ -->
 <script type="module">
-        // 1. นำเข้าเครื่องมือจาก Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue, push } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+    import { getDatabase, ref, set, onValue, push } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
 
-        // 2. ใส่กุญแจที่เราก๊อปปี้มา
-        const firebaseConfig = {
-            apiKey: "AIzaSyBn-t7mx3_Hb8gjL18SgCeRjVJCGG9N_DI",
-            authDomain: "wolf-note.firebaseapp.com",
-            databaseURL: "https://wolf-note-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "wolf-note",
-            storageBucket: "wolf-note.firebasestorage.app",
-            messagingSenderId: "783649820868",
-            appId: "1:783649820868:web:b7bb2a89b94b730c54b991"
-        };
+    const firebaseConfig = {
+        apiKey: "AIzaSyBn-t7mx3_Hb8gjL18SgCeRjVJCGG9N_DI",
+        authDomain: "wolf-note.firebaseapp.com",
+        databaseURL: "https://wolf-note-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "wolf-note",
+        storageBucket: "wolf-note.firebasestorage.app",
+        messagingSenderId: "783649820868",
+        appId: "1:783649820868:web:b7bb2a89b94b730c54b991"
+    };
 
-        // 3. สตาร์ทเครื่องยนต์ Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-        // 4. สร้างตัวแปรให้ระบบอื่นเรียกใช้ได้
-        window.db = db;
-        window.ref = ref;
-        window.set = set;
-        window.onValue = onValue;
-        window.push = push;
+    window.db = db;
+    window.ref = ref;
+    window.set = set;
+    window.onValue = onValue;
+    window.push = push;
 
-        console.log("🔥 เชื่อมต่อ Firebase สำเร็จแล้ว!");
-</script>
-<!-- 🧠 สคริปต์ควบคุมการสร้างห้องและดักฟังผู้เล่น -->
-    <script type="module">
-        document.addEventListener('DOMContentLoaded', () => {
-            const createBtn = document.getElementById('create-room-btn');
-            const roomDisplay = document.getElementById('room-display');
-            const roomPinText = document.getElementById('room-pin');
-            const playerCountText = document.getElementById('player-count');
-            const playerListContainer = document.getElementById('player-list-container');
+    console.log("🔥 เชื่อมต่อ Firebase สำเร็จแล้ว!");
 
-            createBtn.addEventListener('click', () => {
-                // 1. สุ่มเลข 4 หลัก
-                const pin = Math.floor(1000 + Math.random() * 9000).toString();
-                
-                // 2. เปลี่ยนหน้าจอโชว์รหัส
-                createBtn.classList.add('hidden');
-                roomDisplay.classList.remove('hidden');
-                roomPinText.innerText = pin;
+    document.addEventListener('DOMContentLoaded', () => {
+        const createBtn = document.getElementById('create-room-btn');
+        const roomDisplay = document.getElementById('room-display');
+        const roomPinText = document.getElementById('room-pin');
+        const playerCountText = document.getElementById('player-count');
+        const playerListContainer = document.getElementById('player-list-container');
+        const startGameBtn = document.getElementById('start-game-btn');
 
-                // 3. ส่งข้อมูลไปสร้างห้อง
-                const roomRef = window.ref(window.db, 'rooms/' + pin);
-                window.set(roomRef, {
-                    status: 'waiting_for_players',
-                    createdAt: new Date().toISOString()
-                }).then(() => {
-                    console.log("✅ สร้างห้องสำเร็จ รหัส: " + pin);
+        let currentPin = "";
+        let currentPlayersData = {}; // เก็บข้อมูลเพื่อนที่จอยเข้ามา
+
+        // 1. กดปุ่มเปิดห้องใหม่
+        createBtn.addEventListener('click', () => {
+            currentPin = Math.floor(1000 + Math.random() * 9000).toString();
+            
+            createBtn.classList.add('hidden');
+            roomDisplay.classList.remove('hidden');
+            roomPinText.innerText = currentPin;
+
+            window.set(window.ref(window.db, 'rooms/' + currentPin), {
+                status: 'waiting_for_players',
+                createdAt: new Date().toISOString()
+            });
+
+            // ดักฟังคนเข้าห้อง
+            window.onValue(window.ref(window.db, `rooms/${currentPin}/players`), (snapshot) => {
+                currentPlayersData = snapshot.val();
+                if (currentPlayersData) {
+                    const players = Object.values(currentPlayersData);
+                    playerCountText.innerText = players.length;
                     
-                    // 4. ⭐ ระบบดักฟัง Real-time: เวลามีคนเข้าห้อง ให้ทำสิ่งนี้!
-                    const playersRef = window.ref(window.db, `rooms/${pin}/players`);
-                    window.onValue(playersRef, (snapshot) => {
-                        const data = snapshot.val();
-                        if (data) {
-                            // ดึงรายชื่อทั้งหมดออกมา
-                            const players = Object.values(data);
-                            
-                            // อัปเดตตัวเลขจำนวนคนบนหน้าจอ
-                            playerCountText.innerText = players.length;
-                            
-                            // สร้างป้ายชื่อให้แต่ละคน
-                            playerListContainer.innerHTML = players.map(p => `
-                                <div class="bg-indigo-500/20 border border-indigo-500/50 text-indigo-300 px-4 py-2 rounded-xl flex items-center gap-2 font-medium shadow-lg animate-[pulse_2s_ease-in-out_1]">
-                                    <i class="ph-fill ph-user"></i> ${p.name}
-                                </div>
-                            `).join('');
-                        } else {
-                            playerCountText.innerText = "0";
-                            playerListContainer.innerHTML = '<span class="text-slate-500 text-sm">ยังไม่มีผู้เล่น...</span>';
-                        }
-                    });
+                    playerListContainer.innerHTML = players.map(p => `
+                        <div class="bg-indigo-500/20 border border-indigo-500/50 text-indigo-300 px-4 py-2 rounded-xl flex items-center gap-2 font-medium shadow-lg animate-[pulse_2s_ease-in-out_1]">
+                            <i class="ph-fill ph-user"></i> ${p.name}
+                        </div>
+                    `).join('');
 
-                }).catch((error) => {
-                    alert("❌ เกิดข้อผิดพลาดในการสร้างห้อง: " + error.message);
+                    // ถ้ามีคนเข้าห้องอย่างน้อย 1 คน ให้โชว์ปุ่ม "แจกบทบาท"
+                    if(players.length > 0) {
+                        startGameBtn.classList.remove('hidden');
+                        startGameBtn.classList.add('flex');
+                    }
+                } else {
+                    playerCountText.innerText = "0";
+                    playerListContainer.innerHTML = '<span class="text-slate-500 text-sm">ยังไม่มีผู้เล่น...</span>';
+                }
+            });
+        });
+
+        // 2. 🌟 กดยืนยันเริ่มเกม & แจกไพ่
+        startGameBtn.addEventListener('click', () => {
+            if(!currentPlayersData) return;
+            
+            const playerKeys = Object.keys(currentPlayersData);
+            const playerCount = playerKeys.length;
+
+            // สร้างสำรับไพ่ (1 หมาป่า, 1 หยั่งรู้, ที่เหลือชาวบ้าน)
+            let deck = ['werewolf', 'seer'];
+            while(deck.length < playerCount) {
+                deck.push('villager');
+            }
+
+            // สับไพ่แบบสุ่ม (Shuffle)
+            deck.sort(() => Math.random() - 0.5);
+
+            // เปลี่ยนหน้าตาปุ่มเป็นกำลังโหลด
+            startGameBtn.innerHTML = `<i class="ph-bold ph-spinner-gap animate-spin text-xl"></i> กำลังแจกไพ่และดึงข้อมูลลงกระดาน...`;
+            startGameBtn.disabled = true;
+
+            // ลบ "ผู้เล่นสมมติ 1,2,3" ออกจากกระดาน GM
+            window.players = [];
+
+            // แจกไพ่ให้ผู้เล่นแต่ละคน
+            let updatesCount = 0;
+            playerKeys.forEach((key, index) => {
+                const assignedRoleCode = deck[index];
+                
+                // แปลงรหัสอังกฤษเป็นชื่อภาษาไทยให้ตรงกับระบบกระดาน GM
+                let thaiRoleName = "🧑‍🌾 ชาวบ้าน";
+                if(assignedRoleCode === 'werewolf') thaiRoleName = "🐺 มนุษย์หมาป่า";
+                if(assignedRoleCode === 'seer') thaiRoleName = "🔮 เทพพยากรณ์";
+
+                const playerName = currentPlayersData[key].name;
+
+                // 🌟 ดึงรายชื่อเพื่อนมาใส่ในกระดาน GM โดยอัตโนมัติ!
+                window.players.push({
+                    name: playerName,
+                    role: thaiRoleName,
+                    status: "รอด"
+                });
+
+                // ส่งการ์ดไปเปลี่ยนหน้าจอมือถือเพื่อน
+                window.set(window.ref(window.db, `rooms/${currentPin}/players/${key}/role`), assignedRoleCode)
+                .then(() => {
+                    updatesCount++;
+                    // ถ้าแจกครบทุกคนแล้ว
+                    if(updatesCount === playerCount) {
+                        // ปิดกล่องรหัสห้องทิ้งไปเลย
+                        roomDisplay.classList.add('hidden');
+                        
+                        // สั่งอัปเดตกระดาน GM ใหม่ให้เห็นรายชื่อเพื่อนทุกคน
+                        window.renderPlayerCards();
+                        window.updateStats();
+                        window.addLog(`เริ่มเกมแล้ว! ผู้เล่น ${playerCount} คน โหลดลงกระดานเรียบร้อย`);
+                        
+                        // เลื่อนหน้าจอลงมาที่ตารางผู้เล่น
+                        document.getElementById('player-cards-grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
                 });
             });
         });
-    </script>
+    });
+</script>
 </body>
 </html>
