@@ -131,43 +131,47 @@
             <p class="text-base md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
                 เครื่องมือสำหรับผู้ดำเนินเกมของคนไทย (GM) ช่วยจัดการบอร์ดเกมมนุษย์หมาป่าภาษาไทย100% (Werewolf) แบบ Real-time พร้อมระบบจับเวลา บันทึกเหตุการณ์ และคู่มือบทบาทกว่า 30 ตัวละคร ใช้งานฟรี
             </p>
-            <!-- ปุ่มเข้าใช้งาน (เพิ่มเข้าไปในไฟล์ index.html) -->
-<div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-    
-    <!-- ปุ่มสำหรับผู้เล่น (เด่นสุด) -->
-    <a href="join.html" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 px-10 rounded-2xl transition-all hover:-translate-y-1 shadow-[0_15px_30px_-10px_rgba(79,70,229,0.5)] flex items-center justify-center gap-3 text-lg">
-        <i class="ph-bold ph-users-three text-3xl"></i> 
-        <span>เข้าร่วมเกม<br><span class="text-sm font-normal text-indigo-200">สำหรับผู้เล่น</span></span>
-    </a>
-
-    <!-- ปุ่มสำหรับ GM -->
-    <a href="dashboard.html" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-4 px-10 rounded-2xl transition-all hover:-translate-y-1 border border-slate-700 flex items-center justify-center gap-3 text-lg">
-        <i class="ph-bold ph-game-controller text-3xl"></i> 
-        <span>สร้างห้องเกม<br><span class="text-sm font-normal text-slate-400">สำหรับ GM</span></span>
-    </a>
-
-</div>
-
+<!-- โซนปุ่มเมนูหลัก (จัดเรียงด้วย Grid เว้นระยะสวยงาม) -->
+        <div class="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5 max-w-2xl mx-auto px-4 relative z-10">
             
-            <div class="flex flex-col sm:flex-row flex-wrap gap-4 w-full sm:w-auto justify-center items-start">
-                
-                
-                <!-- ปุ่ม วิธีการใช้งาน -->
-                <a href="how-to-play.html" class="w-full sm:w-auto bg-slate-800/80 hover:bg-slate-700/80 backdrop-blur-md text-white border border-slate-700 font-medium text-lg px-6 py-4 rounded-xl transition-all hover:-translate-y-1 flex items-center justify-center gap-2">
-                    <i class="ph ph-info text-2xl text-slate-400"></i> วิธีการใช้งาน
-                </a>
-
-                <!-- ปุ่ม ติดตั้งแอป -->
-                <div class="w-full sm:w-auto flex flex-col items-center">
-                    <button class="install-app-btn w-full sm:w-auto bg-emerald-600/90 hover:bg-emerald-500 backdrop-blur-md text-white border border-emerald-400 font-bold text-lg px-6 py-4 rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:-translate-y-1 flex items-center justify-center gap-2">
-                        <i class="ph-bold ph-download-simple text-2xl"></i> ติดตั้งแอป
-                    </button>
-                    <!-- ข้อความอธิบายด้านล่างปุ่ม -->
-                    <span class="text-emerald-400 text-[13px] mt-2 font-medium bg-emerald-900/30 px-3 py-1 rounded-full border border-emerald-500/20 flex items-center gap-1">
-                        <i class="ph-bold ph-wifi-slash"></i> ติดตั้งเพื่อใช้งานแบบออฟไลน์
-                    </span>
+            <!-- 1. ปุ่มเข้าร่วมเกม (ผู้เล่น) - สีม่วง Indigo -->
+            <a href="join.html" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 px-6 rounded-2xl transition-all hover:-translate-y-1 shadow-[0_10px_20px_-10px_rgba(79,70,229,0.5)] flex items-center justify-center gap-4">
+                <i class="ph-fill ph-users-three text-4xl"></i> 
+                <div class="text-left">
+                    <div class="text-lg leading-tight">เข้าร่วมเกม</div>
+                    <div class="text-xs font-normal text-indigo-200 mt-0.5">สำหรับผู้เล่น</div>
                 </div>
+            </a>
+
+            <!-- 2. ปุ่มสร้างห้องเกม (GM) - สีแดง Rose -->
+            <a href="dashboard.html" class="bg-rose-600 hover:bg-rose-500 text-white font-bold py-4 px-6 rounded-2xl transition-all hover:-translate-y-1 shadow-[0_10px_20px_-10px_rgba(225,29,72,0.5)] flex items-center justify-center gap-4">
+                <i class="ph-fill ph-game-controller text-4xl"></i> 
+                <div class="text-left">
+                    <div class="text-lg leading-tight">สร้างห้องเกม</div>
+                    <div class="text-xs font-normal text-rose-200 mt-0.5">สำหรับ GM</div>
+                </div>
+            </a>
+
+            <!-- 3. ปุ่มวิธีการใช้งาน - สีเทาเข้ม Slate -->
+            <a href="how-to-play.html" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-4 px-6 rounded-2xl transition-all hover:-translate-y-1 border border-slate-700 flex items-center justify-center gap-3">
+                <i class="ph-bold ph-info text-2xl text-slate-400"></i> 
+                <span class="text-lg">วิธีการใช้งาน</span>
+            </a>
+
+            <!-- 4. ปุ่มติดตั้งแอป - สีเขียว Emerald -->
+            <div class="flex flex-col">
+                <button id="install-button" class="h-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 px-6 rounded-2xl transition-all hover:-translate-y-1 shadow-[0_10px_20px_-10px_rgba(16,185,129,0.5)] flex items-center justify-center gap-3">
+                    <i class="ph-bold ph-download-simple text-2xl"></i> 
+                    <span class="text-lg">ติดตั้งแอป</span>
+                </button>
             </div>
+            
+        </div>
+        
+        <!-- ข้อความใบ้ใต้ปุ่มติดตั้ง -->
+        <div class="mt-4 text-center text-xs text-emerald-500/80 flex items-center justify-center gap-1 relative z-10 hidden" id="install-hint">
+            <i class="ph-fill ph-wifi-slash"></i> ติดตั้งเพื่อใช้งานแบบออฟไลน์
+        </div>
         </div>
     </main>
 
