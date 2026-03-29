@@ -95,7 +95,29 @@
     </div>
 
     <div class="max-w-7xl mx-auto space-y-4 md:space-y-6 relative p-2 sm:p-4 md:p-8">
-        
+    <div class="max-w-7xl mx-auto mt-8 px-4 relative z-10">
+            <div class="bg-slate-900/90 backdrop-blur-md border border-indigo-500/30 rounded-2xl p-6 text-center shadow-2xl">
+                <h2 class="text-xl md:text-2xl font-bold text-white mb-2 flex items-center justify-center gap-2">
+                    <i class="ph-fill ph-monitor-play text-indigo-400"></i> กระดานควบคุมเกม (Real-time)
+                </h2>
+                
+                <div id="room-display" class="hidden my-6">
+                    <p class="text-slate-400 text-sm md:text-base mb-1">ให้ผู้เล่นเข้าเว็บและกรอกรหัส (PIN)</p>
+                    <div class="text-6xl md:text-7xl font-black text-amber-400 tracking-widest drop-shadow-[0_0_20px_rgba(251,191,36,0.3)] my-4" id="room-pin">----</div>
+                    <div class="inline-flex items-center gap-2 bg-slate-800 px-4 py-2 rounded-full border border-slate-700">
+                        <span class="relative flex h-3 w-3">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                        </span>
+                        <p class="text-emerald-400 text-sm font-medium">รอผู้เล่นเข้าห้อง... <span id="player-count" class="text-white font-bold ml-1">0</span> คน</p>
+                    </div>
+                </div>
+
+                <button id="create-room-btn" class="mt-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-8 rounded-xl transition-all hover:-translate-y-1 shadow-[0_10px_20px_-10px_rgba(79,70,229,0.5)] flex items-center gap-2 mx-auto">
+                    <i class="ph-bold ph-plus-circle text-xl"></i> สร้างห้องใหม่
+                </button>
+            </div>
+    </div>    
         <!-- Header Controls -->
         <header class="sticky top-[72px] md:top-24 z-30 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-900/95 backdrop-blur-md p-4 md:p-6 rounded-xl border border-slate-700/50 shadow-xl shadow-black/20 gap-3 md:gap-4 mt-2">
             <div class="flex items-center gap-2">
@@ -448,6 +470,63 @@
             window.addLog("เริ่มเซสชั่นเกมเรียบร้อยแล้ว");
         }
     });
+</script>
+<script type="module">
+        // 1. นำเข้าเครื่องมือจาก Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue, push } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+
+        // 2. ใส่กุญแจที่เราก๊อปปี้มา
+        const firebaseConfig = {
+            apiKey: "AIzaSyBn-t7mx3_Hb8gjL18SgCeRjVJCGG9N_DI",
+            authDomain: "wolf-note.firebaseapp.com",
+            projectId: "wolf-note",
+            storageBucket: "wolf-note.firebasestorage.app",
+            messagingSenderId: "783649820868",
+            appId: "1:783649820868:web:b7bb2a89b94b730c54b991"
+        };
+
+        // 3. สตาร์ทเครื่องยนต์ Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // 4. สร้างตัวแปรให้ระบบอื่นเรียกใช้ได้
+        window.db = db;
+        window.ref = ref;
+        window.set = set;
+        window.onValue = onValue;
+        window.push = push;
+
+        console.log("🔥 เชื่อมต่อ Firebase สำเร็จแล้ว!");
+</script>
+<script type="module">
+        // รอให้โหลดหน้าเว็บเสร็จก่อน
+        document.addEventListener('DOMContentLoaded', () => {
+            const createBtn = document.getElementById('create-room-btn');
+            const roomDisplay = document.getElementById('room-display');
+            const roomPinText = document.getElementById('room-pin');
+
+            createBtn.addEventListener('click', () => {
+                // 1. สุ่มเลข 4 หลัก (1000 - 9999)
+                const pin = Math.floor(1000 + Math.random() * 9000).toString();
+                
+                // 2. เปลี่ยนหน้าจอ (ซ่อนปุ่มสร้างห้อง -> โชว์รหัส PIN)
+                createBtn.classList.add('hidden');
+                roomDisplay.classList.remove('hidden');
+                roomPinText.innerText = pin;
+
+                // 3. ส่งข้อมูลไปสร้างห้องใน Firebase
+                const roomRef = window.ref(window.db, 'rooms/' + pin);
+                window.set(roomRef, {
+                    status: 'waiting_for_players',
+                    createdAt: new Date().toISOString()
+                }).then(() => {
+                    console.log("✅ สร้างห้องสำเร็จ รหัส: " + pin);
+                }).catch((error) => {
+                    alert("❌ เกิดข้อผิดพลาดในการสร้างห้อง: " + error.message);
+                });
+            });
+        });
 </script>
 </body>
 </html>
