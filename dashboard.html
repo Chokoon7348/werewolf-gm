@@ -552,8 +552,7 @@
         let currentPlayersData = {}; 
 
         // 1. กดปุ่มเปิดห้องใหม่
-        createBtn.addEventListener('click', () => {
-            currentPin = Math.floor(1000 + Math.random() * 9000).toString();
+        
             
             createBtn.classList.add('hidden');
             roomDisplay.classList.remove('hidden');
@@ -587,6 +586,18 @@
             window.set(window.ref(window.db, 'rooms/' + pin), { status: 'waiting', createdAt: new Date().toISOString() });
             window.bindRoomListener(pin);
         });
+        window.endGameAndCloseRoom = function() {
+    if(confirm("ปิดห้องแบบถาวร (วงแตก) ใช่หรือไม่?")) {
+        // 🗑️ ล้างความจำออกจากเครื่อง GM จะได้ไม่เด้งเข้าห้องเดิมอีก
+        sessionStorage.removeItem('wolf_gm_pin');
+        }
+};
+        window.addEventListener('beforeunload', function (e) {
+    if (window.players && window.players.length > 0) { 
+        e.preventDefault(); 
+        e.returnValue = ''; // เบราว์เซอร์จะเด้งเตือนว่า "คุณแน่ใจนะว่าจะออก?"
+    }
+});
 
             // ดักฟังคนเข้าห้อง
             window.onValue(window.ref(window.db, `rooms/${currentPin}/players`), (snapshot) => {
