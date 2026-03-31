@@ -163,7 +163,7 @@
                 <i class="ph-fill ph-game-controller text-indigo-500 text-2xl md:text-3xl"></i>
                 <div><h1 class="text-lg md:text-xl font-bold text-white leading-tight">กระดาน GM</h1></div>
             </div>
-            <div class="flex items-center justify-between w-full sm:w-auto gap-2 md:gap-3">
+            <div class="flex items-center justify-between w-full sm:w-auto gap-2 md:gap-3 flex-wrap sm:flex-nowrap">
                 <div class="bg-slate-800 px-3 py-2 md:px-4 md:py-2 rounded-lg border border-slate-700 flex items-center gap-2 flex-shrink-0">
                     <span class="relative flex h-2.5 w-2.5 md:h-3 md:w-3">
                       <span id="phase-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
@@ -173,10 +173,16 @@
                 </div>
                 <div class="flex gap-2 w-full sm:w-auto">
                     <button onclick="nextTurn()" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-3 md:px-4 rounded-lg transition-colors flex items-center justify-center gap-1 md:gap-2 shadow-lg shadow-indigo-900/20">
-                        <i class="ph ph-moon-stars text-lg"></i> <span id="btn-next-phase-text" class="text-sm md:text-base">เปลี่ยนช่วงเวลา</span>
+                        <i class="ph ph-moon-stars text-lg"></i> <span id="btn-next-phase-text" class="text-sm md:text-base">เปลี่ยนเวลา</span>
                     </button>
-                    <button onclick="openResetModal()" class="bg-rose-900/50 text-rose-400 hover:bg-rose-900 hover:text-rose-300 font-medium py-2 px-3 rounded-lg transition-colors border border-rose-800/50 flex items-center justify-center flex-shrink-0">
+                    <button onclick="endRoundAndKeepRoom()" class="bg-amber-600 hover:bg-amber-500 text-white font-medium py-2 px-3 rounded-lg transition-colors flex items-center justify-center gap-1 shadow-lg shadow-amber-900/20 flex-shrink-0">
+                        <i class="ph-bold ph-arrows-clockwise text-lg"></i> <span class="hidden sm:inline">รอบใหม่</span>
+                    </button>
+                    <button onclick="openResetModal()" class="bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white font-medium py-2 px-3 rounded-lg transition-colors border border-slate-700 flex items-center justify-center flex-shrink-0">
                         <i class="ph ph-arrow-counter-clockwise text-lg"></i>
+                    </button>
+                    <button onclick="endGameAndCloseRoom()" class="bg-rose-600 hover:bg-rose-500 text-white font-medium py-2 px-3 rounded-lg transition-colors flex items-center justify-center gap-1 shadow-lg shadow-rose-900/20 flex-shrink-0">
+                        <i class="ph-bold ph-power text-lg"></i> <span class="hidden sm:inline">ปิดห้อง</span>
                     </button>
                 </div>
             </div>
@@ -255,7 +261,7 @@
         <div class="bg-slate-900 border border-rose-800/50 rounded-xl p-5 md:p-6 w-full max-w-sm shadow-2xl transform transition-all text-center">
             <div class="mb-4 md:mb-5 flex justify-center"><div class="bg-rose-900/30 p-4 rounded-full text-rose-500"><i class="ph ph-warning-circle text-4xl"></i></div></div>
             <h3 class="text-lg md:text-xl font-bold text-white mb-2">ยืนยันการรีเซ็ตเกม?</h3>
-            <p class="text-slate-400 text-xs md:text-sm mb-6">ระบบจะเคลียร์บทบาทและสถานะของผู้เล่นทุกคนกลับไปเริ่มคืนแรก</p>
+            <p class="text-slate-400 text-xs md:text-sm mb-6">ระบบจะเคลียร์บทบาทและสถานะของผู้เล่นทุกคนกลับไปเริ่มคืนแรก (สำหรับเล่นโหมดออฟไลน์)</p>
             <div class="flex gap-2 md:gap-3 justify-center">
                 <button onclick="closeResetModal()" class="flex-1 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors font-medium text-sm md:text-base border border-slate-700">ยกเลิก</button>
                 <button onclick="executeReset()" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white px-4 py-2.5 rounded-lg transition-colors font-medium text-sm md:text-base">ยืนยันรีเซ็ต</button>
@@ -498,7 +504,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-    import { getDatabase, ref, set, onValue, push } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+    import { getDatabase, ref, set, onValue, push, update } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBn-t7mx3_Hb8gjL18SgCeRjVJCGG9N_DI",
@@ -518,10 +524,57 @@
     window.set = set;
     window.onValue = onValue;
     window.push = push;
+    window.update = update;
 
     let currentPlayersData = {}; 
 
-    // 🌟 1. ฟังก์ชันดักฟังคนเข้าห้อง
+    // 🌟 ระบบกดจบเกม (เล่นรอบใหม่ แต่เก็บห้องไว้)
+    window.endRoundAndKeepRoom = function() {
+        if(!window.currentPin) {
+            alert("ไม่มีห้องออนไลน์ที่เปิดอยู่ (หากเล่นออฟไลน์ให้ใช้ปุ่ม 'รีเซ็ต' แทน)");
+            return;
+        }
+        if(confirm("⚠️ ต้องการจบเกมรอบนี้และเล่น 'รอบใหม่' ใช่หรือไม่?\n\n(ผู้เล่นจะอยู่ในห้องเดิม และมือถือทุกคนจะเด้งกลับไปหน้ารอแจกไพ่)")) {
+            const updates = {};
+            Object.keys(currentPlayersData).forEach(key => { 
+                updates[`rooms/${window.currentPin}/players/${key}/role`] = "waiting"; 
+            });
+            window.update(window.ref(window.db), updates).then(() => {
+                document.getElementById('player-cards-grid').innerHTML = '';
+                document.getElementById('room-display').classList.remove('hidden');
+                document.getElementById('settings-panel').classList.remove('hidden');
+                document.getElementById('start-game-btn').innerHTML = `<i class="ph-bold ph-cards text-xl"></i> แจกบทบาทรอบใหม่!`;
+                document.getElementById('start-game-btn').disabled = false;
+                
+                window.players = []; 
+                window.updateStats(); 
+                window.resetTimer(); 
+                dayCount = 1; 
+                isNight = true; 
+                window.updateGamePhaseUI();
+                
+                window.addLog("--- จบเกมรอบนี้! กลับสู่ล็อบบี้ ---"); 
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+    };
+
+    // 🌟 ระบบลบห้องทิ้งถาวร (เตะผู้เล่นทุกคนออก)
+    window.endGameAndCloseRoom = function() {
+        if(confirm("⚠️ ปิดห้องแบบถาวร (วงแตก) ใช่หรือไม่?\n\n(ผู้เล่นทุกคนจะถูกเตะกลับหน้าแรก และลบข้อมูลห้องทิ้ง)")) {
+            if(window.currentPin) {
+                window.set(window.ref(window.db, 'rooms/' + window.currentPin), null).then(() => {
+                    sessionStorage.removeItem('wolf_gm_pin'); 
+                    window.location.reload(); 
+                });
+            } else { 
+                sessionStorage.removeItem('wolf_gm_pin'); 
+                window.location.reload(); 
+            }
+        }
+    };
+
+    // 🌟 ฟังก์ชันดักฟังคนเข้าห้อง
     window.bindRoomListener = function(pin) {
         window.currentPin = pin;
         const playerCountText = document.getElementById('player-count');
@@ -551,7 +604,7 @@
         });
     };
 
-    // 🌟 2. ป้องกัน GM เผลอรีเฟรชหน้าเว็บ
+    // 🌟 ป้องกัน GM เผลอรีเฟรชหน้าเว็บ
     window.addEventListener('beforeunload', function (e) {
         if (window.players && window.players.length > 0) { 
             e.preventDefault(); 
@@ -566,7 +619,7 @@
         const startGameBtn = document.getElementById('start-game-btn');
         const settingsPanel = document.getElementById('settings-panel');
 
-        // 🌟 3. ระบบ Auto-Reconnect ให้ GM (จำห้องเดิมไว้)
+        // 🌟 ระบบ Auto-Reconnect ให้ GM (จำห้องเดิมไว้)
         const savedPin = sessionStorage.getItem('wolf_gm_pin');
         if (savedPin) {
             createBtn.classList.add('hidden');
@@ -576,7 +629,7 @@
             window.bindRoomListener(savedPin);
         }
 
-        // 🌟 4. กดสร้างห้องใหม่
+        // 🌟 กดสร้างห้องใหม่
         createBtn.addEventListener('click', () => {
             const pin = Math.floor(1000 + Math.random() * 9000).toString();
             sessionStorage.setItem('wolf_gm_pin', pin); // เซฟลงเครื่อง GM
@@ -594,7 +647,7 @@
             window.bindRoomListener(pin);
         });
 
-        // 🌟 5. AI แจกไพ่
+        // 🌟 AI แจกไพ่
         startGameBtn.addEventListener('click', () => {
             if(!currentPlayersData) return;
             
@@ -640,7 +693,7 @@
                         window.renderPlayerCards(); 
                         window.updateStats(); 
                         window.addLog(`⭐ เกมเริ่ม! AI จัดไพ่ ${playerCount} ใบ (โหมด: ${villagerMode === 'no-villager' ? 'All Power' : 'ปกติ'})`);
-                        document.getElementById('player-cards-grid').scrollIntoView({ behavior: 'smooth' });
+                        document.getElementById('player-cards-grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }
                 });
             });
