@@ -100,7 +100,7 @@
         <!-- ระบบสร้างห้องและแจกบทบาท (Real-time) -->
         <div class="bg-slate-900/90 backdrop-blur-md border border-indigo-500/30 rounded-2xl p-6 text-center shadow-2xl mt-4">
             <h2 class="text-xl md:text-2xl font-bold text-white mb-2 flex items-center justify-center gap-2">
-                <i class="ph-fill ph-monitor-play text-indigo-400"></i> ศูนย์ควบคุมผู้เล่น (Real-time)
+                <i class="ph-fill ph-monitor-play text-indigo-400"></i> ศูนย์ควบคุมเกม (Real-time)
             </h2>
             
             <div id="room-display" class="hidden my-6">
@@ -118,6 +118,43 @@
                     <h3 class="text-slate-300 font-semibold mb-3 border-b border-slate-800 pb-2">ผู้เล่นที่เข้ามาแล้ว</h3>
                     <div id="player-list-container" class="flex flex-wrap gap-2 justify-center md:justify-start min-h-[50px] items-center">
                         <span class="text-slate-500 text-sm">ยังไม่มีผู้เล่น...</span>
+                    </div>
+                </div>
+
+                <!-- ⚙️ เมนูตั้งค่าก่อนเริ่มเกม -->
+                <div id="settings-panel" class="hidden mt-6 bg-slate-950/40 border border-slate-800 rounded-2xl p-5 max-w-2xl mx-auto text-left mb-6">
+                    <h3 class="text-indigo-400 font-bold mb-4 flex items-center gap-2">
+                        <i class="ph-fill ph-gear-six"></i> ตั้งค่าโหมดการสุ่ม
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- เลือกโหมดชาวบ้าน -->
+                        <div class="space-y-3">
+                            <label class="text-sm text-slate-400 font-medium">รูปแบบบทบาทพื้นฐาน:</label>
+                            <div class="flex flex-col gap-2">
+                                <label class="flex items-center gap-3 p-3 bg-slate-900/60 rounded-xl border border-slate-700 cursor-pointer hover:bg-slate-800 transition-colors">
+                                    <input type="radio" name="villager-mode" value="with-villager" checked class="w-5 h-5 accent-indigo-500">
+                                    <div class="text-sm">
+                                        <div class="text-white font-bold">สุ่มแบบมีชาวบ้าน</div>
+                                        <div class="text-xs text-slate-500">เน้นการปั่นกระแสและจับโกหก</div>
+                                    </div>
+                                </label>
+                                <label class="flex items-center gap-3 p-3 bg-slate-900/60 rounded-xl border border-slate-700 cursor-pointer hover:bg-slate-800 transition-colors">
+                                    <input type="radio" name="villager-mode" value="no-villager" class="w-5 h-5 accent-rose-500">
+                                    <div class="text-sm">
+                                        <div class="text-white font-bold">No Villager (All Power)</div>
+                                        <div class="text-xs text-slate-500">ทุกคนมีพลังพิเศษทั้งหมด</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- แจ้งเตือนบทบาทบังคับ -->
+                        <div class="bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-4 flex flex-col justify-center">
+                            <p class="text-xs text-indigo-300 leading-relaxed italic">
+                                * ระบบ AI จะล็อค <span class="text-white font-bold">🔮 เทพพยากรณ์</span> และ <span class="text-white font-bold">🛡️ บอดี้การ์ด</span> เป็นตัวยืนพื้นให้เสมอเพื่อความสมดุล
+                            </p>
+                        </div>
                     </div>
                 </div>
 
@@ -260,14 +297,10 @@
         </div>
     </div>
 
+<!-- Local Scripts (ระบบ UI) -->
 <script>
-    // --- Data Setup ---
-    // เปลี่ยนจาก let players เป็น window.players เพื่อให้เชื่อมกับ Firebase ได้
-    window.players = [
-        { name: "ผู้เล่น 1", role: "➖ เลือกบทบาท", status: "รอด" },
-        { name: "ผู้เล่น 2", role: "➖ เลือกบทบาท", status: "รอด" },
-        { name: "ผู้เล่น 3", role: "➖ เลือกบทบาท", status: "รอด" }
-    ];
+    // ข้อมูลเริ่มต้น
+    window.players = [];
     let dayCount = 1;
     let isNight = true;
     let timerInterval;
@@ -467,24 +500,22 @@
             resetModal: document.getElementById('confirm-reset-modal'), rolesModal: document.getElementById('in-game-roles-modal'), rolesContainer: document.getElementById('in-game-roles-container')
         };
 
-        // Mobile Menu
         const menuBtn = document.getElementById('mobile-menu-btn');
         const closeMenuBtn = document.getElementById('close-mobile-menu');
         const mobileMenu = document.getElementById('mobile-menu');
         if (menuBtn) menuBtn.addEventListener('click', () => { mobileMenu.classList.add('open'); document.body.style.overflow = 'hidden'; });
         if (closeMenuBtn) closeMenuBtn.addEventListener('click', () => { mobileMenu.classList.remove('open'); document.body.style.overflow = ''; });
 
-        // Start
         if(DOM.grid) {
             window.setTimer(600); 
             window.renderPlayerCards(); 
             window.updateGamePhaseUI(); 
-            window.addLog("เริ่มเซสชั่นเกมเรียบร้อยแล้ว");
+            window.addLog("กระดาน GM พร้อมใช้งาน");
         }
     });
 </script>
 
-<!-- 🔥 Firebase Setup & Logic สุ่มไพ่ -->
+<!-- 🔥 Firebase Setup & Logic สุ่มไพ่ (AI อัจฉริยะ V2) -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
     import { getDatabase, ref, set, onValue, push } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
@@ -508,8 +539,6 @@
     window.onValue = onValue;
     window.push = push;
 
-    console.log("🔥 เชื่อมต่อ Firebase สำเร็จแล้ว!");
-
     document.addEventListener('DOMContentLoaded', () => {
         const createBtn = document.getElementById('create-room-btn');
         const roomDisplay = document.getElementById('room-display');
@@ -517,9 +546,10 @@
         const playerCountText = document.getElementById('player-count');
         const playerListContainer = document.getElementById('player-list-container');
         const startGameBtn = document.getElementById('start-game-btn');
+        const settingsPanel = document.getElementById('settings-panel');
 
         let currentPin = "";
-        let currentPlayersData = {}; // เก็บข้อมูลเพื่อนที่จอยเข้ามา
+        let currentPlayersData = {}; 
 
         // 1. กดปุ่มเปิดห้องใหม่
         createBtn.addEventListener('click', () => {
@@ -527,6 +557,7 @@
             
             createBtn.classList.add('hidden');
             roomDisplay.classList.remove('hidden');
+            settingsPanel.classList.remove('hidden'); // โชว์เมนูตั้งค่า
             roomPinText.innerText = currentPin;
 
             window.set(window.ref(window.db, 'rooms/' + currentPin), {
@@ -559,63 +590,102 @@
             });
         });
 
-        // 2. 🌟 กดยืนยันเริ่มเกม & แจกไพ่
+        // 2. 🌟 กดยืนยันเริ่มเกม & แจกไพ่ (สมองกล AI อัจฉริยะ V2)
         startGameBtn.addEventListener('click', () => {
             if(!currentPlayersData) return;
             
             const playerKeys = Object.keys(currentPlayersData);
             const playerCount = playerKeys.length;
+            
+            // อ่านค่าโหมดที่ GM เลือก
+            const villagerMode = document.querySelector('input[name="villager-mode"]:checked').value;
 
-            // สร้างสำรับไพ่ (1 หมาป่า, 1 หยั่งรู้, ที่เหลือชาวบ้าน)
-            let deck = ['werewolf', 'seer'];
-            while(deck.length < playerCount) {
-                deck.push('villager');
+            let deck = [];
+            
+            // 1. 🛡️ บังคับมี "พยากรณ์" และ "บอดี้การ์ด" (ตัวยืนพื้น)
+            // เช็คว่าคนเล่นมากกว่า 2 คนค่อยล็อค (กันบักกรณีเทสคนเดียว)
+            if (playerCount >= 2) {
+                deck.push('seer');
+                deck.push('bodyguard');
+            } else if (playerCount === 1) {
+                deck.push('seer'); 
             }
 
-            // สับไพ่แบบสุ่ม (Shuffle)
+            // 2. คำนวณจำนวนหมาป่า (1 ใน 3 ของผู้เล่น)
+            let wolfCount = Math.max(1, Math.floor(playerCount / 3));
+            
+            // สุ่มอัปเกรดหมาป่าให้เก่งขึ้น 1 ตัวถ้าคนเล่นเยอะ
+            if (playerCount >= 8) {
+                const evilPool = ['wolfcub', 'sorceress'];
+                deck.push(evilPool[Math.floor(Math.random() * evilPool.length)]);
+                for(let i = 0; i < wolfCount - 1; i++) deck.push('werewolf');
+            } else {
+                for(let i = 0; i < wolfCount; i++) deck.push('werewolf');
+            }
+
+            // 3. เติมบทบาทที่เหลือตามโหมดที่เลือก
+            const specialPool = ['witch', 'hunter', 'investigator', 'revealer', 'toughguy', 'cursed'];
+            
+            while(deck.length < playerCount) {
+                if (villagerMode === 'no-villager') {
+                    // ❌ โหมดไม่มีชาวบ้าน: สุ่มหยิบจากบทบาทพิเศษจนครบ
+                    const availableSpecials = specialPool.filter(role => !deck.includes(role));
+                    
+                    if (availableSpecials.length > 0) {
+                        const randomRole = availableSpecials[Math.floor(Math.random() * availableSpecials.length)];
+                        deck.push(randomRole);
+                    } else {
+                        // ถ้าบทพิเศษใน Pool หมดจริงๆ ให้เติมชาวบ้าน
+                        deck.push('villager');
+                    }
+                } else {
+                    // ✅ โหมดปกติ: เติมชาวบ้านลงไปให้เต็ม
+                    deck.push('villager');
+                }
+            }
+
+            // 4. สับไพ่
             deck.sort(() => Math.random() - 0.5);
 
             // เปลี่ยนหน้าตาปุ่มเป็นกำลังโหลด
-            startGameBtn.innerHTML = `<i class="ph-bold ph-spinner-gap animate-spin text-xl"></i> กำลังแจกไพ่และดึงข้อมูลลงกระดาน...`;
+            startGameBtn.innerHTML = `<i class="ph-bold ph-spinner-gap animate-spin text-xl"></i> AI กำลังจัดสมดุลไพ่...`;
             startGameBtn.disabled = true;
 
-            // ลบ "ผู้เล่นสมมติ 1,2,3" ออกจากกระดาน GM
+            // ลบ "ผู้เล่นสมมติ" ออกจากกระดาน GM
             window.players = [];
 
-            // แจกไพ่ให้ผู้เล่นแต่ละคน
             let updatesCount = 0;
             playerKeys.forEach((key, index) => {
                 const assignedRoleCode = deck[index];
                 
-                // แปลงรหัสอังกฤษเป็นชื่อภาษาไทยให้ตรงกับระบบกระดาน GM
-                let thaiRoleName = "🧑‍🌾 ชาวบ้าน";
-                if(assignedRoleCode === 'werewolf') thaiRoleName = "🐺 มนุษย์หมาป่า";
-                if(assignedRoleCode === 'seer') thaiRoleName = "🔮 เทพพยากรณ์";
+                // Dictionary สำหรับแปลชื่อ (โค้ด -> ไทย) เพื่อแสดงบนกระดาน GM
+                const roleDict = {
+                    'werewolf': "🐺 มนุษย์หมาป่า", 'seer': "🔮 เทพพยากรณ์", 
+                    'bodyguard': "🛡️ บอดี้การ์ด", 'witch': "🧪 แม่มด",
+                    'hunter': "🎯 นายพรานธรรมดา", 'investigator': "🕵️ นักสืบลึกลับ",
+                    'wolfcub': "🐶 ลูกมนุษย์หมาป่า", 'sorceress': "🌑 แม่หมอมนต์ดำ",
+                    'revealer': "🔥 ผู้เผยตัวตน", 'toughguy': "💪 หนุ่มถึก",
+                    'cursed': "👻 ผู้ต้องคำสาป", 'villager': "🧑‍🌾 ชาวบ้าน"
+                };
 
+                const thaiName = roleDict[assignedRoleCode] || "🧑‍🌾 ชาวบ้าน";
                 const playerName = currentPlayersData[key].name;
 
-                // 🌟 ดึงรายชื่อเพื่อนมาใส่ในกระดาน GM โดยอัตโนมัติ!
-                window.players.push({
-                    name: playerName,
-                    role: thaiRoleName,
-                    status: "รอด"
-                });
+                // โหลดรายชื่อลงกระดาน GM
+                window.players.push({ name: playerName, role: thaiName, status: "รอด" });
 
-                // ส่งการ์ดไปเปลี่ยนหน้าจอมือถือเพื่อน
+                // ส่งการ์ดไปหน้าจอมือถือเพื่อน
                 window.set(window.ref(window.db, `rooms/${currentPin}/players/${key}/role`), assignedRoleCode)
                 .then(() => {
                     updatesCount++;
-                    // ถ้าแจกครบทุกคนแล้ว
                     if(updatesCount === playerCount) {
-                        // ปิดกล่องรหัสห้องทิ้งไปเลย
+                        // ปิดหน้าจอเปิดห้อง & เมนูตั้งค่า
                         roomDisplay.classList.add('hidden');
-                        
-                        // สั่งอัปเดตกระดาน GM ใหม่ให้เห็นรายชื่อเพื่อนทุกคน
+                        settingsPanel.classList.add('hidden');
+
                         window.renderPlayerCards();
                         window.updateStats();
-                        window.addLog(`เริ่มเกมแล้ว! ผู้เล่น ${playerCount} คน โหลดลงกระดานเรียบร้อย`);
-                        
-                        // เลื่อนหน้าจอลงมาที่ตารางผู้เล่น
+                        window.addLog(`⭐ เกมเริ่ม! AI จัดไพ่ ${playerCount} ใบ (โหมด: ${villagerMode === 'no-villager' ? 'All Power' : 'ปกติ'})`);
                         document.getElementById('player-cards-grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }
                 });
