@@ -15,9 +15,7 @@
 
     <div id="join-section" class="w-full max-w-sm bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 shadow-2xl z-10 relative">
         <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center p-3 bg-indigo-500/10 text-indigo-400 rounded-2xl mb-4">
-                <i class="ph-fill ph-users-three text-4xl"></i>
-            </div>
+            <div class="inline-flex items-center justify-center p-3 bg-indigo-500/10 text-indigo-400 rounded-2xl mb-4"><i class="ph-fill ph-users-three text-4xl"></i></div>
             <h1 class="text-3xl font-bold text-white tracking-tight">เข้าร่วมเกม</h1>
         </div>
         <div class="space-y-5">
@@ -28,101 +26,114 @@
     </div>
 
     <div id="waiting-section" class="hidden w-full max-w-sm text-center z-10 relative">
-        <div class="relative w-24 h-24 mx-auto mb-6">
-            <i class="ph-fill ph-hourglass-high text-6xl text-amber-400 animate-pulse absolute inset-0 flex items-center justify-center"></i>
-        </div>
+        <div class="relative w-24 h-24 mx-auto mb-6"><i class="ph-fill ph-hourglass-high text-6xl text-amber-400 animate-pulse absolute inset-0 flex items-center justify-center"></i></div>
         <h2 class="text-2xl font-bold text-white mb-2" id="welcome-name">รอสักครู่...</h2>
-        <p class="text-slate-400">กำลังรอ GM เลือกโหมดและแจกบทบาท</p>
+        <p class="text-slate-400 mb-8">กำลังรอ GM เลือกโหมดและแจกบทบาท</p>
+        
+        <button onclick="leaveRoom()" class="mx-auto flex items-center justify-center gap-2 px-6 py-3 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 hover:text-rose-400 rounded-xl transition-all border border-rose-500/20 font-medium">
+            <i class="ph-bold ph-sign-out text-lg"></i> ขอตัวออกจากห้อง
+        </button>
     </div>
 
     <div id="role-section" class="hidden w-full max-w-sm z-10 relative">
         <div id="role-card" class="bg-slate-900 border-2 rounded-3xl p-6 text-center shadow-2xl transform transition-all duration-500 scale-90 opacity-0 relative overflow-hidden">
-            
             <img id="role-image" src="" alt="Role Card" class="w-full h-auto rounded-xl mb-4 shadow-lg hidden">
             
             <div id="role-info-text">
-                <div id="role-icon-box" class="w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-6 shadow-lg">
-                    <i id="role-icon" class="text-5xl text-white"></i>
-                </div>
+                <div id="role-icon-box" class="w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-6 shadow-lg"><i id="role-icon" class="text-5xl text-white"></i></div>
                 <h3 class="text-slate-400 font-medium mb-1">บทบาทของคุณคือ</h3>
                 <h1 id="role-name" class="text-3xl font-black text-white mb-3 tracking-tight">...</h1>
                 <p id="role-desc" class="text-slate-300 text-sm leading-relaxed pb-4 border-b border-slate-800">...</p>
             </div>
 
-            <div class="mt-4 pb-2">
-                <p class="text-[11px] text-rose-500 uppercase tracking-widest font-bold animate-pulse">ห้ามให้ใครดูหน้าจอนี้อย่างเด็ดขาด!</p>
-            </div>
+            <div class="mt-4 pb-2"><p class="text-[11px] text-rose-500 uppercase tracking-widest font-bold animate-pulse">ห้ามให้ใครดูหน้าจอนี้อย่างเด็ดขาด!</p></div>
             
-            <div id="role-loading-hint" class="absolute inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center gap-3 rounded-3xl z-20">
-                <i class="ph-bold ph-spinner-gap animate-spin text-4xl text-indigo-400"></i>
-                <p class="text-slate-400 text-sm font-medium">กำลังวาดการ์ดบทบาท...</p>
-            </div>
+            <div id="role-loading-hint" class="absolute inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center gap-3 rounded-3xl z-20"><i class="ph-bold ph-spinner-gap animate-spin text-4xl text-indigo-400"></i><p class="text-slate-400 text-sm font-medium">กำลังวาดการ์ดบทบาท...</p></div>
         </div>
+
+        <button onclick="leaveRoom()" class="mt-8 mx-auto flex items-center justify-center gap-2 px-6 py-3 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 hover:text-rose-400 rounded-xl transition-all border border-rose-500/20 font-medium">
+            <i class="ph-bold ph-sign-out text-lg"></i> ขอตัวออกจากห้อง
+        </button>
     </div>
 
     <script type="module">
+        // 🌟 นำเข้า Firebase ครบถ้วน รวมถึง remove สำหรับออกจากห้อง
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-        import { getDatabase, ref, get, set, push, child, onValue } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+        import { getDatabase, ref, get, set, push, child, onValue, remove } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBn-t7mx3_Hb8gjL18SgCeRjVJCGG9N_DI",
-            authDomain: "wolf-note.firebaseapp.com",
-            databaseURL: "https://wolf-note-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "wolf-note",
-            storageBucket: "wolf-note.firebasestorage.app",
-            messagingSenderId: "783649820868",
-            appId: "1:783649820868:web:b7bb2a89b94b730c54b991"
-        };
+        const firebaseConfig = { apiKey: "AIzaSyBn-t7mx3_Hb8gjL18SgCeRjVJCGG9N_DI", authDomain: "wolf-note.firebaseapp.com", databaseURL: "https://wolf-note-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "wolf-note", storageBucket: "wolf-note.firebasestorage.app", messagingSenderId: "783649820868", appId: "1:783649820868:web:b7bb2a89b94b730c54b991" };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        let myPlayerId = ""; 
+        const joinSection = document.getElementById('join-section'); const waitingSection = document.getElementById('waiting-section'); const roleSection = document.getElementById('role-section'); const roleCard = document.getElementById('role-card');
 
-        const joinSection = document.getElementById('join-section');
-        const waitingSection = document.getElementById('waiting-section');
-        const roleSection = document.getElementById('role-section');
-        const roleCard = document.getElementById('role-card');
+        // 🌟 1. ฟังก์ชันขอออกจากห้อง (วงยังไม่แตก แต่เราขอกลับก่อน)
+        window.leaveRoom = function() {
+            const pin = sessionStorage.getItem('wolf_pin'); const pId = sessionStorage.getItem('wolf_playerId');
+            if(confirm("ต้องการออกจากห้องเกมนี้ใช่หรือไม่?")) {
+                if(pin && pId) { remove(ref(db, `rooms/${pin}/players/${pId}`)).then(() => { sessionStorage.clear(); window.location.reload(); }); } else { sessionStorage.clear(); window.location.reload(); }
+            }
+        };
 
+        // 🌟 2. ฟังก์ชันสลับกลับไปหน้ารอ (เมื่อ GM กดเล่นรอบใหม่)
+        function showWaitingScreen() {
+            roleSection.classList.add('hidden'); waitingSection.classList.remove('hidden');
+            const rImage = document.getElementById('role-image'); rImage.src = ""; rImage.classList.add('hidden');
+            roleCard.classList.remove('scale-100', 'opacity-100'); roleCard.classList.add('scale-90', 'opacity-0');
+        }
+
+        // 🌟 3. ฟังก์ชันหลักในการเชื่อมต่อและดักฟังห้อง (ใช้ตอนเข้าใหม่ + ตอน Reconnect)
+        function listenToRoom(pin, playerId, playerName) {
+            joinSection.classList.add('hidden'); waitingSection.classList.remove('hidden');
+            document.getElementById('welcome-name').innerText = `สวัสดี, ${playerName}!`;
+
+            onValue(ref(db, `rooms/${pin}/players/${playerId}`), (snap) => {
+                const myData = snap.val();
+                
+                // กรณี 1: ข้อมูลเราหายไป (GM ยุบห้อง หรือเราถูกเตะ)
+                if (myData === null) {
+                    sessionStorage.clear(); alert("📢 GM ได้ทำการปิดห้องเกมนี้ลงแล้ว (วงแตก!)"); window.location.reload(); return;
+                }
+
+                // กรณี 2: GM กดเล่นรอบใหม่ (กลับสู่สถานะรอ)
+                if (myData.role === "waiting" || myData.role === "waiting_for_players") {
+                    showWaitingScreen();
+                } 
+                // กรณี 3: GM แจกบทบาทแล้ว
+                else {
+                    showMyRole(myData.role);
+                }
+            });
+        }
+
+        // 🌟 4. ระบบ Auto-Reconnect ให้ผู้เล่น (จำรหัสห้องไว้ในเครื่อง)
+        const savedPin = sessionStorage.getItem('wolf_pin'); const savedPlayerId = sessionStorage.getItem('wolf_playerId'); const savedPlayerName = sessionStorage.getItem('wolf_playerName');
+        if (savedPin && savedPlayerId && savedPlayerName) {
+            get(child(ref(db), `rooms/${savedPin}/players/${savedPlayerId}`)).then((snapshot) => {
+                if (snapshot.exists()) { listenToRoom(savedPin, savedPlayerId, savedPlayerName); } else { sessionStorage.clear(); }
+            });
+        }
+
+        // 🌟 5. การกดเข้าห้องครั้งแรก
         document.getElementById('join-btn').addEventListener('click', () => {
-            const pin = document.getElementById('pin-input').value.trim();
-            const playerName = document.getElementById('name-input').value.trim();
-
-            if(pin.length !== 4 || playerName === "") return alert("กรุณากรอกรหัส PIN และชื่อของคุณให้ครบถ้วน");
-
-            const joinBtn = document.getElementById('join-btn');
-            joinBtn.innerText = "กำลังตรวจสอบ..."; joinBtn.disabled = true;
+            const pin = document.getElementById('pin-input').value.trim(); const playerName = document.getElementById('name-input').value.trim();
+            if(pin.length !== 4 || playerName === "") return alert("กรุณากรอกรหัส PIN และชื่อให้ครบ");
+            const joinBtn = document.getElementById('join-btn'); joinBtn.innerText = "กำลังตรวจสอบ..."; joinBtn.disabled = true;
 
             get(child(ref(db), `rooms/${pin}`)).then((snapshot) => {
                 if (snapshot.exists()) {
                     const newPlayerRef = push(ref(db, `rooms/${pin}/players`));
-                    myPlayerId = newPlayerRef.key; 
+                    const newPlayerId = newPlayerRef.key; 
 
-                    set(newPlayerRef, {
-                        name: playerName,
-                        role: "waiting", 
-                        status: "alive"
-                    }).then(() => {
-                        joinSection.classList.add('hidden');
-                        waitingSection.classList.remove('hidden');
-                        document.getElementById('welcome-name').innerText = `สวัสดี, ${playerName}!`;
+                    sessionStorage.setItem('wolf_pin', pin); sessionStorage.setItem('wolf_playerId', newPlayerId); sessionStorage.setItem('wolf_playerName', playerName);
 
-                        // 🌟 ดักฟังบทบาทจาก GM
-                        onValue(ref(db, `rooms/${pin}/players/${myPlayerId}`), (snap) => {
-                            const myData = snap.val();
-                            if(myData && myData.role !== "waiting" && myData.role !== "waiting_for_players") {
-                                showMyRole(myData.role);
-                            }
-                        });
-                    });
-                } else {
-                    alert("ไม่พบห้องนี้! รหัส PIN อาจผิดพลาด");
-                    joinBtn.innerText = "เข้าสู่ห้องเกม"; joinBtn.disabled = false;
-                }
+                    set(newPlayerRef, { name: playerName, role: "waiting", status: "รอด" }).then(() => { listenToRoom(pin, newPlayerId, playerName); });
+                } else { alert("ไม่พบห้องนี้! รหัส PIN อาจผิดพลาด หรือ GM ปิดห้องไปแล้ว"); joinBtn.innerText = "เข้าสู่ห้องเกม"; joinBtn.disabled = false; }
             });
         });
 
-        // 🧠 ฐานข้อมูลหน้าตาการ์ด (ข้อมูลชื่อ, สี, และคำอธิบาย)
+        // 🧠 ฐานข้อมูลหน้าตาการ์ดสำรอง
         const fallbackCards = {
             'villager': { name: "ชาวบ้าน", desc: "ไม่มีความสามารถพิเศษ ใช้ทักษะการจับโกหกเพื่อหาตัวหมาป่า", nameClass: "text-emerald-400", icon: "ph-user", boxColor: "bg-emerald-500", borderClass: "border-emerald-500/50", shadow: "shadow-[0_0_30px_rgba(16,185,129,0.2)]" },
             'werewolf': { name: "มนุษย์หมาป่า", desc: "ตื่นขึ้นมาในตอนกลางคืนเพื่อเลือกเหยื่อที่จะกำจัด", nameClass: "text-rose-500", icon: "ph-paw-print", boxColor: "bg-rose-600", borderClass: "border-rose-500/50", shadow: "shadow-[0_0_30px_rgba(225,29,72,0.2)]" },
@@ -139,55 +150,22 @@
             'fool': { name: "ตัวป่วน", desc: "คุณไม่ได้อยู่ฝ่ายใดเลย คุณจะชนะทันที หากหลอกให้ทุกคนโหวตประหารคุณได้สำเร็จ!", nameClass: "text-pink-400", icon: "ph-smiley-wink", boxColor: "bg-pink-500", borderClass: "border-pink-500/50", shadow: "shadow-[0_0_30px_rgba(236,72,153,0.2)]" }
         };
 
-        // ฟังก์ชันเปิดการ์ดโชว์บนหน้าจอ
         function showMyRole(roleCode) {
-            waitingSection.classList.add('hidden');
-            roleSection.classList.remove('hidden');
-            
-            // ทำให้การ์ดเด้งขึ้นมา
-            setTimeout(() => {
-                roleCard.classList.remove('scale-90', 'opacity-0');
-                roleCard.classList.add('scale-100', 'opacity-100');
-            }, 50);
+            waitingSection.classList.add('hidden'); roleSection.classList.remove('hidden');
+            setTimeout(() => { roleCard.classList.remove('scale-90', 'opacity-0'); roleCard.classList.add('scale-100', 'opacity-100'); }, 50);
 
-            const rImage = document.getElementById('role-image');
-            const rInfoText = document.getElementById('role-info-text');
-            const rLoadingHint = document.getElementById('role-loading-hint');
-            const roleIconBox = document.getElementById('role-icon-box'); // ดึงกล่องไอคอนมาจัดการ
-
-            // 1. นำข้อมูลสำรอง (ชื่อและคำอธิบาย) มาจัดเตรียมไว้
+            const rImage = document.getElementById('role-image'); const rInfoText = document.getElementById('role-info-text'); const rLoadingHint = document.getElementById('role-loading-hint'); const roleIconBox = document.getElementById('role-icon-box');
             const fallback = fallbackCards[roleCode] || fallbackCards['villager']; 
             
-            document.getElementById('role-name').innerText = fallback.name;
-            document.getElementById('role-name').className = `text-3xl font-black mb-3 tracking-tight ${fallback.nameClass}`;
-            document.getElementById('role-desc').innerText = fallback.desc;
-            document.getElementById('role-icon').className = `ph-fill ${fallback.icon} text-5xl text-white`;
+            document.getElementById('role-name').innerText = fallback.name; document.getElementById('role-name').className = `text-3xl font-black mb-3 tracking-tight ${fallback.nameClass}`; document.getElementById('role-desc').innerText = fallback.desc; document.getElementById('role-icon').className = `ph-fill ${fallback.icon} text-5xl text-white`;
             roleIconBox.className = `w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-6 shadow-lg ${fallback.boxColor}`;
             roleCard.className = `bg-slate-900 border-2 rounded-3xl p-6 text-center transform transition-all duration-500 relative overflow-hidden ${fallback.borderClass} ${fallback.shadow}`;
 
-            // รีเซ็ตสถานะทุกอย่างให้โชว์ก่อนเริ่มโหลดรูปรอบใหม่ (เผื่อเล่นตาถัดไป)
-            rInfoText.classList.remove('hidden');
-            roleIconBox.classList.remove('hidden');
-            rImage.classList.add('hidden');
-            rLoadingHint.classList.remove('hidden');
+            rInfoText.classList.remove('hidden'); roleIconBox.classList.remove('hidden'); rImage.classList.add('hidden'); rLoadingHint.classList.remove('hidden');
 
-            // 2. พยายามโหลดรูปภาพการ์ดจากโฟลเดอร์ assets
             rImage.src = `assets/${roleCode}.png`;
-
-            // ✅ กรณีที่ 1: โหลดรูปภาพสำเร็จ
-            rImage.onload = () => {
-                rLoadingHint.classList.add('hidden'); // ปิดหน้าจอโหลดวงกลมหมุนๆ
-                roleIconBox.classList.add('hidden');  // 🌟 ซ่อนแค่ "ไอคอนวงกลม"
-                rImage.classList.remove('hidden');    // โชว์รูปภาพเต็มใบ
-                // ส่วน rInfoText จะยังคงแสดงชื่อและคำอธิบายอยู่ด้านล่างรูป
-            };
-
-            // ❌ กรณีที่ 2: โหลดรูปไม่สำเร็จ (ลืมใส่รูป หรือพิมพ์ชื่อไฟล์ผิด)
-            rImage.onerror = () => {
-                rLoadingHint.classList.add('hidden'); 
-                rImage.classList.add('hidden');       // ซ่อนกรอบรูปภาพที่โหลดไม่ขึ้น
-                roleIconBox.classList.remove('hidden'); // โชว์ไอคอนวงกลมกลับมาแทน
-            };
+            rImage.onload = () => { rLoadingHint.classList.add('hidden'); roleIconBox.classList.add('hidden'); rImage.classList.remove('hidden'); };
+            rImage.onerror = () => { rLoadingHint.classList.add('hidden'); rImage.classList.add('hidden'); roleIconBox.classList.remove('hidden'); };
         }
     </script>
 </body>
