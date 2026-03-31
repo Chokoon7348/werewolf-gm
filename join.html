@@ -16,33 +16,52 @@
     <!-- 1. หน้ากรอกรหัส -->
     <div id="join-section" class="w-full max-w-sm bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 shadow-2xl z-10 relative">
         <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center p-3 bg-indigo-500/10 text-indigo-400 rounded-2xl mb-4">
+                <i class="ph-fill ph-users-three text-4xl"></i>
+            </div>
             <h1 class="text-3xl font-bold text-white tracking-tight">เข้าร่วมเกม</h1>
         </div>
         <div class="space-y-5">
-            <input type="number" id="pin-input" placeholder="รหัสห้อง 4 หลัก" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white text-center text-2xl font-bold focus:border-indigo-500 outline-none">
-            <input type="text" id="name-input" placeholder="ชื่อของคุณ" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white text-lg focus:border-indigo-500 outline-none">
-            <button id="join-btn" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg mt-4">เข้าสู่ห้องเกม</button>
+            <input type="number" id="pin-input" placeholder="รหัสห้อง 4 หลัก" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white text-center text-2xl font-bold focus:border-indigo-500 outline-none transition-colors">
+            <input type="text" id="name-input" placeholder="ชื่อของคุณ" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white text-lg focus:border-indigo-500 outline-none transition-colors">
+            <button id="join-btn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-xl shadow-lg mt-4 transition-all">เข้าสู่ห้องเกม</button>
         </div>
     </div>
 
     <!-- 2. หน้ารอ GM -->
     <div id="waiting-section" class="hidden w-full max-w-sm text-center z-10 relative">
-        <i class="ph-fill ph-hourglass-high text-6xl text-amber-400 animate-pulse mb-6"></i>
+        <div class="relative w-24 h-24 mx-auto mb-6">
+            <i class="ph-fill ph-hourglass-high text-6xl text-amber-400 animate-pulse absolute inset-0 flex items-center justify-center"></i>
+        </div>
         <h2 class="text-2xl font-bold text-white mb-2" id="welcome-name">รอสักครู่...</h2>
-        <p class="text-slate-400">กำลังรอ GM เริ่มเกมและแจกบทบาท</p>
+        <p class="text-slate-400">กำลังรอ GM เลือกโหมดและแจกบทบาท</p>
     </div>
 
-    <!-- 3. หน้าโชว์การ์ดบทบาท (ใหม่ล่าสุด 🌟) -->
+    <!-- 3. หน้าโชว์การ์ดบทบาท (Dynamic Load) -->
     <div id="role-section" class="hidden w-full max-w-sm z-10 relative">
-        <div id="role-card" class="bg-slate-900 border-2 rounded-3xl p-8 text-center shadow-2xl transform transition-all duration-500 scale-90 opacity-0">
-            <div id="role-icon-box" class="w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-6 shadow-lg">
-                <i id="role-icon" class="text-5xl text-white"></i>
+        <div id="role-card" class="bg-slate-900 border-2 rounded-3xl p-6 text-center shadow-2xl transform transition-all duration-500 scale-90 opacity-0 relative overflow-hidden">
+            
+            <!-- 🌟 ส่วนที่ 1: โหลดรูปภาพเต็มใบ (ถ้ามีรูปในโฟลเดอร์ assets) -->
+            <img id="role-image" src="" alt="Role Card" class="w-full h-auto rounded-xl mb-4 shadow-lg hidden">
+            
+            <!-- 🌟 ส่วนที่ 2: ข้อมูลบทบาท (ระบบสำรองถ้าไม่มีรูปภาพ) -->
+            <div id="role-info-text">
+                <div id="role-icon-box" class="w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-6 shadow-lg">
+                    <i id="role-icon" class="text-5xl text-white"></i>
+                </div>
+                <h3 class="text-slate-400 font-medium mb-1">บทบาทของคุณคือ</h3>
+                <h1 id="role-name" class="text-3xl font-black text-white mb-3 tracking-tight">...</h1>
+                <p id="role-desc" class="text-slate-300 text-sm leading-relaxed pb-4 border-b border-slate-800">...</p>
             </div>
-            <h3 class="text-slate-400 font-medium mb-1">บทบาทของคุณคือ</h3>
-            <h1 id="role-name" class="text-4xl font-black text-white mb-4 tracking-tight">...</h1>
-            <p id="role-desc" class="text-slate-300 text-sm leading-relaxed pb-6 border-b border-slate-800">...</p>
-            <div class="mt-6">
-                <p class="text-xs text-slate-500 uppercase tracking-widest font-bold">ห้ามให้ใครดูหน้าจอนี้!</p>
+
+            <div class="mt-4 pb-2">
+                <p class="text-[11px] text-rose-500 uppercase tracking-widest font-bold animate-pulse">ห้ามให้ใครดูหน้าจอนี้อย่างเด็ดขาด!</p>
+            </div>
+            
+            <!-- ตัวบอกสถานะกำลังโหลด -->
+            <div id="role-loading-hint" class="absolute inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center gap-3 rounded-3xl z-20">
+                <i class="ph-bold ph-spinner-gap animate-spin text-4xl text-indigo-400"></i>
+                <p class="text-slate-400 text-sm font-medium">กำลังวาดการ์ดบทบาท...</p>
             </div>
         </div>
     </div>
@@ -64,7 +83,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        let myPlayerId = ""; // ตัวแปรเก็บรหัสประจำตัวของเครื่องนี้
+        let myPlayerId = ""; 
 
         const joinSection = document.getElementById('join-section');
         const waitingSection = document.getElementById('waiting-section');
@@ -75,11 +94,13 @@
             const pin = document.getElementById('pin-input').value.trim();
             const playerName = document.getElementById('name-input').value.trim();
 
-            if(pin.length !== 4 || playerName === "") return alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+            if(pin.length !== 4 || playerName === "") return alert("กรุณากรอกรหัส PIN และชื่อของคุณให้ครบถ้วน");
+
+            const joinBtn = document.getElementById('join-btn');
+            joinBtn.innerText = "กำลังตรวจสอบ..."; joinBtn.disabled = true;
 
             get(child(ref(db), `rooms/${pin}`)).then((snapshot) => {
                 if (snapshot.exists()) {
-                    // สร้างผู้เล่นใหม่ และจำรหัสประจำตัว (Key) ไว้
                     const newPlayerRef = push(ref(db, `rooms/${pin}/players`));
                     myPlayerId = newPlayerRef.key; 
 
@@ -92,19 +113,37 @@
                         waitingSection.classList.remove('hidden');
                         document.getElementById('welcome-name').innerText = `สวัสดี, ${playerName}!`;
 
-                        // 🌟 ดักฟังหน้าจอตัวเองตลอดเวลา ถ้า GM เปลี่ยนบทบาทให้ จะเด้งทันที!
+                        // 🌟 ดักฟังบทบาทจาก GM
                         onValue(ref(db, `rooms/${pin}/players/${myPlayerId}`), (snap) => {
                             const myData = snap.val();
-                            if(myData && myData.role !== "waiting") {
+                            if(myData && myData.role !== "waiting" && myData.role !== "waiting_for_players") {
                                 showMyRole(myData.role);
                             }
                         });
                     });
                 } else {
-                    alert("ไม่พบห้องนี้!");
+                    alert("ไม่พบห้องนี้! รหัส PIN อาจผิดพลาด");
+                    joinBtn.innerText = "เข้าสู่ห้องเกม"; joinBtn.disabled = false;
                 }
             });
         });
+
+        // 🧠 ฐานข้อมูลหน้าตาการ์ดสำรอง (เผื่อยังไม่มีรูปในโฟลเดอร์ assets)
+        const fallbackCards = {
+            'villager': { name: "ชาวบ้าน", desc: "ไม่มีความสามารถพิเศษ ใช้ทักษะการจับโกหกเพื่อหาตัวหมาป่า", nameClass: "text-emerald-400", icon: "ph-user", boxColor: "bg-emerald-500", borderClass: "border-emerald-500/50", shadow: "shadow-[0_0_30px_rgba(16,185,129,0.2)]" },
+            'werewolf': { name: "มนุษย์หมาป่า", desc: "ตื่นขึ้นมาในตอนกลางคืนเพื่อเลือกเหยื่อที่จะกำจัด", nameClass: "text-rose-500", icon: "ph-paw-print", boxColor: "bg-rose-600", borderClass: "border-rose-500/50", shadow: "shadow-[0_0_30px_rgba(225,29,72,0.2)]" },
+            'seer': { name: "เทพพยากรณ์", desc: "ตื่นตอนกลางคืนเพื่อตรวจดูว่าผู้เล่น 1 คนเป็นหมาป่าหรือไม่", nameClass: "text-blue-400", icon: "ph-eye", boxColor: "bg-blue-500", borderClass: "border-blue-500/50", shadow: "shadow-[0_0_30px_rgba(59,130,246,0.2)]" },
+            'bodyguard': { name: "บอดี้การ์ด", desc: "เลือกปกป้องผู้เล่น 1 คนให้รอดจากการถูกหมาป่ากำจัดในคืนนี้", nameClass: "text-indigo-400", icon: "ph-shield-check", boxColor: "bg-indigo-500", borderClass: "border-indigo-500/50", shadow: "shadow-[0_0_30px_rgba(99,102,241,0.2)]" },
+            'witch': { name: "แม่มด", desc: "มียาชุบชีวิต 1 ขวด และยาพิษ 1 ขวด (ใช้ได้แค่อย่างละ 1 ครั้งทั้งเกม)", nameClass: "text-fuchsia-400", icon: "ph-flask", boxColor: "bg-fuchsia-600", borderClass: "border-fuchsia-500/50", shadow: "shadow-[0_0_30px_rgba(217,70,239,0.2)]" },
+            'hunter': { name: "นายพราน", desc: "หากคุณถูกกำจัด คุณสามารถเลือกยิงใครก็ได้ให้ตายตามไป 1 คน", nameClass: "text-amber-500", icon: "ph-crosshair", boxColor: "bg-amber-600", borderClass: "border-amber-500/50", shadow: "shadow-[0_0_30px_rgba(245,158,11,0.2)]" },
+            'investigator': { name: "นักสืบลึกลับ", desc: "เลือกตรวจผู้เล่น 3 คนที่นั่งติดกัน จะรู้ว่า 1 ในนั้นมีหมาป่าหรือไม่", nameClass: "text-sky-400", icon: "ph-magnifying-glass", boxColor: "bg-sky-500", borderClass: "border-sky-500/50", shadow: "shadow-[0_0_30px_rgba(14,165,233,0.2)]" },
+            'wolfcub': { name: "ลูกหมาป่า", desc: "อยู่ฝ่ายหมาป่า หากคุณถูกโหวตตาย คืนถัดไปหมาป่าจะกัดได้ 2 คน", nameClass: "text-red-500", icon: "ph-dog", boxColor: "bg-red-600", borderClass: "border-red-500/50", shadow: "shadow-[0_0_30px_rgba(220,38,38,0.2)]" },
+            'sorceress': { name: "แม่หมอมนต์ดำ", desc: "อยู่ฝ่ายหมาป่า ตื่นตอนกลางคืนเพื่อค้นหาว่าใครคือเทพพยากรณ์", nameClass: "text-purple-400", icon: "ph-magic-wand", boxColor: "bg-purple-600", borderClass: "border-purple-500/50", shadow: "shadow-[0_0_30px_rgba(147,51,234,0.2)]" },
+            'revealer': { name: "ผู้เผยตัวตน", desc: "ทายผู้เล่น 1 คน ถ้าเขาเป็นหมาป่า หมาป่าตาย แต่ถ้าทายผิด คุณจะตายแทน", nameClass: "text-orange-400", icon: "ph-mask-happy", boxColor: "bg-orange-500", borderClass: "border-orange-500/50", shadow: "shadow-[0_0_30px_rgba(249,115,22,0.2)]" },
+            'toughguy': { name: "หนุ่มถึก", desc: "หากคุณถูกหมาป่ากัด คุณจะยังไม่ตายทันที แต่จะไปตายเอาในคืนถัดไป", nameClass: "text-stone-400", icon: "ph-barbell", boxColor: "bg-stone-600", borderClass: "border-stone-500/50", shadow: "shadow-[0_0_30px_rgba(120,113,108,0.2)]" },
+            'cursed': { name: "ผู้ต้องคำสาป", desc: "ตอนแรกคุณเป็นชาวบ้าน แต่ถ้าถูกหมาป่ากัด คุณจะกลายเป็นหมาป่าทันที", nameClass: "text-zinc-400", icon: "ph-ghost", boxColor: "bg-zinc-600", borderClass: "border-zinc-500/50", shadow: "shadow-[0_0_30px_rgba(161,161,170,0.2)]" },
+            'fool': { name: "ตัวป่วน", desc: "คุณไม่ได้อยู่ฝ่ายใดเลย คุณจะชนะทันที หากหลอกให้ทุกคนโหวตประหารคุณได้สำเร็จ!", nameClass: "text-pink-400", icon: "ph-smiley-wink", boxColor: "bg-pink-500", borderClass: "border-pink-500/50", shadow: "shadow-[0_0_30px_rgba(236,72,153,0.2)]" }
+        };
 
         // ฟังก์ชันเปิดการ์ดโชว์บนหน้าจอ
         function showMyRole(roleCode) {
@@ -115,32 +154,39 @@
             setTimeout(() => {
                 roleCard.classList.remove('scale-90', 'opacity-0');
                 roleCard.classList.add('scale-100', 'opacity-100');
-            }, 100);
+            }, 50);
 
-            const rName = document.getElementById('role-name');
-            const rDesc = document.getElementById('role-desc');
-            const rIcon = document.getElementById('role-icon');
-            const rBox = document.getElementById('role-icon-box');
+            const rImage = document.getElementById('role-image');
+            const rInfoText = document.getElementById('role-info-text');
+            const rLoadingHint = document.getElementById('role-loading-hint');
 
-            if(roleCode === "werewolf") {
-                rName.innerText = "หมาป่า"; rName.className = "text-4xl font-black text-rose-500 mb-4";
-                rDesc.innerText = "ตื่นขึ้นมาในตอนกลางคืนเพื่อเลือกเหยื่อที่จะกำจัด และแฝงตัวเป็นชาวบ้านในตอนกลางวัน";
-                rIcon.className = "ph-fill ph-paw-print text-5xl text-white";
-                rBox.className = "w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-6 shadow-lg bg-rose-600";
-                roleCard.className = "bg-slate-900 border-2 border-rose-500/50 rounded-3xl p-8 text-center shadow-[0_0_30px_rgba(244,63,94,0.2)]";
-            } else if (roleCode === "seer") {
-                rName.innerText = "ผู้หยั่งรู้"; rName.className = "text-4xl font-black text-blue-400 mb-4";
-                rDesc.innerText = "ตื่นขึ้นมาตอนกลางคืนเพื่อตรวจดูว่าผู้เล่น 1 คนเป็นหมาป่าหรือไม่";
-                rIcon.className = "ph-fill ph-eye text-5xl text-white";
-                rBox.className = "w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-6 shadow-lg bg-blue-500";
-                roleCard.className = "bg-slate-900 border-2 border-blue-500/50 rounded-3xl p-8 text-center shadow-[0_0_30px_rgba(59,130,246,0.2)]";
-            } else {
-                rName.innerText = "ชาวบ้าน"; rName.className = "text-4xl font-black text-emerald-400 mb-4";
-                rDesc.innerText = "ไม่มีความสามารถพิเศษ ต้องใช้การสังเกตและจับโกหกเพื่อหาตัวหมาป่าในตอนกลางวัน";
-                rIcon.className = "ph-fill ph-user text-5xl text-white";
-                rBox.className = "w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-6 shadow-lg bg-emerald-500";
-                roleCard.className = "bg-slate-900 border-2 border-emerald-500/50 rounded-3xl p-8 text-center shadow-[0_0_30px_rgba(16,185,129,0.2)]";
-            }
+            // 1. นำข้อมูลสำรองมาจัดเตรียมไว้ก่อน
+            const fallback = fallbackCards[roleCode] || fallbackCards['villager']; // ถ้าบักให้โชว์เป็นชาวบ้านไว้ก่อน
+            
+            document.getElementById('role-name').innerText = fallback.name;
+            document.getElementById('role-name').className = `text-3xl font-black mb-3 tracking-tight ${fallback.nameClass}`;
+            document.getElementById('role-desc').innerText = fallback.desc;
+            document.getElementById('role-icon').className = `ph-fill ${fallback.icon} text-5xl text-white`;
+            document.getElementById('role-icon-box').className = `w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-6 shadow-lg ${fallback.boxColor}`;
+            roleCard.className = `bg-slate-900 border-2 rounded-3xl p-6 text-center transform transition-all duration-500 relative overflow-hidden ${fallback.borderClass} ${fallback.shadow}`;
+
+            // 2. พยายามโหลดรูปภาพการ์ดจริงๆ จากโฟลเดอร์ assets
+            // ใช้ Path สัมพัทธ์ เพื่อให้ดึงรูปภาพจากโฟลเดอร์ assets ใน GitHub ได้เลย
+            rImage.src = `assets/${roleCode}.png`;
+
+            // กรณีที่ 1: โหลดรูปภาพสำเร็จ!
+            rImage.onload = () => {
+                rLoadingHint.classList.add('hidden'); // ปิดหน้าจอโหลด
+                rInfoText.classList.add('hidden');    // ซ่อนข้อความสำรอง
+                rImage.classList.remove('hidden');    // โชว์รูปภาพเต็มใบ
+            };
+
+            // กรณีที่ 2: โหลดรูปไม่สำเร็จ (ยังไม่ได้ใส่รูป หรือพิมพ์ชื่อไฟล์ผิด)
+            rImage.onerror = () => {
+                rLoadingHint.classList.add('hidden'); // ปิดหน้าจอโหลด
+                rImage.classList.add('hidden');       // ซ่อนกรอบรูปภาพที่เสีย
+                rInfoText.classList.remove('hidden'); // โชว์ข้อความและการ์ดสวยๆ แทน
+            };
         }
     </script>
 </body>
