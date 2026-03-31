@@ -112,7 +112,7 @@
                 </div>
                 <div class="flex gap-2 w-full sm:w-auto">
                     <button onclick="nextTurn()" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-3 md:px-4 rounded-lg transition-colors flex items-center justify-center gap-1 md:gap-2 shadow-lg shadow-indigo-900/20"><i class="ph ph-moon-stars text-lg"></i> <span id="btn-next-phase-text" class="text-sm md:text-base">เปลี่ยนเวลา</span></button>
-                    <button onclick="openResetModal()" class="bg-rose-900/50 text-rose-400 hover:bg-rose-900 hover:text-rose-300 font-medium py-2 px-3 rounded-lg transition-colors border border-rose-800/50 flex items-center justify-center flex-shrink-0">
+                    <button onclick="openResetModal()" class="bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white font-medium py-2 px-3 rounded-lg transition-colors border border-slate-700 flex items-center justify-center flex-shrink-0">
                         <i class="ph ph-arrow-counter-clockwise text-lg"></i>
                     </button>
                 </div>
@@ -147,6 +147,10 @@
             <div class="lg:col-span-8 lg:col-start-5 lg:row-start-1 lg:row-span-3 order-3 h-fit bg-slate-900 p-4 md:p-6 rounded-xl border border-slate-800 shadow-md">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 md:mb-6 gap-3">
                     <h2 class="text-base md:text-lg font-semibold text-white flex items-center gap-1.5 md:gap-2"><i class="ph ph-users-three text-lg md:text-xl text-indigo-400"></i> จัดการผู้เล่น</h2>
+                    <div class="flex gap-2 w-full sm:w-auto">
+                        <button onclick="openInGameRolesModal()" class="flex-1 sm:flex-none bg-purple-600 hover:bg-purple-500 text-white text-sm md:text-base font-medium py-2 px-3 md:px-4 rounded-lg transition-colors flex items-center justify-center gap-1.5 md:gap-2 shadow-sm"><i class="ph ph-book-open-text text-base md:text-lg"></i> <span class="hidden sm:inline">บทบาทในเกม</span></button>
+                        <button onclick="openAddPlayerModal()" class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white text-sm md:text-base font-medium py-2 px-3 md:px-4 rounded-lg transition-colors flex items-center justify-center gap-1.5 md:gap-2 shadow-sm"><i class="ph ph-user-plus text-base md:text-lg"></i> <span class="hidden sm:inline">เพิ่มแมนนวล</span></button>
+                    </div>
                 </div>
                 <div id="player-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-4"></div>
             </div>
@@ -162,15 +166,49 @@
         </div>
     </div>
 
+    <div id="add-player-modal" class="modal-backdrop fixed inset-0 z-50 bg-black/70 items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 md:p-6 w-full max-w-md shadow-2xl transform transition-all">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="text-lg md:text-xl font-bold text-white flex items-center gap-2"><i class="ph ph-user-plus text-indigo-400"></i> เพิ่มผู้เล่นใหม่</h3>
+                <button onclick="closeAddPlayerModal()" class="text-slate-400 hover:text-white transition-colors p-1"><i class="ph ph-x text-xl"></i></button>
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-slate-400 mb-2">ชื่อผู้เล่น</label>
+                <input type="text" id="new-player-name-input" placeholder="ระบุชื่อ" class="w-full bg-slate-800 border border-slate-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" onkeypress="handleNewPlayerEnter(event)">
+                <p id="modal-error" class="text-rose-400 text-sm mt-2 hidden">กรุณาระบุชื่อผู้เล่น</p>
+            </div>
+            <div class="flex gap-2 md:gap-3 justify-end">
+                <button onclick="closeAddPlayerModal()" class="flex-1 sm:flex-none px-4 py-2.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors font-medium text-sm md:text-base border border-slate-700">ยกเลิก</button>
+                <button onclick="addPlayer()" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-lg transition-colors font-medium text-sm md:text-base">บันทึก</button>
+            </div>
+        </div>
+    </div>
+
     <div id="confirm-reset-modal" class="modal-backdrop fixed inset-0 z-50 bg-black/70 items-center justify-center p-4">
         <div class="bg-slate-900 border border-rose-800/50 rounded-xl p-5 md:p-6 w-full max-w-sm shadow-2xl transform transition-all text-center">
             <div class="mb-4 md:mb-5 flex justify-center"><div class="bg-rose-900/30 p-4 rounded-full text-rose-500"><i class="ph ph-warning-circle text-4xl"></i></div></div>
             <h3 class="text-lg md:text-xl font-bold text-white mb-2">ยืนยันการรีเซ็ตเกม?</h3>
-            <p class="text-slate-400 text-xs md:text-sm mb-6">ระบบจะเคลียร์บทบาทและสถานะของผู้เล่นทุกคนกลับไปเริ่มคืนแรก (สำหรับทดสอบในเครื่อง GM)</p>
+            <p class="text-slate-400 text-xs md:text-sm mb-6">ระบบจะเคลียร์บทบาทและสถานะของผู้เล่นทุกคนกลับไปเริ่มคืนแรก</p>
             <div class="flex gap-2 md:gap-3 justify-center">
                 <button onclick="closeResetModal()" class="flex-1 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors font-medium text-sm md:text-base border border-slate-700">ยกเลิก</button>
                 <button onclick="executeReset()" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white px-4 py-2.5 rounded-lg transition-colors font-medium text-sm md:text-base">ยืนยันรีเซ็ต</button>
             </div>
+        </div>
+    </div>
+
+    <div id="in-game-roles-modal" class="modal-backdrop fixed inset-0 z-50 bg-black/80 items-center justify-center p-2 sm:p-4">
+        <div class="bg-slate-900 border border-slate-700/50 rounded-xl w-full max-w-2xl max-h-[90vh] shadow-2xl transform transition-all flex flex-col mt-16 md:mt-0">
+            <div class="flex justify-between items-center p-4 md:p-6 border-b border-slate-800 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="bg-purple-500/20 p-2 rounded-lg text-purple-400"><i class="ph-fill ph-book-open-text text-2xl md:text-3xl"></i></div>
+                    <div>
+                        <h3 class="text-lg md:text-xl font-bold text-white">บทบาทในเกมกระดานนี้</h3>
+                        <p class="text-slate-400 text-xs md:text-sm mt-0.5">สรุปความสามารถเฉพาะตัวละครที่ถูกเลือกไว้</p>
+                    </div>
+                </div>
+                <button onclick="closeInGameRolesModal()" class="text-slate-400 hover:text-white transition-colors bg-slate-800 hover:bg-slate-700 p-2 rounded-lg"><i class="ph ph-x text-xl"></i></button>
+            </div>
+            <div class="p-4 md:p-6 overflow-y-auto flex-grow scroll-smooth" id="in-game-roles-container"></div>
         </div>
     </div>
 
@@ -179,20 +217,20 @@
     let dayCount = 1; let isNight = true; let timerInterval; let timeRemaining = 600;
 
     const rolesData = {
-        "➖ เลือกบทบาท": { group: "default", side: "-" },
-        "🧑‍🌾 ชาวบ้าน": { group: "villager", side: "Village Side" },
-        "🔮 เทพพยากรณ์": { group: "villager", side: "Village Side" },
-        "🛡️ บอดี้การ์ด": { group: "villager", side: "Village Side" },
-        "🧪 แม่มด": { group: "villager", side: "Village Side" },
-        "🎯 นายพรานธรรมดา": { group: "villager", side: "Village Side" },
-        "🕵️ นักสืบลึกลับ": { group: "villager", side: "Village Side" },
-        "🔥 ผู้เผยตัวตน": { group: "villager", side: "Village Side" },
-        "💪 หนุ่มถึก": { group: "villager", side: "Village Side" },
-        "🐺 มนุษย์หมาป่า": { group: "wolf", side: "Werewolf Side" },
-        "🐶 ลูกมนุษย์หมาป่า": { group: "wolf", side: "Werewolf Side" },
-        "🌑 แม่หมอมนต์ดำ": { group: "wolf", side: "Werewolf Side" },
-        "👻 ผู้ต้องคำสาป": { group: "special", side: "Mixed" },
-        "😜 ตัวป่วน": { group: "special", side: "Neutral" }
+        "➖ เลือกบทบาท": { group: "default", desc: "-", side: "-" },
+        "🧑‍🌾 ชาวบ้าน": { group: "villager", desc: "ไม่มีพลังพิเศษ", side: "Village Side" },
+        "🔮 เทพพยากรณ์": { group: "villager", desc: "ตรวจสอบหมาป่าได้", side: "Village Side" },
+        "🛡️ บอดี้การ์ด": { group: "villager", desc: "ปกป้อง 1 คนจากหมาป่า", side: "Village Side" },
+        "🧪 แม่มด": { group: "villager", desc: "มียาชุบชีวิตและยาพิษ", side: "Village Side" },
+        "🎯 นายพรานธรรมดา": { group: "villager", desc: "ตายแล้วลากคนไปตายด้วย", side: "Village Side" },
+        "🕵️ นักสืบลึกลับ": { group: "villager", desc: "เช็ค 3 คนหาหมาป่า", side: "Village Side" },
+        "🔥 ผู้เผยตัวตน": { group: "villager", desc: "เปิดการ์ดพิสูจน์หมาป่า", side: "Village Side" },
+        "💪 หนุ่มถึก": { group: "villager", desc: "ทนการกัดได้ 1 วัน", side: "Village Side" },
+        "🐺 มนุษย์หมาป่า": { group: "wolf", desc: "เลือกเหยื่อเพื่อกำจัด", side: "Werewolf Side" },
+        "🐶 ลูกมนุษย์หมาป่า": { group: "wolf", desc: "ตายแล้วหมาป่าคลั่งฆ่า 2 คน", side: "Werewolf Side" },
+        "🌑 แม่หมอมนต์ดำ": { group: "wolf", desc: "ตามหาเทพพยากรณ์", side: "Werewolf Side" },
+        "👻 ผู้ต้องคำสาป": { group: "special", desc: "โดนกัดจะกลายเป็นหมาป่า", side: "Mixed" },
+        "😜 ตัวป่วน": { group: "special", desc: "บังคับโหวตตาย 2 คน", side: "Neutral" }
     };
     const allRoles = Object.keys(rolesData);
 
@@ -226,6 +264,7 @@
             card.innerHTML = `
                 <div class="flex justify-between items-center gap-2 mb-1">
                     <input type="text" value="${player.name}" class="bg-transparent text-white font-semibold text-base w-full pb-1 outline-none" readonly>
+                    <button onclick="window.removePlayer(${index})" class="text-slate-500 hover:text-rose-400 transition-colors p-1.5 -mr-1"><i class="ph ph-trash text-xl"></i></button>
                 </div>
                 <div class="grid grid-cols-2 gap-2 mt-auto">
                     <select onchange="window.updatePlayerRole(${index}, this.value)" class="w-full text-xs md:text-sm border border-slate-700 rounded-lg py-2 px-2 outline-none cursor-pointer ${selectBgClass}">${roleOptions}</select>
@@ -241,6 +280,7 @@
 
     window.updatePlayerRole = function(index, newRole) { window.players[index].role = newRole; window.renderPlayerCards(); window.addLog(`[${window.players[index].name}] ➔ ${newRole}`); };
     window.updatePlayerStatus = function(index, newStatus) { window.players[index].status = newStatus; window.renderPlayerCards(); window.addLog(`[${window.players[index].name}] ➔ ${newStatus}`); };
+    window.removePlayer = function(index) { const name = window.players[index].name; window.players.splice(index, 1); window.renderPlayerCards(); window.addLog(`ลบผู้เล่น: ${name}`); };
 
     window.updateGamePhaseUI = function() {
         DOM.statusLabel.textContent = isNight ? `คืนที่ ${dayCount}` : `วันที่ ${dayCount}`;
@@ -270,7 +310,17 @@
     window.pauseTimer = function() { clearInterval(timerInterval); timerInterval = null; };
     window.resetTimer = function() { window.pauseTimer(); window.setTimer(600); };
 
-    // Reset Modal
+    // Modals Handling (🌟 คืนชีพการเพิ่มแมนนวล / ดูบทบาท)
+    window.openAddPlayerModal = function() { DOM.modal.classList.add('active'); DOM.modalInput.value = ''; DOM.modalError.classList.add('hidden'); setTimeout(() => DOM.modalInput.focus(), 100); };
+    window.closeAddPlayerModal = function() { DOM.modal.classList.remove('active'); };
+    window.addPlayer = function() {
+        const name = DOM.modalInput.value.trim();
+        if (name) {
+            window.players.push({ name: name, role: "➖ เลือกบทบาท", status: "รอด" }); window.renderPlayerCards(); window.addLog(`เพิ่มผู้เล่น: ${name}`); window.closeAddPlayerModal();
+        } else { DOM.modalError.classList.remove('hidden'); }
+    };
+    window.handleNewPlayerEnter = function(e) { if (e.key === 'Enter') window.addPlayer(); };
+
     window.openResetModal = function() { DOM.resetModal.classList.add('active'); };
     window.closeResetModal = function() { DOM.resetModal.classList.remove('active'); };
     window.executeReset = function() {
@@ -279,12 +329,37 @@
         window.renderPlayerCards(); window.updateGamePhaseUI(); window.addLog("รีเซ็ตกระดานเริ่มคืนที่ 1"); window.resetTimer(); window.closeResetModal(); window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    window.openInGameRolesModal = function() {
+        const roleMap = {}; let unassignedCount = 0;
+        window.players.forEach(p => { if (p.role === "➖ เลือกบทบาท") { unassignedCount++; } else { if (!roleMap[p.role]) roleMap[p.role] = []; roleMap[p.role].push(p.name); } });
+        DOM.rolesContainer.innerHTML = '';
+        if (unassignedCount > 0) DOM.rolesContainer.innerHTML += `<div class="bg-amber-900/30 border border-amber-500/30 text-amber-400 px-4 py-3 rounded-lg mb-5 text-sm flex items-center gap-2"><i class="ph-fill ph-warning-circle text-xl"></i><span>มีผู้เล่น <strong>${unassignedCount} คน</strong> ที่ยังไม่ได้กำหนดบทบาท</span></div>`;
+        const rolesInPlay = Object.keys(roleMap);
+        if (rolesInPlay.length === 0) {
+            DOM.rolesContainer.innerHTML += `<div class="text-center py-10 flex flex-col items-center justify-center opacity-60"><i class="ph-fill ph-ghost text-5xl text-slate-500 mb-3"></i><p class="text-slate-400">ยังไม่มีบทบาทในเกมขณะนี้</p></div>`;
+        } else {
+            const gridContainer = document.createElement('div'); gridContainer.className = 'grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4';
+            rolesInPlay.forEach(roleName => {
+                const data = rolesData[roleName] || { group: 'default', side: '-', desc: '' }; const holders = roleMap[roleName].join(', ');
+                const firstSpaceIndex = roleName.indexOf(' '); const emoji = firstSpaceIndex > -1 ? roleName.substring(0, firstSpaceIndex) : '🎭'; const name = firstSpaceIndex > -1 ? roleName.substring(firstSpaceIndex + 1) : roleName;
+                const card = document.createElement('div'); card.className = `p-3 md:p-4 rounded-xl border border-slate-700 bg-slate-800/50 flex gap-3 md:gap-4`;
+                card.innerHTML = `<div class="text-2xl md:text-3xl bg-slate-900/50 p-2 rounded-lg border border-slate-700/50 flex-shrink-0 flex items-center justify-center w-12 h-12 md:w-14 md:h-14">${emoji}</div><div class="flex-grow min-w-0"><div class="flex justify-between items-start gap-2 mb-1"><h4 class="font-bold text-white text-base md:text-lg truncate">${name}</h4></div><p class="text-xs md:text-sm text-slate-400 leading-snug mb-2">${data.desc}</p><div class="text-xs bg-slate-900/60 border border-slate-700/50 rounded-md px-2 py-1.5 text-indigo-300 flex items-center gap-1.5"><i class="ph-fill ph-user font-bold"></i> <span class="truncate">ผู้เล่น: ${holders}</span></div></div>`;
+                gridContainer.appendChild(card);
+            });
+            DOM.rolesContainer.appendChild(gridContainer);
+        }
+        DOM.rolesModal.classList.add('active');
+    };
+    window.closeInGameRolesModal = function() { DOM.rolesModal.classList.remove('active'); };
+
     document.addEventListener('DOMContentLoaded', () => {
         DOM = {
             grid: document.getElementById('player-cards-grid'), log: document.getElementById('game-log'), logInput: document.getElementById('log-input'),
             statTotal: document.getElementById('total-players'), statAlive: document.getElementById('alive-players'), statDead: document.getElementById('dead-players'),
             statusLabel: document.getElementById('game-status'), statusPing: document.getElementById('phase-ping'), statusDot: document.getElementById('phase-dot'), btnNextPhaseText: document.getElementById('btn-next-phase-text'),
-            timerDisplay: document.getElementById('timer-display'), resetModal: document.getElementById('confirm-reset-modal')
+            timerDisplay: document.getElementById('timer-display'), resetModal: document.getElementById('confirm-reset-modal'),
+            modal: document.getElementById('add-player-modal'), modalInput: document.getElementById('new-player-name-input'), modalError: document.getElementById('modal-error'),
+            rolesModal: document.getElementById('in-game-roles-modal'), rolesContainer: document.getElementById('in-game-roles-container')
         };
         if(DOM.grid) { window.setTimer(600); window.updateGamePhaseUI(); window.addLog("กระดาน GM พร้อมใช้งาน"); }
     });
@@ -307,12 +382,12 @@
     window.currentPin = "";
     let currentPlayersData = {}; 
 
-    // 🌟 1. ป้องกัน GM เผลอรีเฟรชหน้าเว็บ (ถามย้ำ)
+    // 🌟 ป้องกัน GM เผลอรีเฟรชหน้าเว็บ (ถามย้ำ)
     window.addEventListener('beforeunload', function (e) {
         if (window.players && window.players.length > 0) { e.preventDefault(); e.returnValue = ''; }
     });
 
-    // 🌟 2. ฟังก์ชันดักฟังผู้เล่นเข้า/ออกห้อง (ใช้ทั้งตอนสร้างใหม่และตอน Reconnect)
+    // 🌟 ฟังก์ชันดักฟังผู้เล่นเข้า/ออกห้อง (ใช้ทั้งตอนสร้างใหม่และตอน Reconnect)
     window.bindRoomListener = function(pin) {
         window.currentPin = pin;
         window.onValue(window.ref(window.db, `rooms/${pin}/players`), (snapshot) => {
@@ -336,7 +411,7 @@
         const createBtn = document.getElementById('create-room-btn');
         const startGameBtn = document.getElementById('start-game-btn');
 
-        // 🌟 3. ระบบ Auto-Reconnect ให้ GM (จำห้องเดิมไว้)
+        // 🌟 ระบบ Auto-Reconnect ให้ GM (จำห้องเดิมไว้)
         const savedPin = sessionStorage.getItem('wolf_gm_pin');
         if (savedPin) {
             document.getElementById('create-room-btn').classList.add('hidden');
