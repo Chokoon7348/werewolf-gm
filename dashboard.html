@@ -655,54 +655,104 @@
         });
 
         // 🌟 AI แจกไพ่
-        startGameBtn.addEventListener('click', () => {
-            if(!currentPlayersData) return;
-            
-            const playerKeys = Object.keys(currentPlayersData);
-            const playerCount = playerKeys.length;
-            const villagerMode = document.querySelector('input[name="villager-mode"]:checked').value;
+        // 🧠 AI แจกไพ่ V5 - All Roles Included (จัดเต็มครบ 38 ตัวละคร)
+    document.getElementById('start-game-btn').addEventListener('click', () => {
+        if(!currentPlayersData) return;
+        const playerKeys = Object.keys(currentPlayersData);
+        const playerCount = playerKeys.length;
+        const villagerMode = document.querySelector('input[name="villager-mode"]:checked').value;
 
-            let deck = [];
-            if (playerCount >= 2) { deck.push('seer'); deck.push('bodyguard'); } else if (playerCount === 1) { deck.push('seer'); }
+        let deck = [];
 
-            let wolfCount = Math.max(1, Math.floor(playerCount / 3));
-            if (playerCount >= 8) { 
-                const evilPool = ['wolfcub', 'sorceress']; 
-                deck.push(evilPool[Math.floor(Math.random() * evilPool.length)]); 
-                for(let i=0; i<wolfCount-1; i++) deck.push('werewolf');
-            } else { 
-                for(let i=0; i<wolfCount; i++) deck.push('werewolf'); 
+        // 1. 🔮 ล็อคบทบาทพื้นฐาน
+        if (playerCount >= 1) deck.push('seer'); // เทพพยากรณ์
+        if (playerCount >= 2) deck.push('bodyguard'); // บอดี้การ์ด
+
+        // 2. 🐺 ทีมมนุษย์หมาป่า (สุ่มหมาป่าพิเศษด้วย)
+        let wolfCount = Math.max(1, Math.floor(playerCount / 3));
+        let specialWolfPool = ['wolfcub', 'wolfman', 'alphawolf', 'minion', 'sorceress']; // ลูกหมาป่า, หมาป่ามนุษย์, โลกันต์, สมุน, แม่หมอ
+        specialWolfPool.sort(() => Math.random() - 0.5);
+
+        for(let i = 0; i < wolfCount; i++) {
+            if(i === 0) {
+                deck.push('werewolf'); // ตัวแรกบังคับหมาป่าธรรมดา
+            } else {
+                if(specialWolfPool.length > 0) deck.push(specialWolfPool.pop());
+                else deck.push('werewolf');
             }
+        }
 
-            const specialPool = ['witch', 'hunter', 'investigator', 'revealer', 'toughguy', 'cursed'];
-            while(deck.length < playerCount) {
-                if (villagerMode === 'no-villager') {
-                    const availableSpecials = specialPool.filter(role => !deck.includes(role));
-                    if (availableSpecials.length > 0) { deck.push(availableSpecials[Math.floor(Math.random() * availableSpecials.length)]); } else { deck.push('villager'); }
-                } else { deck.push('villager'); }
+        // 3. 🎭 จัดการฝ่ายกลาง (Neutral)
+        let neutralPool = ['fool', 'beggar', 'hoodlum', 'lonewolf', 'chupacabra', 'cultleader']; 
+        neutralPool.sort(() => Math.random() - 0.5);
+        
+        let targetNeutralCount = 0;
+        if (playerCount >= 6 && playerCount <= 9) targetNeutralCount = 1;
+        else if (playerCount >= 10 && playerCount <= 14) targetNeutralCount = 2;
+        else if (playerCount >= 15) targetNeutralCount = 3;
+
+        for(let i = 0; i < targetNeutralCount; i++) {
+            if(neutralPool.length > 0) deck.push(neutralPool.pop());
+        }
+
+        // 4. 🧪 บทบาทพิเศษฝ่ายชาวบ้าน และฝ่ายผสม (Mixed)
+        let specialVillagerPool = [
+            'auraseer', 'revealer', 'priest', 'investigator', 'elder', 'halfblood', 'idiot', 
+            'witch', 'spellcaster', 'toughguy', 'prince', 'pacifist', 'diseased', 'insomniac', 
+            'mystic', 'apprentice', 'cupid', 'huntress', 'hunter', 'mason', 'cursed', 'doppelganger', 'drunk'
+        ];
+        specialVillagerPool.sort(() => Math.random() - 0.5);
+
+        // 5. เติมที่ว่างที่เหลือให้เต็มกระดาน
+        while(deck.length < playerCount) {
+            if (villagerMode === 'no-villager') {
+                if(specialVillagerPool.length > 0) deck.push(specialVillagerPool.pop());
+                else deck.push('villager');
+            } else {
+                // สุ่มระหว่างชาวบ้านธรรมดา 70% หรือบทพิเศษ 30%
+                if (Math.random() > 0.7 && specialVillagerPool.length > 0) {
+                    deck.push(specialVillagerPool.pop());
+                } else {
+                    deck.push('villager');
+                }
             }
-            deck.sort(() => Math.random() - 0.5);
+        }
 
-            startGameBtn.innerHTML = `<i class="ph-bold ph-spinner-gap animate-spin text-xl"></i> AI กำลังจัดสมดุลไพ่...`; startGameBtn.disabled = true;
-            window.players = []; let updatesCount = 0;
+        // 6. สับไพ่ก่อนแจกจริง
+        deck.sort(() => Math.random() - 0.5);
 
-            playerKeys.forEach((key, index) => {
-                const assignedRoleCode = deck[index];
-                const roleDict = { 'werewolf': "🐺 มนุษย์หมาป่า", 'seer': "🔮 เทพพยากรณ์", 'bodyguard': "🛡️ บอดี้การ์ด", 'witch': "🧪 แม่มด", 'hunter': "🎯 นายพรานธรรมดา", 'investigator': "🕵️ นักสืบลึกลับ", 'wolfcub': "🐶 ลูกมนุษย์หมาป่า", 'sorceress': "🌑 แม่หมอมนต์ดำ", 'revealer': "🔥 ผู้เผยตัวตน", 'toughguy': "💪 หนุ่มถึก", 'cursed': "👻 ผู้ต้องคำสาป", 'villager': "🧑‍🌾 ชาวบ้าน" };
-                
-                window.players.push({ name: currentPlayersData[key].name, role: roleDict[assignedRoleCode] || "🧑‍🌾 ชาวบ้าน", status: "รอด" });
-                
-                window.set(window.ref(window.db, `rooms/${window.currentPin}/players/${key}/role`), assignedRoleCode).then(() => {
-                    updatesCount++;
-                    if(updatesCount === playerCount) {
-                        roomDisplay.classList.add('hidden'); 
-                        settingsPanel.classList.add('hidden');
-                        window.renderPlayerCards(); 
-                        window.updateStats(); 
-                        window.addLog(`⭐ เกมเริ่ม! AI จัดไพ่ ${playerCount} ใบ (โหมด: ${villagerMode === 'no-villager' ? 'All Power' : 'ปกติ'})`);
-                        document.getElementById('player-cards-grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                });
+        const btn = document.getElementById('start-game-btn');
+        btn.innerHTML = `<i class="ph-bold ph-spinner-gap animate-spin text-xl"></i> AI กำลังจัดสำรับ...`;
+        btn.disabled = true;
+
+        window.players = [];
+        let updatesCount = 0;
+        
+        // 📚 ดิกชันนารีแปลชื่อโค้ดเป็นชื่อไทย (ครบ 38 ตัว)
+        const dict = { 
+            'villager': "🧑‍🌾 ชาวบ้าน", 'seer': "🔮 เทพพยากรณ์", 'auraseer': "👁️ ญาณทิพย์", 'revealer': "🔥 ผู้เผยตัวตน",
+            'priest': "🙏 นักบวช", 'investigator': "🕵️ นักสืบลึกลับ", 'elder': "👵 แม่เฒ่า", 'halfblood': "🌗 ลูกครึ่งมนุษย์หมาป่า",
+            'fool': "😜 ตัวป่วน", 'idiot': "🤦 ไอทึม", 'bodyguard': "🛡️ บอดี้การ์ด", 'witch': "🧪 แม่มด",
+            'spellcaster': "✨ จอมเวท", 'toughguy': "💪 หนุ่มถึก", 'prince': "👑 เจ้าชาย", 'pacifist': "🕊️ ผู้รักสันติ",
+            'diseased': "🤢 ผู้ป่วยติดเชื้อ", 'insomniac': "😴 คนอดนอน", 'mystic': "🧿 ตาทิพย์", 'apprentice': "🎓 ลูกศิษย์ของเทพพยากรณ์",
+            'cupid': "💘 กามเทพ", 'huntress': "🏹 นายพรานหญิง", 'hunter': "🎯 นายพรานธรรมดา", 'mason': "🤝 พาราดอนแห่งเมสัน",
+            'werewolf': "🐺 มนุษย์หมาป่า", 'wolfcub': "🐶 ลูกมนุษย์หมาป่า", 'wolfman': "👤 หมาป่ามนุษย์", 'alphawolf': "🔥🐺 หมาป่าโลกันต์",
+            'minion': "😈 สมุนรับใช้", 'sorceress': "🌑 แม่หมอมนต์ดำ", 'beggar': "👺 ยาจก", 'lonewolf': "🐺🩶 หมาป่าเดียวดาย",
+            'hoodlum': "👊 อันธพาล", 'chupacabra': "🐐 ชูปาคาบา", 'cultleader': "🛐 เจ้าลัทธิ", 'cursed': "👻 ผู้ต้องคำสาป",
+            'doppelganger': "🎭 ผู้จำแลง", 'drunk': "🍺 คนเมา"
+        };
+
+        playerKeys.forEach((key, index) => {
+            const code = deck[index];
+            window.players.push({ name: currentPlayersData[key].name, role: dict[code] || "🧑‍🌾 ชาวบ้าน", status: "รอด" });
+            window.set(window.ref(window.db, `rooms/${window.currentPin}/players/${key}/role`), code).then(() => {
+                updatesCount++;
+                if(updatesCount === playerCount) {
+                    document.getElementById('room-display').classList.add('hidden');
+                    document.getElementById('settings-panel').classList.add('hidden');
+                    window.renderPlayerCards(); window.updateStats();
+                    window.addLog(`⭐ เกมเริ่ม! ดึงบทบาททั้งหมดแล้ว`);
+                }
             });
         });
     });
