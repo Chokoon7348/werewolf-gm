@@ -11,6 +11,7 @@ const ASSETS_TO_CACHE = [
   './hero-logo.png',
   './icon-192.png',
   './icon-512.png',
+  './logo.png',
   // หากคุณมีไฟล์รูปไอคอน (icon-192.png, icon-512.png) ให้เพิ่มชื่อไฟล์ลงในบรรทัดถัดไปด้วยครับ
 ];
 
