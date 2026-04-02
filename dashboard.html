@@ -120,37 +120,54 @@
                     </div>
                 </div>
 
-                <div id="settings-panel" class="hidden mt-6 bg-slate-950/40 border border-slate-800 rounded-2xl p-5 max-w-2xl mx-auto text-left mb-6">
-                    <h3 class="text-indigo-400 font-bold mb-4 flex items-center gap-2">
-                        <i class="ph-fill ph-gear-six"></i> ตั้งค่าโหมดการสุ่ม
-                    </h3>
+                <div id="settings-panel" class="hidden mt-6 bg-slate-950/40 border border-slate-800 rounded-2xl p-4 md:p-6 max-w-3xl mx-auto text-left mb-6">
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-3">
-                            <label class="text-sm text-slate-400 font-medium">รูปแบบบทบาทพื้นฐาน:</label>
-                            <div class="flex flex-col gap-2">
-                                <label class="flex items-center gap-3 p-3 bg-slate-900/60 rounded-xl border border-slate-700 cursor-pointer hover:bg-slate-800 transition-colors">
-                                    <input type="radio" name="villager-mode" value="with-villager" checked class="w-5 h-5 accent-indigo-500">
-                                    <div class="text-sm">
-                                        <div class="text-white font-bold">สุ่มแบบมีชาวบ้าน</div>
-                                        <div class="text-xs text-slate-500">เน้นการปั่นกระแสและจับโกหก</div>
-                                    </div>
-                                </label>
-                                <label class="flex items-center gap-3 p-3 bg-slate-900/60 rounded-xl border border-slate-700 cursor-pointer hover:bg-slate-800 transition-colors">
-                                    <input type="radio" name="villager-mode" value="no-villager" class="w-5 h-5 accent-rose-500">
-                                    <div class="text-sm">
-                                        <div class="text-white font-bold">No Villager (All Power)</div>
-                                        <div class="text-xs text-slate-500">ทุกคนมีพลังพิเศษทั้งหมด</div>
-                                    </div>
-                                </label>
+                    <div class="flex bg-slate-900 rounded-xl p-1 mb-5 border border-slate-700">
+                        <button id="tab-auto" class="flex-1 py-2.5 text-sm md:text-base font-bold rounded-lg bg-indigo-600 text-white shadow transition-all">🤖 AI สุ่มจัดให้</button>
+                        <button id="tab-custom" class="flex-1 py-2.5 text-sm md:text-base font-bold rounded-lg text-slate-400 hover:text-white transition-all">🛠️ จัดไพ่เอง (เลือกเกินได้)</button>
+                    </div>
+
+                    <div id="mode-auto-content" class="block">
+                        <h3 class="text-indigo-400 font-bold mb-4 flex items-center gap-2"><i class="ph-fill ph-gear-six"></i> ตั้งค่าโหมดการสุ่ม</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-3">
+                                <label class="text-sm text-slate-400 font-medium">รูปแบบบทบาทพื้นฐาน:</label>
+                                <div class="flex flex-col gap-2">
+                                    <label class="flex items-center gap-3 p-3 bg-slate-900/60 rounded-xl border border-slate-700 cursor-pointer hover:bg-slate-800 transition-colors">
+                                        <input type="radio" name="villager-mode" value="with-villager" checked class="w-5 h-5 accent-indigo-500">
+                                        <div class="text-sm">
+                                            <div class="text-white font-bold">สุ่มแบบมีชาวบ้าน</div>
+                                            <div class="text-xs text-slate-500">เน้นการปั่นกระแสและจับโกหก</div>
+                                        </div>
+                                    </label>
+                                    <label class="flex items-center gap-3 p-3 bg-slate-900/60 rounded-xl border border-slate-700 cursor-pointer hover:bg-slate-800 transition-colors">
+                                        <input type="radio" name="villager-mode" value="no-villager" class="w-5 h-5 accent-rose-500">
+                                        <div class="text-sm">
+                                            <div class="text-white font-bold">No Villager (All Power)</div>
+                                            <div class="text-xs text-slate-500">ทุกคนมีพลังพิเศษทั้งหมด</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-4 flex flex-col justify-center">
+                                <p class="text-xs text-indigo-300 leading-relaxed italic">* ระบบ AI จะล็อค <span class="text-white font-bold">🔮 เทพพยากรณ์</span> และ <span class="text-white font-bold">🛡️ บอดี้การ์ด</span> เป็นตัวยืนพื้นให้เสมอเพื่อความสมดุล</p>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-4 flex flex-col justify-center">
-                            <p class="text-xs text-indigo-300 leading-relaxed italic">
-                                * ระบบ AI จะล็อค <span class="text-white font-bold">🔮 เทพพยากรณ์</span> และ <span class="text-white font-bold">🛡️ บอดี้การ์ด</span> เป็นตัวยืนพื้นให้เสมอเพื่อความสมดุล
-                            </p>
+                    <div id="mode-custom-content" class="hidden">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-800/50 border border-slate-700 p-3 rounded-xl mb-4 gap-2">
+                            <div>
+                                <h3 class="text-white font-bold flex items-center gap-2"><i class="ph-fill ph-cards text-indigo-400"></i> เลือกไพ่ลงสำรับ</h3>
+                                <p class="text-xs text-slate-400">เลือกเกินได้ (ไพ่ที่เหลือจะถูกเก็บไว้เป็นไพ่กองกลาง)</p>
+                            </div>
+                            <div class="bg-slate-950 px-4 py-2 rounded-lg border border-slate-800 text-center flex-shrink-0">
+                                <div class="text-xs text-slate-500">จำนวนไพ่ที่เลือก</div>
+                                <div class="font-bold text-lg"><span id="custom-deck-total" class="text-indigo-400">0</span> <span class="text-slate-400">/</span> <span id="custom-deck-players" class="text-white">0</span></div>
+                            </div>
                         </div>
+                        <div id="custom-roles-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 max-h-[40vh] overflow-y-auto pr-2 pb-2">
+                            </div>
                     </div>
                 </div>
 
@@ -195,7 +212,6 @@
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
-            
             <div class="lg:col-span-4 lg:col-start-1 lg:row-start-1 order-1 h-fit bg-slate-900 p-4 md:p-5 rounded-xl border border-slate-800 shadow-md">
                 <h2 class="text-xs md:text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3 md:mb-4 flex items-center gap-2"><i class="ph ph-chart-bar text-base md:text-lg"></i> ภาพรวม</h2>
                 <div class="grid grid-cols-3 gap-2 md:gap-3 text-center">
@@ -230,7 +246,6 @@
                         <button onclick="openAddPlayerModal()" class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white text-sm md:text-base font-medium py-2 px-3 md:px-4 rounded-lg transition-colors flex items-center justify-center gap-1.5 md:gap-2 shadow-sm"><i class="ph ph-user-plus text-base md:text-lg"></i> <span class="hidden sm:inline">เพิ่มแมนนวล</span></button>
                     </div>
                 </div>
-                
                 <div id="player-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-4"></div>
             </div>
 
@@ -290,6 +305,7 @@
             <div class="p-4 md:p-6 overflow-y-auto flex-grow scroll-smooth" id="in-game-roles-container"></div>
         </div>
     </div>
+
 <script>
     window.players = [];
     let dayCount = 1;
@@ -300,43 +316,43 @@
     const rolesData = {
         "➖ เลือกบทบาท": { group: "default", desc: "-", side: "-" },
         "🧑‍🌾 ชาวบ้าน": { group: "villager", desc: "ไม่มีพลังพิเศษ", side: "Village Side" },
-        "🔮 เทพพยากรณ์": { group: "villager", desc: "ตรวจสอบผู้เล่น 1 คนในทุกคืนว่าเป็นหมาป่าหรือไม่", side: "Village Side" },
-        "👁️ ญาณทิพย์": { group: "villager", desc: "ตรวจสอบได้เฉพาะชาวบ้านว่ามีพลังพิเศษหรือไม่", side: "Village Side" },
-        "🔥 ผู้เผยตัวตน": { group: "villager", desc: "ทุกคืนสามารถเลือกชี้เป้ากำจัดมนุษย์หมาป่าได้ แต่ถ้าชี้ผิดคุณถูกกำจัด *ชี้ถูกจะได้ชี้ต่อคืนถัดไป*", side: "Village Side" },
-        "🙏 นักบวช": { group: "villager", desc: "ให้พรกันตายจากทุกสิ่ง 1 ครั้ง", side: "Village Side" },
-        "🕵️ นักสืบลึกลับ": { group: "villager", desc: "เช็ค 3 คนที่ติดกันว่าใครมีมนุษย์หมาป่าปนไหม", side: "Village Side" },
+        "🔮 เทพพยากรณ์": { group: "villager", desc: "ตรวจสอบหมาป่าได้", side: "Village Side" },
+        "👁️ ญาณทิพย์": { group: "villager", desc: "ตรวจสอบตัวละครพิเศษได้", side: "Village Side" },
+        "🔥 ผู้เผยตัวตน": { group: "villager", desc: "เปิดการ์ดพิสูจน์หมาป่า", side: "Village Side" },
+        "🙏 นักบวช": { group: "villager", desc: "ให้พรกันตายจากการโหวต", side: "Village Side" },
+        "🕵️ นักสืบลึกลับ": { group: "villager", desc: "เช็ค 3 คนหาหมาป่า", side: "Village Side" },
         "👵 แม่เฒ่า": { group: "villager", desc: "ไล่คนออกจากหมู่บ้าน", side: "Village Side" },
         "🌗 ลูกครึ่งมนุษย์หมาป่า": { group: "villager", desc: "เทพพยากรณ์จะเห็นเป็นหมาป่า", side: "Village Side" },
-        "😜 ตัวป่วน": { group: "villager", desc: "บังคับมีโหวตตายได้ 2 คน ใช้ได้ครั้งเดียว", side: "Neutral" },
+        "😜 ตัวป่วน": { group: "villager", desc: "บังคับโหวตตาย 2 คน", side: "Neutral" },
         "🤦 ไอทึม": { group: "villager", desc: "โหวต 'ฆ่า' อย่างเดียว", side: "Village Side" },
-        "🛡️ บอดี้การ์ด": { group: "villager", desc: "ปกป้อง 1 คนจากหมาป่า ไม่ซ้ำกับคืนก่อน", side: "Village Side" },
-        "🧪 แม่มด": { group: "villager", desc: "รู้ว่าใครโดนหมากัด เลือกชุบชีวิตหรือวางยาพิษ ใช้ได้ครั้งเดียว", side: "Village Side" },
+        "🛡️ บอดี้การ์ด": { group: "villager", desc: "ปกป้อง 1 คนจากหมาป่า", side: "Village Side" },
+        "🧪 แม่มด": { group: "villager", desc: "มียาชุบชีวิตและยาพิษ", side: "Village Side" },
         "✨ จอมเวท": { group: "villager", desc: "ปิดปากไม่ให้พูด", side: "Village Side" },
         "💪 หนุ่มถึก": { group: "villager", desc: "ทนการกัดได้ 1 วัน", side: "Village Side" },
         "👑 เจ้าชาย": { group: "villager", desc: "ไม่โดนประหาร", side: "Village Side" },
         "🕊️ ผู้รักสันติ": { group: "villager", desc: "โหวต 'ไม่ฆ่า' อย่างเดียว", side: "Village Side" },
-        "🤢 ผู้ป่วยติดเชื้อ": { group: "villager", desc: "หากถูกหมาป่าฆ่าจะทำให้หมาป่าท้องเสียไม่สามารถฆ่าได้ในคืนถัดไป", side: "Village Side" },
-        "😴 คนอดนอน": { group: "villager", desc: "รู้ว่าข้างๆมีคนตื่นตอนกลางคืนหรือไม่", side: "Village Side" },
+        "🤢 ผู้ป่วยติดเชื้อ": { group: "villager", desc: "ทำหมาป่าท้องเสีย", side: "Village Side" },
+        "😴 คนอดนอน": { group: "villager", desc: "เช็คคนตื่นตอนกลางคืน", side: "Village Side" },
         "🧿 ตาทิพย์": { group: "villager", desc: "รู้ว่าใครคือเทพพยากรณ์", side: "Village Side" },
-        "🎓 ลูกศิษย์ของเทพพยากรณ์": { group: "villager", desc: "ตื่นพร้อมเทพยากรณ์ รับสืบทอดเทพพยากรณ์", side: "Village Side" },
-        "💘 กามเทพ": { group: "villager", desc: "จับคู่รัก และคู่รักรู้กัน", side: "Village Side" },
-        "🏹 นายพรานหญิง": { group: "villager", desc: "กำจัดผู้เล่นได้ 1 คน ได้ครั้งเดียว", side: "Village Side" },
+        "🎓 ลูกศิษย์ของเทพพยากรณ์": { group: "villager", desc: "รับสืบทอดเทพพยากรณ์", side: "Village Side" },
+        "💘 กามเทพ": { group: "villager", desc: "จับคู่รัก", side: "Village Side" },
+        "🏹 นายพรานหญิง": { group: "villager", desc: "กำจัดผู้เล่นได้ 1 คน", side: "Village Side" },
         "🎯 นายพรานธรรมดา": { group: "villager", desc: "ตายแล้วลากคนไปตายด้วย", side: "Village Side" },
         "🤝 พาราดอนแห่งเมสัน": { group: "villager", desc: "ลืมตามองหน้าแฝดกัน", side: "Village Side" },
         "🐺 มนุษย์หมาป่า": { group: "wolf", desc: "เลือกเหยื่อเพื่อกำจัด", side: "Werewolf Side" },
         "🐶 ลูกมนุษย์หมาป่า": { group: "wolf", desc: "ตายแล้วหมาป่าคลั่งฆ่า 2 คน", side: "Werewolf Side" },
         "👤 หมาป่ามนุษย์": { group: "wolf", desc: "เทพพยากรณ์เห็นเป็นคนธรรมดา", side: "Werewolf Side" },
         "🔥🐺 หมาป่าโลกันต์": { group: "wolf", desc: "ผูกชะตากับ 1 คน", side: "Werewolf Side" },
-        "😈 สมุนรับใช้": { group: "wolf", desc: "รู้ว่าหมาป่าคือใคร ช่วยหมาป่าให้ชนะ แต่หมาป่าจะไม่รู้", side: "Werewolf Side" },
+        "😈 สมุนรับใช้": { group: "wolf", desc: "ช่วยหมาป่าให้ชนะ", side: "Werewolf Side" },
         "🌑 แม่หมอมนต์ดำ": { group: "wolf", desc: "ตามหาเทพพยากรณ์", side: "Werewolf Side" },
-        "👺 ยาจก": { group: "special", desc: "ชนะเมื่อถูกโหวตตาย", side: "Neutral" },
+        "👺 ยาจก": { group: "special", desc: "ชนะเมื่อถูกกำจัด", side: "Neutral" },
         "🐺🩶 หมาป่าเดียวดาย": { group: "special", desc: "ชนะถ้าเป็นหมาป่าตัวสุดท้าย", side: "Neutral" },
-        "👊 อันธพาล": { group: "special", desc: "เลือก 2 คน จะชนะถ้าคนที่เลือกตายหมด", side: "Neutral" },
+        "👊 อันธพาล": { group: "special", desc: "ชนะถ้าคนที่เลือกตายหมด", side: "Neutral" },
         "🐐 ชูปาคาบา": { group: "special", desc: "ฆ่าหมาป่าก่อน แล้วค่อยฆ่าคน", side: "Neutral" },
-        "🛐 เจ้าลัทธิ": { group: "special", desc: "ชวน 1 คนต่อคืน ชนะเมื่อทุกคนเข้าลัทธิ ", side: "Neutral" },
-        "👻 ผู้ต้องคำสาป": { group: "special", desc: "เป็นชาวบ้าน ถ้าโดนกัดจะกลายเป็นหมาป่า", side: "Mixed" },
-        "🎭 ผู้จำแลง": { group: "special", desc: "เลือก 1 คน ในคืนแรกเพื่อสืบทอดบทบาทหลังเค้าตาย", side: "Mixed" },
-        "🍺 คนเมา": { group: "special", desc: "บทบาทจริง จะเปิดเผยในคืนที่ 3", side: "Mixed" },
+        "🛐 เจ้าลัทธิ": { group: "special", desc: "ชวนทุกคนเข้าลัทธิ", side: "Neutral" },
+        "👻 ผู้ต้องคำสาป": { group: "special", desc: "โดนกัดจะกลายเป็นหมาป่า", side: "Mixed" },
+        "🎭 ผู้จำแลง": { group: "special", desc: "สืบทอดบทบาทคนตาย", side: "Mixed" },
+        "🍺 คนเมา": { group: "special", desc: "บทบาทจริงคว่ำไว้", side: "Mixed" },
         "🎲 ผู้ดำเนินเกม": { group: "gm", desc: "ผู้คุมเกม", side: "GM" }
     };
     const allRoles = Object.keys(rolesData);
@@ -377,8 +393,13 @@
                     <input type="text" value="${player.name}" class="bg-transparent border-b border-transparent focus:border-indigo-500 hover:border-slate-600 outline-none text-white font-semibold text-base w-full transition-colors pb-1" onchange="window.updatePlayerName(${index}, this.value)" placeholder="ชื่อผู้เล่น">
                     <button onclick="window.removePlayer(${index})" class="text-slate-500 hover:text-rose-400 transition-colors p-1.5 -mr-1"><i class="ph ph-trash text-xl"></i></button>
                 </div>
-                <div class="grid grid-cols-2 gap-2 mt-auto">
-                    <select onchange="window.updatePlayerRole(${index}, this.value)" class="w-full text-xs md:text-sm border border-slate-700 rounded-lg py-2 px-2 outline-none cursor-pointer ${selectBgClass}">${roleOptions}</select>
+                <div class="flex flex-col gap-2 mt-auto">
+                    <div class="flex gap-1">
+                        <select onchange="window.updatePlayerRole(${index}, this.value)" class="flex-grow text-xs md:text-sm border border-slate-700 rounded-lg py-2 px-2 outline-none cursor-pointer ${selectBgClass}">${roleOptions}</select>
+                        <button onclick="window.randomizePlayerRole(${index})" class="bg-slate-700 hover:bg-indigo-600 text-slate-300 hover:text-white px-2.5 rounded-lg transition-colors border border-slate-600" title="สุ่มบทบาทใหม่ให้คนนี้">
+                            <i class="ph-bold ph-dice-three text-lg"></i>
+                        </button>
+                    </div>
                     <select onchange="window.updatePlayerStatus(${index}, this.value)" class="w-full text-xs md:text-sm border rounded-lg py-2 px-2 outline-none cursor-pointer ${statusBadgeColor}">
                         <option value="รอด" class="bg-slate-800 text-white" ${player.status === 'รอด' ? 'selected' : ''}>✅ รอด</option>
                         <option value="ตาย" class="bg-slate-800 text-white" ${player.status === 'ตาย' ? 'selected' : ''}>💀 ตาย</option>
@@ -391,8 +412,16 @@
         window.updateStats();
     };
 
+    // 🎲 ฟังก์ชันสุ่มรายคน (ใส่ปุ่มลูกเต๋า)
+    window.randomizePlayerRole = function(index) {
+        const validRoles = allRoles.filter(r => r !== "➖ เลือกบทบาท" && rolesData[r].group !== "gm");
+        const randomRole = validRoles[Math.floor(Math.random() * validRoles.length)];
+        window.updatePlayerRole(index, randomRole);
+    };
+
     window.updatePlayerName = function(index, newName) { if(!newName.trim()) return; const oldName = window.players[index].name; window.players[index].name = newName; window.addLog(`เปลี่ยนชื่อ [${oldName}] ➔ [${newName}]`); };
     
+    // 🌟 ส่งคำสั่งอัปเดตบทให้มือถือเพื่อน Real-time
     window.updatePlayerRole = function(index, newRole) { 
         window.players[index].role = newRole; 
         window.renderPlayerCards(); 
@@ -402,26 +431,11 @@
             const playerName = window.players[index].name;
             let playerKey = null;
             for (let key in window.currentPlayersData) {
-                if (window.currentPlayersData[key].name === playerName) {
-                    playerKey = key;
-                    break;
-                }
+                if (window.currentPlayersData[key].name === playerName) { playerKey = key; break; }
             }
             if (playerKey) {
-                const dict = { 
-                    'villager': "🧑‍🌾 ชาวบ้าน", 'seer': "🔮 เทพพยากรณ์", 'auraseer': "👁️ ญาณทิพย์", 'revealer': "🔥 ผู้เผยตัวตน",
-                    'priest': "🙏 นักบวช", 'investigator': "🕵️ นักสืบลึกลับ", 'elder': "👵 แม่เฒ่า", 'halfblood': "🌗 ลูกครึ่งมนุษย์หมาป่า",
-                    'fool': "😜 ตัวป่วน", 'idiot': "🤦 ไอทึม", 'bodyguard': "🛡️ บอดี้การ์ด", 'witch': "🧪 แม่มด",
-                    'spellcaster': "✨ จอมเวท", 'toughguy': "💪 หนุ่มถึก", 'prince': "👑 เจ้าชาย", 'pacifist': "🕊️ ผู้รักสันติ",
-                    'diseased': "🤢 ผู้ป่วยติดเชื้อ", 'insomniac': "😴 คนอดนอน", 'mystic': "🧿 ตาทิพย์", 'apprentice': "🎓 ลูกศิษย์ของเทพพยากรณ์",
-                    'cupid': "💘 กามเทพ", 'huntress': "🏹 นายพรานหญิง", 'hunter': "🎯 นายพรานธรรมดา", 'mason': "🤝 พาราดอนแห่งเมสัน",
-                    'werewolf': "🐺 มนุษย์หมาป่า", 'wolfcub': "🐶 ลูกมนุษย์หมาป่า", 'wolfman': "👤 หมาป่ามนุษย์", 'alphawolf': "🔥🐺 หมาป่าโลกันต์",
-                    'minion': "😈 สมุนรับใช้", 'sorceress': "🌑 แม่หมอมนต์ดำ", 'beggar': "👺 ยาจก", 'lonewolf': "🐺🩶 หมาป่าเดียวดาย",
-                    'hoodlum': "👊 อันธพาล", 'chupacabra': "🐐 ชูปาคาบา", 'cultleader': "🛐 เจ้าลัทธิ", 'cursed': "👻 ผู้ต้องคำสาป",
-                    'doppelganger': "🎭 ผู้จำแลง", 'drunk': "🍺 คนเมา"
-                };
                 let roleCode = 'villager'; 
-                for (let code in dict) { if (dict[code] === newRole) { roleCode = code; break; } }
+                for (let code in window.dictGlobal) { if (window.dictGlobal[code] === newRole) { roleCode = code; break; } }
                 window.set(window.ref(window.db, `rooms/${window.currentPin}/players/${playerKey}/role`), roleCode);
             }
         }
@@ -429,29 +443,17 @@
 
     window.updatePlayerStatus = function(index, newStatus) { window.players[index].status = newStatus; window.renderPlayerCards(); window.addLog(`[${window.players[index].name}] สถานะ: ${newStatus}`); };
     
-    // 🌟 ระบบลบคนออกจากกระดานเกม (พร้อมเตะจาก Firebase)
     window.removePlayer = function(index) { 
         const name = window.players[index].name; 
-        if(!confirm(`⚠️ ต้องการลบและเตะ [${name}] ออกจากเกมใช่หรือไม่?`)) return;
-
-        // ค้นหา Firebase Key เพื่อลบข้อมูลแบบ Real-time
+        if(!confirm(`⚠️ ต้องการเตะ [${name}] ออกจากเกมใช่หรือไม่?`)) return;
         if (window.currentPin && window.db && window.currentPlayersData) {
             let playerKey = null;
             for (let key in window.currentPlayersData) {
-                if (window.currentPlayersData[key].name === name) {
-                    playerKey = key;
-                    break;
-                }
+                if (window.currentPlayersData[key].name === name) { playerKey = key; break; }
             }
-            if (playerKey) {
-                // ลบ Data ในฐานข้อมูล (เตะทิ้ง)
-                window.set(window.ref(window.db, `rooms/${window.currentPin}/players/${playerKey}`), null);
-            }
+            if (playerKey) window.set(window.ref(window.db, `rooms/${window.currentPin}/players/${playerKey}`), null);
         }
-
-        window.players.splice(index, 1); 
-        window.renderPlayerCards(); 
-        window.addLog(`เตะผู้เล่น: ${name}`); 
+        window.players.splice(index, 1); window.renderPlayerCards(); window.addLog(`เตะผู้เล่น: ${name}`); 
     };
 
     window.openAddPlayerModal = function() { DOM.modal.classList.add('active'); DOM.modalInput.value = ''; DOM.modalError.classList.add('hidden'); setTimeout(() => DOM.modalInput.focus(), 100); };
@@ -538,6 +540,43 @@
     window.pauseTimer = function() { clearInterval(timerInterval); timerInterval = null; };
     window.resetTimer = function() { window.pauseTimer(); window.setTimer(600); };
 
+    // 🛠️ ระบบเตรียมแสดงผลหน้าต่าง "จัดไพ่เอง"
+    window.customDeck = {};
+    window.gameMode = 'auto'; // 'auto' หรือ 'custom'
+
+    window.dictGlobal = { 
+        'villager': "🧑‍🌾 ชาวบ้าน", 'seer': "🔮 เทพพยากรณ์", 'auraseer': "👁️ ญาณทิพย์", 'revealer': "🔥 ผู้เผยตัวตน",
+        'priest': "🙏 นักบวช", 'investigator': "🕵️ นักสืบลึกลับ", 'elder': "👵 แม่เฒ่า", 'halfblood': "🌗 ลูกครึ่งมนุษย์หมาป่า",
+        'fool': "😜 ตัวป่วน", 'idiot': "🤦 ไอทึม", 'bodyguard': "🛡️ บอดี้การ์ด", 'witch': "🧪 แม่มด",
+        'spellcaster': "✨ จอมเวท", 'toughguy': "💪 หนุ่มถึก", 'prince': "👑 เจ้าชาย", 'pacifist': "🕊️ ผู้รักสันติ",
+        'diseased': "🤢 ผู้ป่วยติดเชื้อ", 'insomniac': "😴 คนอดนอน", 'mystic': "🧿 ตาทิพย์", 'apprentice': "🎓 ลูกศิษย์ของเทพพยากรณ์",
+        'cupid': "💘 กามเทพ", 'huntress': "🏹 นายพรานหญิง", 'hunter': "🎯 นายพรานธรรมดา", 'mason': "🤝 พาราดอนแห่งเมสัน",
+        'werewolf': "🐺 มนุษย์หมาป่า", 'wolfcub': "🐶 ลูกมนุษย์หมาป่า", 'wolfman': "👤 หมาป่ามนุษย์", 'alphawolf': "🔥🐺 หมาป่าโลกันต์",
+        'minion': "😈 สมุนรับใช้", 'sorceress': "🌑 แม่หมอมนต์ดำ", 'beggar': "👺 ยาจก", 'lonewolf': "🐺🩶 หมาป่าเดียวดาย",
+        'hoodlum': "👊 อันธพาล", 'chupacabra': "🐐 ชูปาคาบา", 'cultleader': "🛐 เจ้าลัทธิ", 'cursed': "👻 ผู้ต้องคำสาป",
+        'doppelganger': "🎭 ผู้จำแลง", 'drunk': "🍺 คนเมา"
+    };
+
+    window.updateCustomDeckCounter = function() {
+        let total = Object.values(window.customDeck).reduce((a, b) => a + b, 0);
+        let pCount = window.currentPlayersData ? Object.keys(window.currentPlayersData).length : 0;
+        const totalEl = document.getElementById('custom-deck-total');
+        if(totalEl) totalEl.innerText = total;
+        const pCountEl = document.getElementById('custom-deck-players');
+        if(pCountEl) pCountEl.innerText = pCount;
+
+        if(total < pCount) { totalEl.className = 'text-rose-500'; } 
+        else if (total > pCount) { totalEl.className = 'text-amber-400'; } // เกินได้ (เป็นไพ่กองกลาง)
+        else { totalEl.className = 'text-emerald-400'; }
+    }
+
+    window.changeDeckCount = function(code, delta) {
+        window.customDeck[code] = (window.customDeck[code] || 0) + delta;
+        if(window.customDeck[code] < 0) window.customDeck[code] = 0;
+        document.getElementById(`count-${code}`).innerText = window.customDeck[code];
+        window.updateCustomDeckCounter();
+    };
+
     document.addEventListener('DOMContentLoaded', () => {
         DOM = {
             grid: document.getElementById('player-cards-grid'), log: document.getElementById('game-log'), logInput: document.getElementById('log-input'),
@@ -547,6 +586,48 @@
             resetModal: document.getElementById('confirm-reset-modal'), rolesModal: document.getElementById('in-game-roles-modal'), rolesContainer: document.getElementById('in-game-roles-container')
         };
 
+        // สร้างหน้า UI จัดไพ่เอง
+        const customContainer = document.getElementById('custom-roles-list');
+        if(customContainer) {
+            let html = '';
+            for(let code in window.dictGlobal) {
+                window.customDeck[code] = 0; // ค่าเริ่มต้น
+                let thaiName = window.dictGlobal[code];
+                html += `
+                    <div class="flex items-center justify-between bg-slate-900/60 border border-slate-700/50 p-2 rounded-lg">
+                        <span class="text-white text-xs md:text-sm font-medium truncate pr-2">${thaiName}</span>
+                        <div class="flex items-center gap-2 bg-slate-950 rounded-md border border-slate-800">
+                            <button onclick="window.changeDeckCount('${code}', -1)" class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-l-md transition"><i class="ph-bold ph-minus"></i></button>
+                            <span id="count-${code}" class="text-white font-bold w-4 text-center text-sm">0</span>
+                            <button onclick="window.changeDeckCount('${code}', 1)" class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-emerald-400 hover:bg-slate-800 rounded-r-md transition"><i class="ph-bold ph-plus"></i></button>
+                        </div>
+                    </div>
+                `;
+            }
+            customContainer.innerHTML = html;
+        }
+
+        // ปุ่มสลับโหมด
+        const tabAuto = document.getElementById('tab-auto');
+        const tabCustom = document.getElementById('tab-custom');
+        const contentAuto = document.getElementById('mode-auto-content');
+        const contentCustom = document.getElementById('mode-custom-content');
+
+        if(tabAuto && tabCustom) {
+            tabAuto.addEventListener('click', () => {
+                window.gameMode = 'auto';
+                tabAuto.className = 'flex-1 py-2.5 text-sm md:text-base font-bold rounded-lg bg-indigo-600 text-white shadow transition-all';
+                tabCustom.className = 'flex-1 py-2.5 text-sm md:text-base font-bold rounded-lg text-slate-400 hover:text-white transition-all';
+                contentAuto.classList.remove('hidden'); contentCustom.classList.add('hidden');
+            });
+            tabCustom.addEventListener('click', () => {
+                window.gameMode = 'custom'; window.updateCustomDeckCounter();
+                tabCustom.className = 'flex-1 py-2.5 text-sm md:text-base font-bold rounded-lg bg-indigo-600 text-white shadow transition-all';
+                tabAuto.className = 'flex-1 py-2.5 text-sm md:text-base font-bold rounded-lg text-slate-400 hover:text-white transition-all';
+                contentCustom.classList.remove('hidden'); contentAuto.classList.add('hidden');
+            });
+        }
+
         const menuBtn = document.getElementById('mobile-menu-btn');
         const closeMenuBtn = document.getElementById('close-mobile-menu');
         const mobileMenu = document.getElementById('mobile-menu');
@@ -554,14 +635,11 @@
         if (closeMenuBtn) closeMenuBtn.addEventListener('click', () => { mobileMenu.classList.remove('open'); document.body.style.overflow = ''; });
 
         if(DOM.grid) {
-            window.setTimer(600); 
-            window.renderPlayerCards(); 
-            window.updateGamePhaseUI(); 
-            window.addLog("กระดาน GM พร้อมใช้งาน");
+            window.setTimer(600); window.renderPlayerCards(); window.updateGamePhaseUI(); window.addLog("กระดาน GM พร้อมใช้งาน");
         }
     });
 </script>
-    
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
     import { getDatabase, ref, set, onValue, push, update } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
@@ -579,55 +657,11 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    window.db = db;
-    window.ref = ref;
-    window.set = set;
-    window.onValue = onValue;
-    window.push = push;
-    window.update = update;
-
+    window.db = db; window.ref = ref; window.set = set; window.onValue = onValue; window.update = update;
     window.currentPlayersData = {}; 
 
-    window.endRoundAndKeepRoom = function() {
-        if(!window.currentPin) {
-            alert("ไม่มีห้องออนไลน์ที่เปิดอยู่");
-            return;
-        }
-        if(confirm("⚠️ ต้องการจบเกมรอบนี้และเล่น 'รอบใหม่' ใช่หรือไม่?\n\n(ผู้เล่นจะอยู่ในห้องเดิม และมือถือทุกคนจะเด้งกลับไปหน้ารอแจกไพ่)")) {
-            const updates = {};
-            Object.keys(window.currentPlayersData).forEach(key => { 
-                updates[`rooms/${window.currentPin}/players/${key}/role`] = "waiting"; 
-            });
-            window.update(window.ref(window.db), updates).then(() => {
-                document.getElementById('player-cards-grid').innerHTML = '';
-                document.getElementById('room-display').classList.remove('hidden');
-                document.getElementById('settings-panel').classList.remove('hidden');
-                document.getElementById('start-game-btn').innerHTML = `<i class="ph-bold ph-cards text-xl"></i> แจกบทบาทรอบใหม่!`;
-                document.getElementById('start-game-btn').disabled = false;
-                
-                window.players = []; window.updateStats(); window.resetTimer(); dayCount = 1; isNight = true; window.updateGamePhaseUI();
-                window.addLog("--- จบเกมรอบนี้! กลับสู่ล็อบบี้ ---"); window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-        }
-    };
-
-    window.endGameAndCloseRoom = function() {
-        if(confirm("⚠️ ปิดห้องแบบถาวร (วงแตก) ใช่หรือไม่?\n\n(ผู้เล่นทุกคนจะถูกเตะกลับหน้าแรก และลบข้อมูลห้องทิ้ง)")) {
-            if(window.currentPin) {
-                window.set(window.ref(window.db, 'rooms/' + window.currentPin), null).then(() => {
-                    sessionStorage.removeItem('wolf_gm_pin'); window.location.reload(); 
-                });
-            } else { 
-                sessionStorage.removeItem('wolf_gm_pin'); window.location.reload(); 
-            }
-        }
-    };
-
-    // 🌟 ระบบเตะคนออกจากล็อบบี้รอห้อง
     window.kickPlayerFromLobby = function(key, name) {
-        if(confirm(`⚠️ เตะ [${name}] ออกจากห้องใช่หรือไม่?`)) {
-            window.set(window.ref(window.db, `rooms/${window.currentPin}/players/${key}`), null);
-        }
+        if(confirm(`⚠️ เตะ [${name}] ออกจากห้องใช่หรือไม่?`)) window.set(window.ref(window.db, `rooms/${window.currentPin}/players/${key}`), null);
     };
 
     window.bindRoomListener = function(pin) {
@@ -641,22 +675,14 @@
             if (window.currentPlayersData) {
                 const keys = Object.keys(window.currentPlayersData);
                 playerCountText.innerText = keys.length;
+                window.updateCustomDeckCounter(); // อัปเดตตัวนับยอดคน
                 
-                // 🌟 แทรกปุ่มกากบาท (Kick) ต่อท้ายชื่อผู้เล่นในหน้าล็อบบี้
                 playerListContainer.innerHTML = keys.map(key => {
                     const p = window.currentPlayersData[key];
-                    return `
-                    <div class="bg-indigo-500/20 border border-indigo-500/50 text-indigo-300 pl-4 pr-2 py-1.5 rounded-xl flex items-center gap-3 font-medium shadow-lg">
-                        <i class="ph-fill ph-user"></i> ${p.name}
-                        <button onclick="kickPlayerFromLobby('${key}', '${p.name}')" class="bg-rose-500/20 hover:bg-rose-500 p-1 rounded-lg text-rose-400 hover:text-white transition-colors flex items-center justify-center ml-1" title="เตะผู้เล่น">
-                            <i class="ph-bold ph-x"></i>
-                        </button>
-                    </div>
-                `}).join('');
+                    return `<div class="bg-indigo-500/20 border border-indigo-500/50 text-indigo-300 pl-4 pr-2 py-1.5 rounded-xl flex items-center gap-3 font-medium shadow-lg"><i class="ph-fill ph-user"></i> ${p.name}<button onclick="kickPlayerFromLobby('${key}', '${p.name}')" class="bg-rose-500/20 hover:bg-rose-500 p-1 rounded-lg text-rose-400 hover:text-white transition-colors flex items-center justify-center ml-1" title="เตะผู้เล่น"><i class="ph-bold ph-x"></i></button></div>`
+                }).join('');
 
-                if(keys.length > 0 && window.players.length === 0) {
-                    startGameBtn.classList.remove('hidden'); startGameBtn.classList.add('flex');
-                }
+                if(keys.length > 0 && window.players.length === 0) { startGameBtn.classList.remove('hidden'); startGameBtn.classList.add('flex'); }
             } else {
                 playerCountText.innerText = "0";
                 playerListContainer.innerHTML = '<span class="text-slate-500 text-sm">ยังไม่มีผู้เล่น...</span>';
@@ -664,10 +690,6 @@
             }
         });
     };
-
-    window.addEventListener('beforeunload', function (e) {
-        if (window.players && window.players.length > 0) { e.preventDefault(); e.returnValue = ''; }
-    });
 
     document.addEventListener('DOMContentLoaded', () => {
         const createBtn = document.getElementById('create-room-btn');
@@ -691,93 +713,93 @@
             window.bindRoomListener(pin);
         });
 
+        // 🧠 ระบบเริ่มเกม (ควบรวม AI V5 และ Custom Mode)
         startGameBtn.addEventListener('click', () => {
             if(!window.currentPlayersData) return;
             const playerKeys = Object.keys(window.currentPlayersData);
             const playerCount = playerKeys.length;
-            const villagerMode = document.querySelector('input[name="villager-mode"]:checked').value;
-
             let deck = [];
 
-            if (playerCount >= 1) deck.push('seer'); 
-            if (playerCount >= 2) deck.push('bodyguard'); 
+            if(window.gameMode === 'custom') {
+                // 🛠️ โหมดจัดไพ่เอง
+                let totalSelected = Object.values(window.customDeck).reduce((a, b) => a + b, 0);
+                if(totalSelected < playerCount) {
+                    alert(`กรุณาเลือกไพ่อย่างน้อย ${playerCount} ใบ (ตอนนี้เลือกไป ${totalSelected} ใบ)`);
+                    return;
+                }
+                // ดึงไพ่ที่ GM จัดไว้ลงกอง
+                for(let code in window.customDeck) {
+                    for(let i=0; i<window.customDeck[code]; i++) deck.push(code);
+                }
+            } else {
+                // 🤖 โหมด AI จัดให้
+                const villagerMode = document.querySelector('input[name="villager-mode"]:checked').value;
+                if (playerCount >= 1) deck.push('seer'); 
+                if (playerCount >= 2) deck.push('bodyguard'); 
 
-            let wolfCount = Math.max(1, Math.floor(playerCount / 3));
-            let specialWolfPool = ['wolfcub', 'wolfman', 'alphawolf', 'minion', 'sorceress']; 
-            specialWolfPool.sort(() => Math.random() - 0.5);
+                let wolfCount = Math.max(1, Math.floor(playerCount / 3));
+                let specialWolfPool = ['wolfcub', 'wolfman', 'alphawolf', 'minion', 'sorceress']; 
+                specialWolfPool.sort(() => Math.random() - 0.5);
 
-            for(let i = 0; i < wolfCount; i++) {
-                if(i === 0) deck.push('werewolf'); 
-                else {
-                    if(specialWolfPool.length > 0) deck.push(specialWolfPool.pop());
-                    else deck.push('werewolf');
+                for(let i = 0; i < wolfCount; i++) {
+                    if(i === 0) deck.push('werewolf'); 
+                    else {
+                        if(specialWolfPool.length > 0) deck.push(specialWolfPool.pop()); else deck.push('werewolf');
+                    }
+                }
+
+                let neutralPool = ['fool', 'beggar', 'hoodlum', 'lonewolf', 'chupacabra', 'cultleader']; 
+                neutralPool.sort(() => Math.random() - 0.5);
+                let targetNeutralCount = 0;
+                if (playerCount >= 6 && playerCount <= 9) targetNeutralCount = 1;
+                else if (playerCount >= 10 && playerCount <= 14) targetNeutralCount = 2;
+                else if (playerCount >= 15) targetNeutralCount = 3;
+
+                for(let i = 0; i < targetNeutralCount; i++) { if(neutralPool.length > 0) deck.push(neutralPool.pop()); }
+
+                let specialVillagerPool = ['auraseer', 'revealer', 'priest', 'investigator', 'elder', 'halfblood', 'idiot', 'witch', 'spellcaster', 'toughguy', 'prince', 'pacifist', 'diseased', 'insomniac', 'mystic', 'apprentice', 'cupid', 'huntress', 'hunter', 'mason', 'cursed', 'doppelganger', 'drunk'];
+                specialVillagerPool.sort(() => Math.random() - 0.5);
+
+                while(deck.length < playerCount) {
+                    if (villagerMode === 'no-villager') {
+                        if(specialVillagerPool.length > 0) deck.push(specialVillagerPool.pop()); else deck.push('villager');
+                    } else {
+                        if (Math.random() > 0.7 && specialVillagerPool.length > 0) deck.push(specialVillagerPool.pop()); else deck.push('villager');
+                    }
                 }
             }
 
-            let neutralPool = ['fool', 'beggar', 'hoodlum', 'lonewolf', 'chupacabra', 'cultleader']; 
-            neutralPool.sort(() => Math.random() - 0.5);
-            
-            let targetNeutralCount = 0;
-            if (playerCount >= 6 && playerCount <= 9) targetNeutralCount = 1;
-            else if (playerCount >= 10 && playerCount <= 14) targetNeutralCount = 2;
-            else if (playerCount >= 15) targetNeutralCount = 3;
-
-            for(let i = 0; i < targetNeutralCount; i++) {
-                if(neutralPool.length > 0) deck.push(neutralPool.pop());
-            }
-
-            let specialVillagerPool = [
-                'auraseer', 'revealer', 'priest', 'investigator', 'elder', 'halfblood', 'idiot', 
-                'witch', 'spellcaster', 'toughguy', 'prince', 'pacifist', 'diseased', 'insomniac', 
-                'mystic', 'apprentice', 'cupid', 'huntress', 'hunter', 'mason', 'cursed', 'doppelganger', 'drunk'
-            ];
-            specialVillagerPool.sort(() => Math.random() - 0.5);
-
-            while(deck.length < playerCount) {
-                if (villagerMode === 'no-villager') {
-                    if(specialVillagerPool.length > 0) deck.push(specialVillagerPool.pop());
-                    else deck.push('villager');
-                } else {
-                    if (Math.random() > 0.7 && specialVillagerPool.length > 0) deck.push(specialVillagerPool.pop());
-                    else deck.push('villager');
-                }
-            }
+            // สับไพ่และแจก
             deck.sort(() => Math.random() - 0.5);
-
-            startGameBtn.innerHTML = `<i class="ph-bold ph-spinner-gap animate-spin text-xl"></i> AI กำลังจัดสำรับ...`;
+            startGameBtn.innerHTML = `<i class="ph-bold ph-spinner-gap animate-spin text-xl"></i> กำลังแจกไพ่...`;
             startGameBtn.disabled = true;
 
             window.players = []; let updatesCount = 0;
             
-            const dict = { 
-                'villager': "🧑‍🌾 ชาวบ้าน", 'seer': "🔮 เทพพยากรณ์", 'auraseer': "👁️ ญาณทิพย์", 'revealer': "🔥 ผู้เผยตัวตน",
-                'priest': "🙏 นักบวช", 'investigator': "🕵️ นักสืบลึกลับ", 'elder': "👵 แม่เฒ่า", 'halfblood': "🌗 ลูกครึ่งมนุษย์หมาป่า",
-                'fool': "😜 ตัวป่วน", 'idiot': "🤦 ไอทึม", 'bodyguard': "🛡️ บอดี้การ์ด", 'witch': "🧪 แม่มด",
-                'spellcaster': "✨ จอมเวท", 'toughguy': "💪 หนุ่มถึก", 'prince': "👑 เจ้าชาย", 'pacifist': "🕊️ ผู้รักสันติ",
-                'diseased': "🤢 ผู้ป่วยติดเชื้อ", 'insomniac': "😴 คนอดนอน", 'mystic': "🧿 ตาทิพย์", 'apprentice': "🎓 ลูกศิษย์ของเทพพยากรณ์",
-                'cupid': "💘 กามเทพ", 'huntress': "🏹 นายพรานหญิง", 'hunter': "🎯 นายพรานธรรมดา", 'mason': "🤝 พาราดอนแห่งเมสัน",
-                'werewolf': "🐺 มนุษย์หมาป่า", 'wolfcub': "🐶 ลูกมนุษย์หมาป่า", 'wolfman': "👤 หมาป่ามนุษย์", 'alphawolf': "🔥🐺 หมาป่าโลกันต์",
-                'minion': "😈 สมุนรับใช้", 'sorceress': "🌑 แม่หมอมนต์ดำ", 'beggar': "👺 ยาจก", 'lonewolf': "🐺🩶 หมาป่าเดียวดาย",
-                'hoodlum': "👊 อันธพาล", 'chupacabra': "🐐 ชูปาคาบา", 'cultleader': "🛐 เจ้าลัทธิ", 'cursed': "👻 ผู้ต้องคำสาป",
-                'doppelganger': "🎭 ผู้จำแลง", 'drunk': "🍺 คนเมา"
-            };
+            // ถ้าไพ่เกิน (โหมด Custom) เก็บเป็นกองกลาง
+            const extraCards = deck.slice(playerCount);
 
             playerKeys.forEach((key, index) => {
                 const code = deck[index];
-                window.players.push({ name: window.currentPlayersData[key].name, role: dict[code] || "🧑‍🌾 ชาวบ้าน", status: "รอด" });
+                window.players.push({ name: window.currentPlayersData[key].name, role: window.dictGlobal[code] || "🧑‍🌾 ชาวบ้าน", status: "รอด" });
                 window.set(window.ref(window.db, `rooms/${window.currentPin}/players/${key}/role`), code).then(() => {
                     updatesCount++;
                     if(updatesCount === playerCount) {
                         document.getElementById('room-display').classList.add('hidden');
                         document.getElementById('settings-panel').classList.add('hidden');
                         window.renderPlayerCards(); window.updateStats();
-                        window.addLog(`⭐ เกมเริ่ม! ดึงบทบาททั้งหมดแล้ว`);
+                        
+                        window.addLog(`⭐ เกมเริ่ม! โหมด: ${window.gameMode === 'custom' ? 'จัดไพ่เอง' : 'AI สุ่ม'}`);
+                        // แจ้งเตือน GM ถ้ามีไพ่เหลือ
+                        if(extraCards.length > 0) {
+                            const extraNames = extraCards.map(c => window.dictGlobal[c]).join(', ');
+                            window.addLog(`📦 ไพ่กองกลาง (ไม่ได้แจก): ${extraNames}`);
+                        }
                     }
                 });
             });
         });
     });
 </script>
-
 </body>
 </html>
