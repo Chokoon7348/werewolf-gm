@@ -290,7 +290,6 @@
             <div class="p-4 md:p-6 overflow-y-auto flex-grow scroll-smooth" id="in-game-roles-container"></div>
         </div>
     </div>
-
 <script>
     window.players = [];
     let dayCount = 1;
@@ -394,7 +393,6 @@
 
     window.updatePlayerName = function(index, newName) { if(!newName.trim()) return; const oldName = window.players[index].name; window.players[index].name = newName; window.addLog(`เปลี่ยนชื่อ [${oldName}] ➔ [${newName}]`); };
     
-    // 🌟 ระบบยิงคำสั่งเปลี่ยนบทบาทจากหน้า GM ให้ไปขึ้นบนมือถือเพื่อน (Real-time Role Update)
     window.updatePlayerRole = function(index, newRole) { 
         window.players[index].role = newRole; 
         window.renderPlayerCards(); 
@@ -403,14 +401,12 @@
         if (window.currentPin && window.db && window.currentPlayersData) {
             const playerName = window.players[index].name;
             let playerKey = null;
-            
             for (let key in window.currentPlayersData) {
                 if (window.currentPlayersData[key].name === playerName) {
                     playerKey = key;
                     break;
                 }
             }
-
             if (playerKey) {
                 const dict = { 
                     'villager': "🧑‍🌾 ชาวบ้าน", 'seer': "🔮 เทพพยากรณ์", 'auraseer': "👁️ ญาณทิพย์", 'revealer': "🔥 ผู้เผยตัวตน",
@@ -424,23 +420,39 @@
                     'hoodlum': "👊 อันธพาล", 'chupacabra': "🐐 ชูปาคาบา", 'cultleader': "🛐 เจ้าลัทธิ", 'cursed': "👻 ผู้ต้องคำสาป",
                     'doppelganger': "🎭 ผู้จำแลง", 'drunk': "🍺 คนเมา"
                 };
-                
                 let roleCode = 'villager'; 
-                for (let code in dict) {
-                    if (dict[code] === newRole) {
-                        roleCode = code;
-                        break;
-                    }
-                }
-                
-                // สั่งยิงข้อมูลการ์ดใบใหม่ไปที่ Firebase เลย!
+                for (let code in dict) { if (dict[code] === newRole) { roleCode = code; break; } }
                 window.set(window.ref(window.db, `rooms/${window.currentPin}/players/${playerKey}/role`), roleCode);
             }
         }
     };
 
     window.updatePlayerStatus = function(index, newStatus) { window.players[index].status = newStatus; window.renderPlayerCards(); window.addLog(`[${window.players[index].name}] สถานะ: ${newStatus}`); };
-    window.removePlayer = function(index) { const name = window.players[index].name; window.players.splice(index, 1); window.renderPlayerCards(); window.addLog(`ลบผู้เล่น: ${name}`); };
+    
+    // 🌟 ระบบลบคนออกจากกระดานเกม (พร้อมเตะจาก Firebase)
+    window.removePlayer = function(index) { 
+        const name = window.players[index].name; 
+        if(!confirm(`⚠️ ต้องการลบและเตะ [${name}] ออกจากเกมใช่หรือไม่?`)) return;
+
+        // ค้นหา Firebase Key เพื่อลบข้อมูลแบบ Real-time
+        if (window.currentPin && window.db && window.currentPlayersData) {
+            let playerKey = null;
+            for (let key in window.currentPlayersData) {
+                if (window.currentPlayersData[key].name === name) {
+                    playerKey = key;
+                    break;
+                }
+            }
+            if (playerKey) {
+                // ลบ Data ในฐานข้อมูล (เตะทิ้ง)
+                window.set(window.ref(window.db, `rooms/${window.currentPin}/players/${playerKey}`), null);
+            }
+        }
+
+        window.players.splice(index, 1); 
+        window.renderPlayerCards(); 
+        window.addLog(`เตะผู้เล่น: ${name}`); 
+    };
 
     window.openAddPlayerModal = function() { DOM.modal.classList.add('active'); DOM.modalInput.value = ''; DOM.modalError.classList.add('hidden'); setTimeout(() => DOM.modalInput.focus(), 100); };
     window.closeAddPlayerModal = function() { DOM.modal.classList.remove('active'); };
@@ -549,7 +561,7 @@
         }
     });
 </script>
-
+    
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
     import { getDatabase, ref, set, onValue, push, update } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
