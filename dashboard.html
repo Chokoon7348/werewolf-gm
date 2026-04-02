@@ -590,7 +590,7 @@
 
     window.endRoundAndKeepRoom = function() {
         if(!window.currentPin) {
-            alert("ไม่มีห้องออนไลน์ที่เปิดอยู่ (หากเล่นออฟไลน์ให้ใช้ปุ่ม 'รีเซ็ต' แทน)");
+            alert("ไม่มีห้องออนไลน์ที่เปิดอยู่");
             return;
         }
         if(confirm("⚠️ ต้องการจบเกมรอบนี้และเล่น 'รอบใหม่' ใช่หรือไม่?\n\n(ผู้เล่นจะอยู่ในห้องเดิม และมือถือทุกคนจะเด้งกลับไปหน้ารอแจกไพ่)")) {
@@ -605,15 +605,8 @@
                 document.getElementById('start-game-btn').innerHTML = `<i class="ph-bold ph-cards text-xl"></i> แจกบทบาทรอบใหม่!`;
                 document.getElementById('start-game-btn').disabled = false;
                 
-                window.players = []; 
-                window.updateStats(); 
-                window.resetTimer(); 
-                dayCount = 1; 
-                isNight = true; 
-                window.updateGamePhaseUI();
-                
-                window.addLog("--- จบเกมรอบนี้! กลับสู่ล็อบบี้ ---"); 
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                window.players = []; window.updateStats(); window.resetTimer(); dayCount = 1; isNight = true; window.updateGamePhaseUI();
+                window.addLog("--- จบเกมรอบนี้! กลับสู่ล็อบบี้ ---"); window.scrollTo({ top: 0, behavior: 'smooth' });
             });
         }
     };
@@ -622,13 +615,18 @@
         if(confirm("⚠️ ปิดห้องแบบถาวร (วงแตก) ใช่หรือไม่?\n\n(ผู้เล่นทุกคนจะถูกเตะกลับหน้าแรก และลบข้อมูลห้องทิ้ง)")) {
             if(window.currentPin) {
                 window.set(window.ref(window.db, 'rooms/' + window.currentPin), null).then(() => {
-                    sessionStorage.removeItem('wolf_gm_pin'); 
-                    window.location.reload(); 
+                    sessionStorage.removeItem('wolf_gm_pin'); window.location.reload(); 
                 });
             } else { 
-                sessionStorage.removeItem('wolf_gm_pin'); 
-                window.location.reload(); 
+                sessionStorage.removeItem('wolf_gm_pin'); window.location.reload(); 
             }
+        }
+    };
+
+    // 🌟 ระบบเตะคนออกจากล็อบบี้รอห้อง
+    window.kickPlayerFromLobby = function(key, name) {
+        if(confirm(`⚠️ เตะ [${name}] ออกจากห้องใช่หรือไม่?`)) {
+            window.set(window.ref(window.db, `rooms/${window.currentPin}/players/${key}`), null);
         }
     };
 
@@ -641,31 +639,34 @@
         window.onValue(window.ref(window.db, `rooms/${pin}/players`), (snapshot) => {
             window.currentPlayersData = snapshot.val();
             if (window.currentPlayersData) {
-                const players = Object.values(window.currentPlayersData);
-                playerCountText.innerText = players.length;
+                const keys = Object.keys(window.currentPlayersData);
+                playerCountText.innerText = keys.length;
                 
-                playerListContainer.innerHTML = players.map(p => `
-                    <div class="bg-indigo-500/20 border border-indigo-500/50 text-indigo-300 px-4 py-2 rounded-xl flex items-center gap-2 font-medium shadow-lg animate-[pulse_2s_ease-in-out_1]">
+                // 🌟 แทรกปุ่มกากบาท (Kick) ต่อท้ายชื่อผู้เล่นในหน้าล็อบบี้
+                playerListContainer.innerHTML = keys.map(key => {
+                    const p = window.currentPlayersData[key];
+                    return `
+                    <div class="bg-indigo-500/20 border border-indigo-500/50 text-indigo-300 pl-4 pr-2 py-1.5 rounded-xl flex items-center gap-3 font-medium shadow-lg">
                         <i class="ph-fill ph-user"></i> ${p.name}
+                        <button onclick="kickPlayerFromLobby('${key}', '${p.name}')" class="bg-rose-500/20 hover:bg-rose-500 p-1 rounded-lg text-rose-400 hover:text-white transition-colors flex items-center justify-center ml-1" title="เตะผู้เล่น">
+                            <i class="ph-bold ph-x"></i>
+                        </button>
                     </div>
-                `).join('');
+                `}).join('');
 
-                if(players.length > 0 && window.players.length === 0) {
-                    startGameBtn.classList.remove('hidden');
-                    startGameBtn.classList.add('flex');
+                if(keys.length > 0 && window.players.length === 0) {
+                    startGameBtn.classList.remove('hidden'); startGameBtn.classList.add('flex');
                 }
             } else {
                 playerCountText.innerText = "0";
                 playerListContainer.innerHTML = '<span class="text-slate-500 text-sm">ยังไม่มีผู้เล่น...</span>';
+                if(window.players.length === 0) { startGameBtn.classList.add('hidden'); startGameBtn.classList.remove('flex'); }
             }
         });
     };
 
     window.addEventListener('beforeunload', function (e) {
-        if (window.players && window.players.length > 0) { 
-            e.preventDefault(); 
-            e.returnValue = ''; 
-        }
+        if (window.players && window.players.length > 0) { e.preventDefault(); e.returnValue = ''; }
     });
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -677,27 +678,16 @@
 
         const savedPin = sessionStorage.getItem('wolf_gm_pin');
         if (savedPin) {
-            createBtn.classList.add('hidden');
-            roomDisplay.classList.remove('hidden');
-            settingsPanel.classList.remove('hidden');
-            roomPinText.innerText = savedPin;
-            window.bindRoomListener(savedPin);
+            createBtn.classList.add('hidden'); roomDisplay.classList.remove('hidden'); settingsPanel.classList.remove('hidden');
+            roomPinText.innerText = savedPin; window.bindRoomListener(savedPin);
         }
 
         createBtn.addEventListener('click', () => {
             const pin = Math.floor(1000 + Math.random() * 9000).toString();
             sessionStorage.setItem('wolf_gm_pin', pin); 
-            
-            createBtn.classList.add('hidden');
-            roomDisplay.classList.remove('hidden');
-            settingsPanel.classList.remove('hidden');
+            createBtn.classList.add('hidden'); roomDisplay.classList.remove('hidden'); settingsPanel.classList.remove('hidden');
             roomPinText.innerText = pin;
-
-            window.set(window.ref(window.db, 'rooms/' + pin), { 
-                status: 'waiting_for_players', 
-                createdAt: new Date().toISOString() 
-            });
-            
+            window.set(window.ref(window.db, 'rooms/' + pin), { status: 'waiting_for_players', createdAt: new Date().toISOString() });
             window.bindRoomListener(pin);
         });
 
@@ -717,9 +707,8 @@
             specialWolfPool.sort(() => Math.random() - 0.5);
 
             for(let i = 0; i < wolfCount; i++) {
-                if(i === 0) {
-                    deck.push('werewolf'); 
-                } else {
+                if(i === 0) deck.push('werewolf'); 
+                else {
                     if(specialWolfPool.length > 0) deck.push(specialWolfPool.pop());
                     else deck.push('werewolf');
                 }
@@ -749,21 +738,16 @@
                     if(specialVillagerPool.length > 0) deck.push(specialVillagerPool.pop());
                     else deck.push('villager');
                 } else {
-                    if (Math.random() > 0.7 && specialVillagerPool.length > 0) {
-                        deck.push(specialVillagerPool.pop());
-                    } else {
-                        deck.push('villager');
-                    }
+                    if (Math.random() > 0.7 && specialVillagerPool.length > 0) deck.push(specialVillagerPool.pop());
+                    else deck.push('villager');
                 }
             }
-
             deck.sort(() => Math.random() - 0.5);
 
             startGameBtn.innerHTML = `<i class="ph-bold ph-spinner-gap animate-spin text-xl"></i> AI กำลังจัดสำรับ...`;
             startGameBtn.disabled = true;
 
-            window.players = [];
-            let updatesCount = 0;
+            window.players = []; let updatesCount = 0;
             
             const dict = { 
                 'villager': "🧑‍🌾 ชาวบ้าน", 'seer': "🔮 เทพพยากรณ์", 'auraseer': "👁️ ญาณทิพย์", 'revealer': "🔥 ผู้เผยตัวตน",
@@ -794,5 +778,6 @@
         });
     });
 </script>
+
 </body>
 </html>
