@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <title>Wolf Note - ร้านค้าอุปกรณ์บอร์ดเกม & แฟชั่น</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <meta name="theme-color" content="#0b0f19">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'Noto Sans Thai', 'sans-serif'] },
+                    colors: { slate: { 850: '#151e2e', 950: '#0b0f19' } },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #0b0f19; color: #e2e8f0; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
+        #stars-container { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1; overflow: hidden; background: radial-gradient(ellipse at bottom, #1b2735 0%, #0b0f19 100%); }
+        .star { position: absolute; background-color: white; border-radius: 50%; animation: twinkle infinite alternate; }
+        @keyframes twinkle { 0% { opacity: 0.2; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 8px rgba(255,255,255,0.8); } }
+        #mobile-menu { transition: transform 0.3s ease-in-out; transform: translateY(-100%); }
+        #mobile-menu.open { transform: translateY(0); }
+        .product-card:hover img { transform: scale(1.05); }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <div id="stars-container"></div>
+
+    <!-- Navigation Bar -->
+    <nav class="fixed w-full z-50 bg-slate-950/70 backdrop-blur-lg border-b border-slate-800/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16 md:h-20">
+                <a href="index.html" class="flex items-center gap-2 md:gap-3 group">
+                    <img src="logo.png" alt="Wolf Note Logo" class="w-10 h-10 md:w-12 md:h-12 object-cover rounded-xl shadow-lg shadow-orange-900/20 transition-transform duration-300 group-hover:scale-110" onerror="this.onerror=null; this.src='https://via.placeholder.com/48?text=W';">
+                    <span class="font-bold text-lg md:text-xl tracking-tight text-white group-hover:text-orange-400 transition-colors">Wolf Note</span>
+                </a>
+
+                <div class="hidden md:flex items-center space-x-6 lg:space-x-8">
+                    <a href="index.html" class="text-slate-300 font-medium hover:text-indigo-400 transition-colors">Home</a>
+                    <a href="roles.html" class="text-slate-300 font-medium hover:text-indigo-400 transition-colors">Roles</a>
+                    <a href="how-to-play.html" class="text-slate-300 font-medium hover:text-indigo-400 transition-colors">How to play</a>
+                    <a href="#" class="text-white font-bold border-b-2 border-white pb-1">Shop</a>
+                    <a href="dashboard.html" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-lg shadow-indigo-900/20">
+                        GM Dashboard
+                    </a>
+                </div>
+
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-slate-300 hover:text-white p-2">
+                        <i class="ph ph-list text-3xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" class="fixed inset-0 z-40 bg-slate-950/95 backdrop-blur-xl pt-24 px-6 flex flex-col gap-6 md:hidden">
+        <a href="index.html" class="text-2xl font-bold text-slate-300 hover:text-white border-b border-slate-800 pb-4">Home</a>
+        <a href="roles.html" class="text-2xl font-bold text-slate-300 hover:text-white border-b border-slate-800 pb-4">Roles</a>
+        <a href="how-to-play.html" class="text-2xl font-bold text-slate-300 hover:text-white border-b border-slate-800 pb-4">How to play</a>
+        <a href="#" class="text-2xl font-bold text-white border-b border-slate-800 pb-4">Shop (ร้านค้า)</a>
+        <a href="dashboard.html" class="mt-4 bg-indigo-600 text-center text-white py-4 rounded-xl font-bold text-xl shadow-lg shadow-indigo-900/20">
+            <i class="ph-bold ph-game-controller"></i> เปิดกระดานเกม (Dashboard)
+        </a>
+        <button id="close-mobile-menu" class="absolute top-6 right-6 text-slate-400 hover:text-white p-2">
+            <i class="ph ph-x text-3xl"></i>
+        </button>
+    </div>
+
+    <main class="flex-grow max-w-7xl mx-auto w-full pt-24 pb-16 px-4 relative z-10">
+        
+        <div class="mb-8 text-center md:text-left bg-slate-900/60 p-6 md:p-10 rounded-3xl border border-slate-800 backdrop-blur-md shadow-xl flex flex-col md:flex-row items-center md:items-start gap-6">
+            <div class="bg-indigo-500/20 p-4 rounded-2xl border border-indigo-500/30 flex-shrink-0">
+                <i class="ph-fill ph-storefront text-5xl text-indigo-400"></i>
+            </div>
+            <div>
+                <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-3 tracking-tight">
+                    Wolf Note Store
+                </h1>
+                <p class="text-slate-400 text-base md:text-lg max-w-2xl leading-relaxed">
+                    รวมอุปกรณ์บอร์ดเกม และเสื้อผ้าแฟชั่นสไตล์ Wolf Note! สั่งซื้อได้ง่ายๆ ผ่านแอปที่คุณคุ้นเคย
+                </p>
+            </div>
+        </div>
+
+        <!-- 🏷️ ตัวกรองหมวดหมู่สินค้า -->
+        <div class="flex flex-wrap gap-3 mb-8 justify-center md:justify-start">
+            <button onclick="setFilter('all')" id="btn-filter-all" class="filter-btn bg-indigo-600 text-white px-6 py-2.5 rounded-full font-bold transition-all shadow-lg shadow-indigo-500/20">
+                ทั้งหมด
+            </button>
+            <button onclick="setFilter('boardgame')" id="btn-filter-boardgame" class="filter-btn bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-700 px-6 py-2.5 rounded-full font-bold transition-all border border-slate-700">
+                🎲 อุปกรณ์บอร์ดเกม
+            </button>
+            <button onclick="setFilter('fashion')" id="btn-filter-fashion" class="filter-btn bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-700 px-6 py-2.5 rounded-full font-bold transition-all border border-slate-700">
+                👕 แฟชั่น
+            </button>
+        </div>
+
+        <!-- 🛍️ Product Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="product-list">
+            <!-- Render by JS -->
+        </div>
+
+    </main>
+
+    <footer class="relative z-10 border-t border-slate-900 bg-slate-950 py-8 text-center mt-auto">
+        <p class="text-slate-500 text-sm">© 2024 Wolf Note. Werewolf GM Dashboard. สร้างขึ้นเพื่อผู้เล่นบอร์ดเกม by chaiyanun</p>
+    </footer>
+
+    <script>
+        const starsContainer = document.getElementById('stars-container');
+        for (let i = 0; i < 100; i++) {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            star.style.left = `${Math.random() * 100}vw`; star.style.top = `${Math.random() * 100}vh`;
+            const size = Math.random() * 2 + 1; star.style.width = `${size}px`; star.style.height = `${size}px`;
+            star.style.animationDuration = `${Math.random() * 3 + 2}s`; star.style.animationDelay = `${Math.random() * 5}s`;
+            starsContainer.appendChild(star);
+        }
+
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const closeBtn = document.getElementById('close-mobile-menu');
+        const mobileMenu = document.getElementById('mobile-menu');
+        menuBtn.addEventListener('click', () => { mobileMenu.classList.add('open'); document.body.style.overflow = 'hidden'; });
+        closeBtn.addEventListener('click', () => { mobileMenu.classList.remove('open'); document.body.style.overflow = ''; });
+
+        // ==========================================
+        // 📦 รายการสินค้าทั้งหมด (22 ชิ้น)
+        // 💡 วิธีแก้หมวดหมู่: 
+        // - ถ้าเป็นบอร์ดเกม ให้ใช้ category: "boardgame"
+        // - ถ้าเป็นเสื้อผ้า/แฟชั่น ให้ใช้ category: "fashion"
+        // ==========================================
+        const products = [
+            // ---------- หมวด Shopee ----------
+            { 
+                id: 1, name: "สินค้า Shopee 1", 
+                category: "boardgame", // หมวดหมู่
+                img: "https://via.placeholder.com/600x400/2d3748/ffffff?text=[Image+of+สินค้า+Shopee+1]", 
+                desc: "รายละเอียดสินค้าที่ 1",
+                links: { shopee: "https://s.shopee.co.th/AACvPCOREO", lazada: "" }
+            },
+            { 
+                id: 2, name: "สินค้า Shopee 2", 
+                category: "boardgame", 
+                img: "https://via.placeholder.com/600x400/2d3748/ffffff?text=[Image+of+สินค้า+Shopee+2]", 
+                desc: "รายละเอียดสินค้าที่ 2",
+                links: { shopee: "https://s.shopee.co.th/W2PtbD0JV", lazada: "" }
+            },
+            { 
+                id: 3, name: "สินค้า Shopee 3", 
+                category: "boardgame", 
+                img: "https://via.placeholder.com/600x400/2d3748/ffffff?text=[Image+of+สินค้า+Shopee+3]", 
+                desc: "รายละเอียดสินค้าที่ 3",
+                links: { shopee: "https://s.shopee.co.th/169IizsUG", lazada: "" }
+            },
+            { 
+                id: 4, name: "สินค้า Shopee 4", 
+                category: "boardgame", 
+                img: "https://via.placeholder.com/600x400/2d3748/ffffff?text=[Image+of+สินค้า+Shopee+4]", 
+                desc: "รายละเอียดสินค้าที่ 4",
+                links: { shopee: "https://s.shopee.co.th/7Ksk2NYKTG", lazada: "" }
+            },
+            { 
+                id: 5, name: "สินค้า Shopee 5", 
+                category: "boardgame", 
+                img: "https://via.placeholder.com/600x400/2d3748/ffffff?text=[Image+of+สินค้า+Shopee+5]", 
+                desc: "รายละเอียดสินค้าที่ 5",
+                links: { shopee: "https://s.shopee.co.th/7pp0dJisRo", lazada: "" }
+            },
+            { 
+                id: 6, name: "สินค้า Shopee 6", 
+                category: "boardgame", 
+                img: "https://via.placeholder.com/600x400/2d3748/ffffff?text=[Image+of+สินค้า+Shopee+6]", 
+                desc: "รายละเอียดสินค้าที่ 6",
+                links: { shopee: "https://s.shopee.co.th/2g6uTsjOu3", lazada: "" }
+            },
+            { 
+                id: 7, name: "สินค้า Shopee 7", 
+                category: "boardgame", 
+                img: "https://via.placeholder.com/600x400/2d3748/ffffff?text=[Image+of+สินค้า+Shopee+7]", 
+                desc: "รายละเอียดสินค้าที่ 7",
+                links: { shopee: "https://s.shopee.co.th/9UxEcWCy1b", lazada: "" }
+            },
+            { 
+                id: 8, name: "เสื้อยืด Wolf Note (ตัวอย่าง)", 
+                category: "fashion", // อันนี้ผมตั้งเป็น fashion เป็นตัวอย่างให้ดูครับ
+                img: "https://via.placeholder.com/600x400/1e293b/ffffff?text=[Image+of+เสื้อยืด+Shopee]", 
+                desc: "เสื้อยืดใส่สบาย ลายมนุษย์หมาป่าสุดเท่",
+                links: { shopee: "https://s.shopee.co.th/5L7flXOrjR", lazada: "" }
+            },
+            { 
+                id: 9, name: "หมวก Wolf Note (ตัวอย่าง)", 
+                category: "fashion", // หมวดหมู่แฟชั่น
+                img: "https://via.placeholder.com/600x400/1e293b/ffffff?text=[Image+of+หมวก+Shopee]", 
+                desc: "หมวกแก็ปกันแดด ปักลายโลโก้",
+                links: { shopee: "https://s.shopee.co.th/4LF8Zj5WTJ", lazada: "" }
+            },
+            { 
+                id: 10, name: "สินค้า Shopee 10", 
+                category: "fashion", 
+                img: "https://via.placeholder.com/600x400/1e293b/ffffff?text=[Image+of+สินค้า+แฟชั่น+Shopee]", 
+                desc: "รายละเอียดสินค้าที่ 10",
+                links: { shopee: "https://s.shopee.co.th/BPZc5d86d", lazada: "" }
+            },
+            { 
+                id: 11, name: "สินค้า Shopee 11", 
+                category: "fashion", 
+                img: "https://via.placeholder.com/600x400/1e293b/ffffff?text=[Image+of+สินค้า+แฟชั่น+Shopee]", 
+                desc: "รายละเอียดสินค้าที่ 11",
+                links: { shopee: "https://s.shopee.co.th/808QwXOs2Y", lazada: "" }
+            },
+            { 
+                id: 12, name: "สินค้า Shopee 12", 
+                category: "fashion", 
+                img: "https://via.placeholder.com/600x400/1e293b/ffffff?text=[Image+of+สินค้า+แฟชั่น+Shopee]", 
+                desc: "รายละเอียดสินค้าที่ 12",
+                links: { shopee: "https://s.shopee.co.th/7fVaXyP47X", lazada: "" }
+            },
+            { 
+                id: 13, name: "สินค้า Shopee 13", 
+                category: "fashion", 
+                img: "https://via.placeholder.com/600x400/1e293b/ffffff?text=[Image+of+สินค้า+แฟชั่น+Shopee]", 
+                desc: "รายละเอียดสินค้าที่ 13",
+                links: { shopee: "https://s.shopee.co.th/900y8QxaSO", lazada: "" }
+            },
+            { 
+                id: 14, name: "สินค้า Shopee 14", 
+                category: "fashion", 
+                img: "https://via.placeholder.com/600x400/1e293b/ffffff?text=[Image+of+สินค้า+แฟชั่น+Shopee]", 
+                desc: "รายละเอียดสินค้าที่ 14",
+                links: { shopee: "https://s.shopee.co.th/3qIryxczK0", lazada: "" }
+            },
+            { 
+                id: 15, name: "สินค้า Shopee 15", 
+                category: "fashion", 
+                img: "https://via.placeholder.com/600x400/1e293b/ffffff?text=[Image+of+สินค้า+แฟชั่น+Shopee]", 
+                desc: "รายละเอียดสินค้าที่ 15",
+                links: { shopee: "https://s.shopee.co.th/7pp0kKisEg", lazada: "" }
+            },
+
+            // ---------- หมวด Lazada ----------
+            { 
+                id: 16, name: "สินค้า Lazada 1", 
+                category: "boardgame", 
+                img: "https://via.placeholder.com/600x400/2d3748/ffffff?text=[Image+of+สินค้า+Lazada+1]", 
+                desc: "รายละเอียดสินค้าที่ 16",
+                links: { shopee: "", lazada: "https://s.lazada.co.th/s.ZWdj9n?cc&t=p-i6NyBck-sRFp72X" }
+            },
+            { 
+                id: 17, name: "สินค้า Lazada 2", 
+                category: "boardgame", 
+                img: "https://via.placeholder.com/600x400/2d3748/ffffff?text=[Image+of+สินค้า+Lazada+2]", 
+                desc: "รายละเอียดสินค้าที่ 17",
+                links: { shopee: "", lazada: "https://s.lazada.co.th/s.ZWdjos?cc&t=p-i5zAzuV-sPP3T7s" }
+            },
+            { 
+                id: 18, name: "สินค้า Lazada 3", 
+                category: "boardgame", 
+                img: "https://via.placeholder.com/600x400/2d3748/ffffff?text=[Image+of+สินค้า+Lazada+3]", 
+                desc: "รายละเอียดสินค้าที่ 18",
+                links: { shopee: "", lazada: "https://s.lazada.co.th/s.ZWdjrV?cc&t=p-i6VS3lG-sRwfxEK" }
+            },
+            { 
+                id: 19, name: "สินค้า Lazada 4", 
+                category: "fashion", 
+                img: "https://via.placeholder.com/600x400/1e293b/ffffff?text=[Image+of+สินค้า+Lazada+แฟชั่น]", 
+                desc: "รายละเอียดสินค้าที่ 19",
+                links: { shopee: "", lazada: "https://s.lazada.co.th/s.ZWdjvf?cc&t=p-i3KYvf3-sCClCpx" }
+            },
+            { 
+                id: 20, name: "สินค้า Lazada 5", 
+                category: "fashion", 
+                img: "https://via.placeholder.com/600x400/1e293b/ffffff?text=[Image+of+สินค้า+Lazada+แฟชั่น]", 
+                desc: "รายละเอียดสินค้าที่ 20",
+                links: { shopee: "", lazada: "https://s.lazada.co.th/s.ZWdQ1Q?cc&t=p-iqCiyA-s1edI7b" }
+            },
+            { 
+                id: 21, name: "สินค้า Lazada 6", 
+                category: "fashion", 
+                img: "https://via.placeholder.com/600x400/1e293b/ffffff?text=[Image+of+สินค้า+Lazada+แฟชั่น]", 
+                desc: "รายละเอียดสินค้าที่ 21",
+                links: { shopee: "", lazada: "https://s.lazada.co.th/s.ZWdQ2i?cc&t=p-i6VS3lG-sRwfxEK" }
+            },
+            { 
+                id: 22, name: "สินค้า Lazada 7", 
+                category: "fashion", 
+                img: "https://via.placeholder.com/600x400/1e293b/ffffff?text=[Image+of+สินค้า+Lazada+แฟชั่น]", 
+                desc: "รายละเอียดสินค้าที่ 22",
+                links: { shopee: "", lazada: "https://s.lazada.co.th/s.ZWdQf5?cc&t=p-iHaYEQ2-s2EcT9od" }
+            }
+        ];
+
+        // 🎛️ ฟังก์ชันเปลี่ยนแท็บหมวดหมู่
+        function setFilter(category) {
+            // รีเซ็ตปุ่มทั้งหมดให้เป็นสีเทา
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-500/20');
+                btn.classList.add('bg-slate-800/80', 'text-slate-300', 'border', 'border-slate-700');
+            });
+
+            // ทำให้ปุ่มที่ถูกกดกลายเป็นสีน้ำเงิน (Active)
+            const activeBtn = document.getElementById('btn-filter-' + category);
+            activeBtn.classList.remove('bg-slate-800/80', 'text-slate-300', 'border', 'border-slate-700');
+            activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-500/20');
+
+            // สั่งโหลดสินค้าใหม่ตามหมวดหมู่
+            renderProducts(category);
+        }
+
+        // 🎨 ฟังก์ชันวาดรายการสินค้าลงหน้าจอ
+        function renderProducts(filterType = 'all') {
+            const productList = document.getElementById('product-list');
+            
+            // กรองสินค้าตามหมวดหมู่
+            const filteredProducts = filterType === 'all' 
+                ? products 
+                : products.filter(p => p.category === filterType);
+
+            // ถ้าไม่มีสินค้าในหมวดหมู่นั้น
+            if(filteredProducts.length === 0) {
+                productList.innerHTML = `
+                <div class="col-span-full text-center py-20 flex flex-col items-center">
+                    <div class="w-20 h-20 bg-slate-800/50 rounded-full flex items-center justify-center mb-4 border border-slate-700">
+                        <i class="ph ph-package text-4xl text-slate-500"></i>
+                    </div>
+                    <p class="font-medium text-slate-400 text-lg">ยังไม่มีสินค้าในหมวดหมู่นี้</p>
+                </div>`;
+                return;
+            }
+
+            productList.innerHTML = filteredProducts.map(p => {
+                
+                let shopeeBtn = p.links.shopee ? `
+                    <a href="${p.links.shopee}" target="_blank" rel="noopener noreferrer" class="flex-1 bg-[#ee4d2d] hover:bg-[#d74123] text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md text-sm">
+                        <i class="ph-bold ph-shopping-bag text-lg"></i> สั่งซื้อใน Shopee
+                    </a>` : '';
+
+                let lazadaBtn = p.links.lazada ? `
+                    <a href="${p.links.lazada}" target="_blank" rel="noopener noreferrer" class="flex-1 bg-[#0f146d] hover:bg-[#0a0e4d] text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md text-sm">
+                        <i class="ph-bold ph-shopping-cart text-lg"></i> สั่งซื้อใน Lazada
+                    </a>` : '';
+
+                // ใส่แท็กแยกสีมุมขวาบน
+                let tag = p.category === 'fashion' 
+                    ? '<span class="absolute top-3 right-3 bg-pink-600/90 backdrop-blur text-white text-[11px] px-3 py-1 rounded-full font-bold shadow-lg">👕 แฟชั่น</span>'
+                    : '<span class="absolute top-3 right-3 bg-indigo-600/90 backdrop-blur text-white text-[11px] px-3 py-1 rounded-full font-bold shadow-lg">🎲 บอร์ดเกม</span>';
+
+                return `
+                <div class="product-card bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:border-indigo-500/50 hover:shadow-[0_10px_30px_-10px_rgba(79,70,229,0.3)]">
+                    <div class="relative h-56 overflow-hidden bg-slate-950">
+                        <img src="${p.img}" alt="${p.name}" class="w-full h-full object-cover transition-transform duration-700 opacity-90 hover:opacity-100">
+                        ${tag}
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h3 class="text-white font-bold text-lg mb-2 leading-snug">${p.name}</h3>
+                        <p class="text-slate-400 text-sm mb-5 flex-grow leading-relaxed">${p.desc}</p>
+                        
+                        <!-- โซนปุ่มกดสั่งซื้อ -->
+                        <div class="flex flex-col gap-3 w-full mt-auto pt-4 border-t border-slate-800/80">
+                            ${shopeeBtn}
+                            ${lazadaBtn}
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // เรียกโชว์สินค้าทั้งหมดเป็นค่าเริ่มต้น
+            renderProducts('all');
+        });
+    </script>
+</body>
+</html>
