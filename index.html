@@ -6,15 +6,14 @@
     <title>Wolf Note - Werewolf GM Assistant</title>
 
     <link rel="icon" type="image/png" href="logo.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0b0f19">
 
     <meta property="og:title" content="Wolf Note - ผู้ช่วย GM จัดการบอร์ดเกมมนุษย์หมาป่า">
     <meta property="og:description" content="เครื่องมือสำหรับผู้ดำเนินเกมชาวไทย (GM) ช่วยจัดการบอร์ดเกม Werewolf แบบ Real-time">
     <meta property="og:image" content="https://chokoon7348.github.io/werewolf-gm/logo.png"> 
     <meta property="og:url" content="https://chokoon7348.github.io/werewolf-gm/">
     <meta name="twitter:card" content="summary_large_image">
-    
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0b0f19">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,7 +27,6 @@
                 extend: {
                     fontFamily: {
                         sans: ['Inter', 'Noto Sans Thai', 'sans-serif'],
-                        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', "Liberation Mono", "Courier New", 'monospace'],
                     },
                     colors: { slate: { 850: '#151e2e', 950: '#0b0f19' } }
                 }
@@ -59,7 +57,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16 md:h-20">
                 <a href="index.html" class="flex items-center gap-2 md:gap-3 group">
-                    <img src="logo.png" alt="Wolf Note Logo" class="w-10 h-10 md:w-12 md:h-12 object-cover rounded-xl shadow-lg shadow-orange-900/20 transition-transform duration-300 group-hover:scale-110">
+                    <img src="logo.png" alt="Wolf Note Logo" class="w-10 h-10 md:w-12 md:h-12 object-cover rounded-xl shadow-lg shadow-orange-900/20 transition-transform duration-300 group-hover:scale-110" onerror="this.onerror=null; this.src='https://via.placeholder.com/48?text=W';">
                     <span class="font-bold text-lg md:text-xl tracking-tight text-white group-hover:text-orange-400 transition-colors">Wolf Note</span>
                 </a>
                 
@@ -68,6 +66,7 @@
                     <a href="roles.html" class="text-slate-300 font-medium hover:text-indigo-400 transition-colors">Roles</a>
                     <a href="how-to-play.html" class="text-slate-300 font-medium hover:text-indigo-400 transition-colors">How to play</a>
                     <a href="dashboard.html" class="text-slate-300 font-medium hover:text-indigo-400 transition-colors">Dashboard</a>
+                    
                     <button onclick="openDonateModal()" class="bg-pink-500/10 hover:bg-pink-500/20 text-pink-400 border border-pink-500/30 px-4 py-1.5 rounded-full font-medium transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(236,72,153,0.15)] hover:shadow-[0_0_20px_rgba(236,72,153,0.3)]">
                         <i class="ph-fill ph-coffee text-lg"></i> เลี้ยงกาแฟ
                     </button>
@@ -90,6 +89,9 @@
         <a href="dashboard.html" class="text-2xl font-bold text-slate-300 hover:text-white border-b border-slate-800 pb-4">Dashboard (GM)</a>
         <button onclick="openDonateModal(); document.getElementById('mobile-menu').classList.remove('open');" class="text-left text-2xl font-bold text-pink-400 border-b border-slate-800 pb-4 flex items-center gap-2">
             <i class="ph-fill ph-coffee"></i> สนับสนุนผู้พัฒนา
+        </button>
+        <button class="install-app-btn text-left text-xl font-bold text-emerald-400 border-b border-slate-800 pb-4 flex items-center gap-2">
+            <i class="ph-bold ph-download-simple"></i> ติดตั้งแอปลงเครื่อง
         </button>
         <button id="close-mobile-menu" class="absolute top-6 right-6 text-slate-400 hover:text-white p-2"><i class="ph ph-x text-3xl"></i></button>
     </div>
@@ -124,6 +126,10 @@
                     <i class="ph-bold ph-monitor-play"></i> สร้างห้อง (GM)
                 </a>
             </div>
+
+            <button class="install-app-btn mt-6 text-slate-400 hover:text-white underline text-sm transition-colors">
+                ติดตั้ง Wolf Note ลงในเครื่อง (เล่นออฟไลน์ได้)
+            </button>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mt-16 md:mt-24 w-full max-w-5xl">
@@ -168,12 +174,12 @@
                 <img src="promptpay.png" alt="PromptPay QR Code" class="w-48 h-48 object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/200x200.png?text=QR+Code';">
             </div>
             
-            <p class="text-sm text-slate-300 mt-2 font-medium">ชื่อบัญชี: นาย ชัยอนันต์ ทาลาลัย</p>
+            <p class="text-sm text-slate-300 mt-2 font-medium">ชื่อบัญชี: นาย ชัยนันต์ ทาละลัย</p>
         </div>
     </div>
 
     <script>
-        // ระบบ Mobile Menu
+        // 1. ระบบเมนูมือถือ
         const menuBtn = document.getElementById('mobile-menu-btn');
         const closeMenuBtn = document.getElementById('close-mobile-menu');
         const mobileMenu = document.getElementById('mobile-menu');
@@ -191,7 +197,7 @@
             });
         }
 
-        // 💖 ระบบ Donate Modal
+        // 2. ระบบหน้าต่าง Donate
         window.openDonateModal = function() {
             document.getElementById('donate-modal').classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -202,11 +208,52 @@
             document.body.style.overflow = '';
         };
 
-        // ปิด Modal เมื่อคลิกพื้นที่ว่างด้านนอก
+        // กดพื้นที่ว่างด้านนอกเพื่อปิด Donate Modal
         document.getElementById('donate-modal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeDonateModal();
-            }
+            if (e.target === this) closeDonateModal();
+        });
+
+        // ==========================================
+        // 3. ระบบ Service Worker & PWA (Install App)
+        // ==========================================
+        
+        // ลงทะเบียนเรียกใช้งาน Service Worker (ดึงไฟล์ sw.js มาทำงาน)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker ลงทะเบียนสำเร็จ!', reg.scope))
+                    .catch(err => console.log('Service Worker ลงทะเบียนพลาด:', err));
+            });
+        }
+
+        // ระบบดักจับปุ่ม "ติดตั้งแอป" (PWA Install)
+        let deferredPrompt;
+        const installBtns = document.querySelectorAll('.install-app-btn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            console.log('ระบบพร้อมให้ติดตั้ง PWA แล้ว');
+        });
+
+        installBtns.forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        console.log('ผู้ใช้กดยอมรับการติดตั้ง');
+                    }
+                    deferredPrompt = null;
+                } else {
+                    alert("💡 เบราว์เซอร์ของคุณไม่รองรับการติดตั้งอัตโนมัติ หรือคุณได้ติดตั้งแอปนี้ไปแล้ว\n\n📌 สำหรับ iOS (Safari): แตะปุ่ม 'แชร์' ด้านล่าง แล้วเลือก 'เพิ่มไปยังหน้าจอโฮม'\n\n📌 สำหรับ Android (Chrome): แตะเมนู 3 จุดมุมขวาบน แล้วเลือก 'เพิ่มลงในหน้าจอหลัก'");
+                }
+            });
+        });
+
+        window.addEventListener('appinstalled', () => {
+            deferredPrompt = null;
+            console.log('ติดตั้ง PWA สำเร็จแล้ว!');
         });
     </script>
 </body>
