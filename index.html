@@ -3,21 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Wolf Note - Werewolf GM Assistant</title>
-
+    
+    <title>Wolf Note - ผู้ช่วย GM จัดการบอร์ดเกมมนุษย์หมาป่า (Werewolf)</title>
     <link rel="icon" type="image/png" href="logo.png">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0b0f19">
 
     <meta property="og:title" content="Wolf Note - ผู้ช่วย GM จัดการบอร์ดเกมมนุษย์หมาป่า">
     <meta property="og:description" content="เครื่องมือสำหรับผู้ดำเนินเกมชาวไทย (GM) ช่วยจัดการบอร์ดเกม Werewolf แบบ Real-time">
     <meta property="og:image" content="https://chokoon7348.github.io/werewolf-gm/logo.png"> 
     <meta property="og:url" content="https://chokoon7348.github.io/werewolf-gm/">
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="description" content="เครื่องมือสำหรับผู้ดำเนินเกมของคนไทย (GM) ช่วยจัดการบอร์ดเกมมนุษย์หมาป่าภาษาไทย100% (Werewolf) แบบ Real-time พร้อมระบบจับเวลา บันทึกเหตุการณ์ และคู่มือบทบาทกว่า 30 ตัวละคร ใช้งานฟรี">
+    <meta name="keywords" content="werewolf, บอร์ดเกมมนุษย์หมาป่า, werewolf gm, ผู้ดำเนินเกม, จัดการบอร์ดเกม, wolf note, นาฬิกาจับเวลาบอร์ดเกม, กติกา werewolf, แอพ werewolf, ภาษาไทย, Werewolf Dashboard">
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0b0f19">
+    <link rel="apple-touch-icon" href="icon-192.png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -25,142 +29,177 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'Noto Sans Thai', 'sans-serif'],
-                    },
-                    colors: { slate: { 850: '#151e2e', 950: '#0b0f19' } }
+                    fontFamily: { sans: ['Inter', 'Noto Sans Thai', 'sans-serif'] },
+                    colors: { slate: { 850: '#151e2e', 950: '#0b0f19' } },
+                    animation: { 'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite' }
                 }
             }
         }
     </script>
 
     <style>
-        body { background-color: #0b0f19; color: #e2e8f0; -webkit-tap-highlight-color: transparent; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #1e293b; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        body { background-color: #0b0f19; color: #e2e8f0; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
         
-        .modal-backdrop { display: none; backdrop-filter: blur(4px); }
-        .modal-backdrop.active { display: flex; }
+        #stars-container { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1; overflow: hidden; background: radial-gradient(ellipse at bottom, #1b2735 0%, #0b0f19 100%); }
+        .star { position: absolute; background-color: white; border-radius: 50%; animation: twinkle infinite alternate; }
+        @keyframes twinkle { 0% { opacity: 0.2; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 8px rgba(255,255,255,0.8); } }
+        
         #mobile-menu { transition: transform 0.3s ease-in-out; transform: translateY(-100%); }
         #mobile-menu.open { transform: translateY(0); }
-        
-        .hero-glow {
-            position: absolute; width: 300px; height: 300px; background: radial-gradient(circle, rgba(79,70,229,0.3) 0%, rgba(0,0,0,0) 70%);
-            top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: -1; pointer-events: none;
-        }
     </style>
 </head>
-<body class="antialiased min-h-screen pt-16 md:pt-20 flex flex-col relative overflow-x-hidden">
+<body class="antialiased min-h-screen flex flex-col">
 
-    <nav class="fixed top-0 w-full z-40 bg-slate-950/80 backdrop-blur-lg border-b border-slate-800/50">
+    <div id="stars-container"></div>
+
+    <nav class="fixed w-full z-50 bg-slate-950/70 backdrop-blur-lg border-b border-slate-800/50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16 md:h-20">
                 <a href="index.html" class="flex items-center gap-2 md:gap-3 group">
-                    <img src="logo.png" alt="Wolf Note Logo" class="w-10 h-10 md:w-12 md:h-12 object-cover rounded-xl shadow-lg shadow-orange-900/20 transition-transform duration-300 group-hover:scale-110" onerror="this.onerror=null; this.src='https://via.placeholder.com/48?text=W';">
+                    <img src="logo.png" alt="Wolf Note Logo" class="w-10 h-10 md:w-12 md:h-12 object-cover rounded-xl shadow-lg shadow-orange-900/20 transition-transform duration-300 group-hover:scale-110">
+                    
                     <span class="font-bold text-lg md:text-xl tracking-tight text-white group-hover:text-orange-400 transition-colors">Wolf Note</span>
                 </a>
-                
+
                 <div class="hidden md:flex items-center space-x-6 lg:space-x-8">
-                    <span class="text-indigo-400 font-bold border-b-2 border-indigo-400 pb-1">Home</span>
+                    <a href="#" class="text-white font-bold border-b-2 border-white pb-1">Home</a>
                     <a href="roles.html" class="text-slate-300 font-medium hover:text-indigo-400 transition-colors">Roles</a>
                     <a href="how-to-play.html" class="text-slate-300 font-medium hover:text-indigo-400 transition-colors">How to play</a>
-                    <a href="dashboard.html" class="text-slate-300 font-medium hover:text-indigo-400 transition-colors">Dashboard</a>
+                    <a href="dashboard.html" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-lg shadow-indigo-900/20">
+                        GM Dashboard
+                    </a>
+                    <button class="install-app-btn bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ml-2">
+                        <i class="ph-bold ph-download-simple text-lg"></i> Install App
+                    </button>
                     
-                    <button onclick="openDonateModal()" class="bg-pink-500/10 hover:bg-pink-500/20 text-pink-400 border border-pink-500/30 px-4 py-1.5 rounded-full font-medium transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(236,72,153,0.15)] hover:shadow-[0_0_20px_rgba(236,72,153,0.3)]">
+                    <button onclick="openDonateModal()" class="bg-pink-500/10 hover:bg-pink-500/20 text-pink-400 border border-pink-500/30 px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(236,72,153,0.15)] hover:shadow-[0_0_20px_rgba(236,72,153,0.3)] ml-2">
                         <i class="ph-fill ph-coffee text-lg"></i> เลี้ยงกาแฟ
                     </button>
                 </div>
 
-                <div class="md:hidden flex items-center gap-3">
-                    <button onclick="openDonateModal()" class="text-pink-400 bg-pink-500/10 p-1.5 rounded-lg border border-pink-500/30 shadow-[0_0_10px_rgba(236,72,153,0.1)]">
-                        <i class="ph-fill ph-coffee text-xl"></i>
+                <div class="md:hidden flex items-center gap-1">
+                    <button onclick="openDonateModal()" class="text-pink-400 hover:text-pink-300 p-2 bg-pink-500/10 rounded-lg border border-pink-500/20 mr-1">
+                        <i class="ph-fill ph-coffee text-2xl"></i>
                     </button>
-                    <button id="mobile-menu-btn" class="text-slate-300 hover:text-white p-2"><i class="ph ph-list text-3xl"></i></button>
+
+                    <button class="install-app-btn text-emerald-400 hover:text-emerald-300 p-2 bg-emerald-500/10 rounded-lg border border-emerald-500/20 mr-2">
+                        <i class="ph-bold ph-download-simple text-2xl"></i>
+                    </button>
+                    <button id="mobile-menu-btn" class="text-slate-300 hover:text-white p-2">
+                        <i class="ph ph-list text-3xl"></i>
+                    </button>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div id="mobile-menu" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-xl pt-24 px-6 flex flex-col gap-6 md:hidden">
-        <a href="#" class="text-2xl font-bold text-indigo-400 border-b border-slate-800 pb-4">Home</a>
+    <div id="mobile-menu" class="fixed inset-0 z-40 bg-slate-950/95 backdrop-blur-xl pt-24 px-6 flex flex-col gap-6 md:hidden">
+        <a href="#" class="text-2xl font-bold text-white border-b border-slate-800 pb-4">Home</a>
         <a href="roles.html" class="text-2xl font-bold text-slate-300 hover:text-white border-b border-slate-800 pb-4">Roles</a>
         <a href="how-to-play.html" class="text-2xl font-bold text-slate-300 hover:text-white border-b border-slate-800 pb-4">How to play</a>
-        <a href="dashboard.html" class="text-2xl font-bold text-slate-300 hover:text-white border-b border-slate-800 pb-4">Dashboard (GM)</a>
-        <button onclick="openDonateModal(); document.getElementById('mobile-menu').classList.remove('open');" class="text-left text-2xl font-bold text-pink-400 border-b border-slate-800 pb-4 flex items-center gap-2">
-            <i class="ph-fill ph-coffee"></i> สนับสนุนผู้พัฒนา
-        </button>
-        <button class="install-app-btn text-left text-xl font-bold text-emerald-400 border-b border-slate-800 pb-4 flex items-center gap-2">
+        
+        <a href="dashboard.html" class="mt-4 bg-indigo-600 text-center text-white py-4 rounded-xl font-bold text-xl shadow-lg shadow-indigo-900/20">
+            <i class="ph-bold ph-game-controller"></i> เปิดกระดานเกม (Dashboard)
+        </a>
+
+        <button class="install-app-btn bg-emerald-600 text-center text-white py-4 rounded-xl font-bold text-xl shadow-lg shadow-emerald-900/20 flex justify-center items-center gap-2">
             <i class="ph-bold ph-download-simple"></i> ติดตั้งแอปลงเครื่อง
         </button>
-        <button id="close-mobile-menu" class="absolute top-6 right-6 text-slate-400 hover:text-white p-2"><i class="ph ph-x text-3xl"></i></button>
+
+        <button onclick="openDonateModal(); document.getElementById('mobile-menu').classList.remove('open');" class="text-left text-2xl font-bold text-pink-400 border-b border-slate-800 pb-4 flex items-center gap-2 mt-2">
+            <i class="ph-fill ph-coffee"></i> สนับสนุนผู้พัฒนา
+        </button>
+
+        <button id="close-mobile-menu" class="absolute top-6 right-6 text-slate-400 hover:text-white p-2">
+            <i class="ph ph-x text-3xl"></i>
+        </button>
     </div>
 
-    <main class="flex-grow flex flex-col items-center justify-center p-4 md:p-8 relative z-10">
-        <div class="hero-glow"></div>
-        
-        <div class="text-center max-w-3xl mx-auto mt-8 md:mt-12">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs md:text-sm font-medium mb-6">
-                <span class="relative flex h-2 w-2">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-                </span>
-                ระบบจัดการบอร์ดเกม Werewolf ที่ดีที่สุด
-            </div>
+    <main class="flex-grow flex flex-col justify-center items-center relative pt-24 pb-16 px-4">
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-indigo-600/20 rounded-full blur-[80px] md:blur-[120px] pointer-events-none animate-pulse-slow"></div>
+
+        <div class="relative z-10 text-center max-w-4xl mx-auto flex flex-col items-center">
             
-            <h1 class="text-4xl md:text-6xl lg:text-7xl font-black text-white tracking-tight leading-tight mb-6">
-                เปิดประสบการณ์ <br class="hidden sm:block">
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-indigo-500">Wolf Note</span>
+            <div class="mb-8 relative flex justify-center w-full max-w-[1600px] mx-auto px-4 md:px-0">
+               <img src="hero-logo.png" alt="Wolf Note Logo" class="w-full max-h-[900px] object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.2)] animate-pulse-slow">
+           </div>
+
+            <h1 class="text-4xl md:text-6xl font-extrabold text-white tracking-tight mb-4">
+                Wolf Note
             </h1>
+            <h2 class="text-xl md:text-3xl font-semibold text-indigo-300 mb-6">
+                Werewolf GM
+            </h2>
             
-            <p class="text-slate-400 text-sm md:text-lg mb-10 max-w-2xl mx-auto leading-relaxed">
-                ยกระดับการเป็น Game Master ของคุณให้โปรขึ้นไปอีกขั้น! ระบบสุ่มแจกไพ่ด้วย AI, ดูบทบาทผู้เล่น Real-timeผ่านมือถือ, และระบบจับเวลาจบครบในที่เดียว
+            <p class="text-base md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+                เครื่องมือสำหรับผู้ดำเนินเกมของคนไทย (GM) ช่วยจัดการบอร์ดเกมมนุษย์หมาป่าภาษาไทย100% (Werewolf) แบบ Real-time พร้อมระบบจับเวลา บันทึกเหตุการณ์ และคู่มือบทบาทกว่า 30 ตัวละคร ใช้งานฟรี
             </p>
+<div class="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5 max-w-2xl mx-auto px-4 relative z-10">
+            
+            <a href="join.html" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 px-6 rounded-2xl transition-all hover:-translate-y-1 shadow-[0_10px_20px_-10px_rgba(79,70,229,0.5)] flex items-center justify-center gap-4">
+                <i class="ph-fill ph-users-three text-4xl"></i> 
+                <div class="text-left">
+                    <div class="text-lg leading-tight">เข้าร่วมเกม</div>
+                    <div class="text-xs font-normal text-indigo-200 mt-0.5">สำหรับผู้เล่น</div>
+                </div>
+            </a>
 
-            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <a href="join.html" class="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white font-bold py-4 px-8 rounded-xl transition-all hover:-translate-y-1 shadow-[0_10px_20px_-10px_rgba(249,115,22,0.5)] flex items-center justify-center gap-2 text-lg">
-                    <i class="ph-bold ph-sign-in"></i> เข้าร่วมเกม (ผู้เล่น)
-                </a>
-                
-                <a href="dashboard.html" class="w-full sm:w-auto bg-slate-800 hover:bg-indigo-600 text-white font-bold py-4 px-8 rounded-xl transition-all hover:-translate-y-1 border border-slate-700 hover:border-indigo-500 flex items-center justify-center gap-2 text-lg shadow-lg">
-                    <i class="ph-bold ph-monitor-play"></i> สร้างห้อง (GM)
-                </a>
+            <a href="dashboard.html" class="bg-rose-600 hover:bg-rose-500 text-white font-bold py-4 px-6 rounded-2xl transition-all hover:-translate-y-1 shadow-[0_10px_20px_-10px_rgba(225,29,72,0.5)] flex items-center justify-center gap-4">
+                <i class="ph-fill ph-game-controller text-4xl"></i> 
+                <div class="text-left">
+                    <div class="text-lg leading-tight">สร้างห้องเกม</div>
+                    <div class="text-xs font-normal text-rose-200 mt-0.5">สำหรับ GM</div>
+                </div>
+            </a>
+
+            <a href="how-to-play.html" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-4 px-6 rounded-2xl transition-all hover:-translate-y-1 border border-slate-700 flex items-center justify-center gap-3">
+                <i class="ph-bold ph-info text-2xl text-slate-400"></i> 
+                <span class="text-lg">วิธีการใช้งาน</span>
+            </a>
+
+            <div class="flex flex-col">
+                <button id="install-button" class="install-app-btn h-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 px-6 rounded-2xl transition-all hover:-translate-y-1 shadow-[0_10px_20px_-10px_rgba(16,185,129,0.5)] flex items-center justify-center gap-3">
+                    <i class="ph-bold ph-download-simple text-2xl"></i> 
+                    <span class="text-lg">ติดตั้งแอป</span>
+                </button>
             </div>
-
-            <button class="install-app-btn mt-6 text-slate-400 hover:text-white underline text-sm transition-colors">
-                ติดตั้ง Wolf Note ลงในเครื่อง (เล่นออฟไลน์ได้)
-            </button>
+            
         </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mt-16 md:mt-24 w-full max-w-5xl">
-            <div class="bg-slate-900/50 backdrop-blur-sm border border-slate-800 p-6 rounded-2xl text-center hover:bg-slate-800/50 transition-colors">
-                <div class="bg-indigo-500/20 w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 text-indigo-400">
-                    <i class="ph-fill ph-robot text-2xl"></i>
-                </div>
-                <h3 class="text-white font-bold text-lg mb-2">AI จัดเด็คอัจฉริยะ</h3>
-                <p class="text-slate-400 text-sm">ไม่ต้องคิดให้ปวดหัว AI คำนวณความสมดุลและสุ่มไพ่ให้เข้ากับจำนวนคนเล่นทันที</p>
-            </div>
-            
-            <div class="bg-slate-900/50 backdrop-blur-sm border border-slate-800 p-6 rounded-2xl text-center hover:bg-slate-800/50 transition-colors">
-                <div class="bg-orange-500/20 w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 text-orange-400">
-                    <i class="ph-fill ph-device-mobile text-2xl"></i>
-                </div>
-                <h3 class="text-white font-bold text-lg mb-2">บทบาทส่วนตัว</h3>
-                <p class="text-slate-400 text-sm">ผู้เล่นเปิดดูบทบาทผ่านมือถือตัวเองได้เลย ป้องกันการแอบดูไพ่ตอนหลับตา</p>
-            </div>
-            
-            <div class="bg-slate-900/50 backdrop-blur-sm border border-slate-800 p-6 rounded-2xl text-center hover:bg-slate-800/50 transition-colors">
-                <div class="bg-emerald-500/20 w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 text-emerald-400">
-                    <i class="ph-fill ph-cards text-2xl"></i>
-                </div>
-                <h3 class="text-white font-bold text-lg mb-2">38 บทบาทสุดมันส์</h3>
-                <p class="text-slate-400 text-sm">รองรับตัวละครมากถึง 38 อาชีพ จะให้ AI สุ่ม หรือ GM จะจัดไพ่เองก็ทำได้อิสระ</p>
-            </div>
+        
+        <div class="mt-4 text-center text-xs text-emerald-500/80 flex items-center justify-center gap-1 relative z-10 hidden" id="install-hint">
+            <i class="ph-fill ph-wifi-slash"></i> ติดตั้งเพื่อใช้งานแบบออฟไลน์
+        </div>
         </div>
     </main>
 
-    <div id="donate-modal" class="modal-backdrop fixed inset-0 z-50 bg-black/80 items-center justify-center p-4">
-        <div class="bg-slate-900 border border-pink-500/30 rounded-2xl p-6 w-full max-w-sm shadow-2xl transform transition-all text-center relative">
+    <section class="relative z-10 border-t border-slate-800/50 bg-slate-950/50 backdrop-blur-md py-12 md:py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+                <div class="bg-slate-900/80 border border-slate-800 p-6 md:p-8 rounded-2xl hover:border-indigo-500/30 transition-colors">
+                    <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mb-5 text-blue-400"><i class="ph-fill ph-users-three text-2xl"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">จัดการผู้เล่นแบบ Real-time</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">กำหนดบทบาท เปลี่ยนสถานะ (ตาย/รอด/ปกป้อง) ได้ทันทีในหน้ารวม พร้อมสรุปจำนวนอัตโนมัติ</p>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-800 p-6 md:p-8 rounded-2xl hover:border-indigo-500/30 transition-colors">
+                    <div class="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-5 text-amber-400"><i class="ph-fill ph-timer text-2xl"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">ระบบจับเวลา & บันทึกเหตุการณ์</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">ควบคุมเวลาสนทนาได้อย่างแม่นยำ พร้อมบันทึก Logs ช่วยจำว่าใครตายตอนไหน</p>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-800 p-6 md:p-8 rounded-2xl hover:border-indigo-500/30 transition-colors">
+                    <div class="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mb-5 text-purple-400"><i class="ph-fill ph-device-mobile text-2xl"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">ติดตั้งเป็นแอป (PWA)</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">สามารถกดติดตั้งลงเครื่องมือถือได้ เพื่อพกพาไปใช้งานแบบออฟไลน์โดยไม่ต้องง้ออินเทอร์เน็ต</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="relative z-10 border-t border-slate-900 bg-slate-950 py-8 text-center">
+        <p class="text-slate-500 text-sm">© 2024 Wolf Note. Werewolf GM Dashboard. สร้างขึ้นเพื่อผู้เล่นบอร์ดเกม by chaiyanun</p>
+    </footer>
+
+    <div id="donate-modal" style="display: none; z-index: 9999;" class="fixed inset-0 bg-black/80 items-center justify-center p-4">
+        <div class="bg-slate-900 border border-pink-500/30 rounded-2xl p-6 w-full max-w-sm shadow-2xl transform transition-all text-center relative mx-auto mt-20 md:mt-32">
             <button onclick="closeDonateModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors p-1"><i class="ph ph-x text-2xl"></i></button>
             
             <div class="bg-pink-500/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-pink-400 shadow-[0_0_15px_rgba(236,72,153,0.3)]">
@@ -168,72 +207,43 @@
             </div>
             
             <h3 class="text-xl font-bold text-white mb-2">สนับสนุนนักพัฒนา ☕</h3>
-            <p class="text-slate-400 text-sm mb-6">หากแอปนี้ช่วยให้วง Werewolf ของคุณสนุกขึ้น สามารถสแกนเลี้ยงกาแฟหรือสมทบทุนค่าเซิร์ฟเวอร์ได้นะครับ 🐺💖</p>
+            <p class="text-slate-400 text-sm mb-6">หากแอปนี้ช่วยให้วง Werewolf ของคุณสนุกขึ้น สามารถสแกนเลี้ยงกาแฟได้นะครับ 🐺💖</p>
             
             <div class="bg-white p-3 rounded-xl mb-4 inline-block shadow-lg">
                 <img src="promptpay.png" alt="PromptPay QR Code" class="w-48 h-48 object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/200x200.png?text=QR+Code';">
             </div>
             
-            <p class="text-sm text-slate-300 mt-2 font-medium">ชื่อบัญชี: นาย ชัยนันต์ ทาละลัย</p>
+            <p class="text-sm text-slate-300 mt-2 font-medium">ชื่อบัญชี: นาย ชัยอนันต์ ทาลาลัย</p>
         </div>
     </div>
 
     <script>
-        // 1. ระบบเมนูมือถือ
+        // 1. Mobile Menu Toggle
         const menuBtn = document.getElementById('mobile-menu-btn');
-        const closeMenuBtn = document.getElementById('close-mobile-menu');
+        const closeBtn = document.getElementById('close-mobile-menu');
         const mobileMenu = document.getElementById('mobile-menu');
+        menuBtn.addEventListener('click', () => { mobileMenu.classList.add('open'); document.body.style.overflow = 'hidden'; });
+        closeBtn.addEventListener('click', () => { mobileMenu.classList.remove('open'); document.body.style.overflow = ''; });
 
-        if (menuBtn) {
-            menuBtn.addEventListener('click', () => { 
-                mobileMenu.classList.add('open'); 
-                document.body.style.overflow = 'hidden'; 
-            });
-        }
-        if (closeMenuBtn) {
-            closeMenuBtn.addEventListener('click', () => { 
-                mobileMenu.classList.remove('open'); 
-                document.body.style.overflow = ''; 
-            });
-        }
-
-        // 2. ระบบหน้าต่าง Donate
-        window.openDonateModal = function() {
-            document.getElementById('donate-modal').classList.add('active');
-            document.body.style.overflow = 'hidden';
-        };
-
-        window.closeDonateModal = function() {
-            document.getElementById('donate-modal').classList.remove('active');
-            document.body.style.overflow = '';
-        };
-
-        // กดพื้นที่ว่างด้านนอกเพื่อปิด Donate Modal
-        document.getElementById('donate-modal').addEventListener('click', function(e) {
-            if (e.target === this) closeDonateModal();
-        });
-
-        // ==========================================
-        // 3. ระบบ Service Worker & PWA (Install App)
-        // ==========================================
-        
-        // ลงทะเบียนเรียกใช้งาน Service Worker (ดึงไฟล์ sw.js มาทำงาน)
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker ลงทะเบียนสำเร็จ!', reg.scope))
-                    .catch(err => console.log('Service Worker ลงทะเบียนพลาด:', err));
-            });
+        // 2. Generate Random Stars
+        const starsContainer = document.getElementById('stars-container');
+        for (let i = 0; i < 100; i++) {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            star.style.left = `${Math.random() * 100}vw`; star.style.top = `${Math.random() * 100}vh`;
+            const size = Math.random() * 2 + 1; star.style.width = `${size}px`; star.style.height = `${size}px`;
+            star.style.animationDuration = `${Math.random() * 3 + 2}s`; star.style.animationDelay = `${Math.random() * 5}s`;
+            starsContainer.appendChild(star);
         }
 
-        // ระบบดักจับปุ่ม "ติดตั้งแอป" (PWA Install)
+        // 3. ระบบจัดการปุ่มติดตั้ง PWA (Install App)
         let deferredPrompt;
         const installBtns = document.querySelectorAll('.install-app-btn');
 
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            console.log('ระบบพร้อมให้ติดตั้ง PWA แล้ว');
+            console.log('PWA Install prompt is ready.');
         });
 
         installBtns.forEach(btn => {
@@ -242,9 +252,8 @@
                     deferredPrompt.prompt();
                     const { outcome } = await deferredPrompt.userChoice;
                     if (outcome === 'accepted') {
-                        console.log('ผู้ใช้กดยอมรับการติดตั้ง');
+                        deferredPrompt = null;
                     }
-                    deferredPrompt = null;
                 } else {
                     alert("💡 เบราว์เซอร์ของคุณไม่รองรับการติดตั้งอัตโนมัติ หรือคุณได้ติดตั้งแอปนี้ไปแล้ว\n\n📌 สำหรับ iOS (Safari): แตะปุ่ม 'แชร์' ด้านล่าง แล้วเลือก 'เพิ่มไปยังหน้าจอโฮม'\n\n📌 สำหรับ Android (Chrome): แตะเมนู 3 จุดมุมขวาบน แล้วเลือก 'เพิ่มลงในหน้าจอหลัก'");
                 }
@@ -253,7 +262,42 @@
 
         window.addEventListener('appinstalled', () => {
             deferredPrompt = null;
-            console.log('ติดตั้ง PWA สำเร็จแล้ว!');
+            console.log('PWA was installed successfully');
+        });
+
+        // 4. PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                .then(registration => {
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                console.log('New update available! Refreshing...');
+                                window.location.reload();
+                            }
+                        });
+                    });
+                })
+                .catch(err => console.log('SW error:', err));
+            });
+        }
+
+        // 5. ระบบหน้าต่าง Donate Modal
+        window.openDonateModal = function() {
+            document.getElementById('donate-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeDonateModal = function() {
+            document.getElementById('donate-modal').style.display = 'none';
+            document.body.style.overflow = '';
+        };
+
+        // กดพื้นที่ว่างด้านนอกเพื่อปิด Donate Modal
+        document.getElementById('donate-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeDonateModal();
         });
     </script>
 </body>
