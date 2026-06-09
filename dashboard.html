@@ -519,7 +519,27 @@
         }
     };
     window.nextTurn = function() { isNight = !isNight; if (isNight) dayCount++; window.updateGamePhaseUI(); window.addLog(`-- เข้าสู่${isNight ? 'กลางคืน' : 'กลางวัน'} ที่ ${dayCount} --`); };
-
+window.endGameAndCloseRoom = function() {
+        if (confirm("คุณต้องการปิดห้องนี้ใช่หรือไม่? ข้อมูลทั้งหมดในห้องจะถูกลบ")) {
+            if (window.currentPin && window.db) {
+                // ลบข้อมูลห้องจาก Firebase (อ้างอิง path ที่คุณใช้งานอยู่คือ 'rooms/')
+                window.set(window.ref(window.db, 'rooms/' + window.currentPin), null)
+                .then(() => {
+                    sessionStorage.removeItem('wolf_gm_pin');
+                    alert("ปิดห้องเรียบร้อยแล้ว");
+                    window.location.reload();
+                })
+                .catch((error) => {
+                    console.error("ปิดห้องไม่สำเร็จ:", error);
+                    alert("เกิดข้อผิดพลาดในการปิดห้อง");
+                });
+            } else {
+                // ถ้าไม่มี pin ก็รีเฟรชหน้าไปเลย
+                sessionStorage.removeItem('wolf_gm_pin');
+                window.location.reload();
+            }
+        }
+    };
     window.addLog = function(message) {
         if(!DOM.log) return;
         const now = new Date(); const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
