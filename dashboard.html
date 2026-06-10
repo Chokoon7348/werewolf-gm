@@ -505,18 +505,68 @@
     };
     window.closeInGameRolesModal = function() { DOM.rolesModal.classList.remove('active'); document.body.style.overflow = ''; };
 
+    // กำหนดตัวแปรสถานะเฟสเกมเพิ่มเติมไว้ด้านบนสุดของสคริปต์
+    window.currentGamePhase = "NIGHT"; 
+
     window.updateGamePhaseUI = function() {
         if(!DOM.statusLabel) return;
-        DOM.statusLabel.textContent = isNight ? `คืนที่ ${dayCount}` : `วันที่ ${dayCount}`;
-        if (isNight) {
+        
+        if (window.currentGamePhase === "NIGHT") {
+            DOM.statusLabel.textContent = `คืนที่ ${dayCount}`;
             DOM.statusPing.className = 'animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75';
             DOM.statusDot.className = 'relative inline-flex rounded-full h-2.5 w-2.5 md:h-3 md:w-3 bg-yellow-500';
-            DOM.btnNextPhaseText.innerHTML = `ไปช่วงกลางวัน`; DOM.statusLabel.classList.remove('text-sky-400'); DOM.statusLabel.classList.add('text-yellow-400');
-        } else {
+            DOM.btnNextPhaseText.innerHTML = `☀️ เรียกทุกคนตื่น`;
+            DOM.statusLabel.className = 'font-semibold text-yellow-400 text-sm md:text-base tracking-wide whitespace-nowrap';
+        } else if (window.currentGamePhase === "DAY") {
+            DOM.statusLabel.textContent = `วันที่ ${dayCount} (พูดคุย)`;
             DOM.statusPing.className = 'animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75';
             DOM.statusDot.className = 'relative inline-flex rounded-full h-2.5 w-2.5 md:h-3 md:w-3 bg-sky-500';
-            DOM.btnNextPhaseText.innerHTML = `เข้าสู่กลางคืน`; DOM.statusLabel.classList.remove('text-yellow-400'); DOM.statusLabel.classList.add('text-sky-400');
+            DOM.btnNextPhaseText.innerHTML = `🗳️ เปิดระบบโหวต`;
+            DOM.statusLabel.className = 'font-semibold text-sky-400 text-sm md:text-base tracking-wide whitespace-nowrap';
+        } else if (window.currentGamePhase === "VOTE") {
+            DOM.statusLabel.textContent = `วันที่ ${dayCount} (ช่วงโหวต)`;
+            DOM.statusPing.className = 'animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75';
+            DOM.statusDot.className = 'relative inline-flex rounded-full h-2.5 w-2.5 md:h-3 md:w-3 bg-rose-500';
+            DOM.btnNextPhaseText.innerHTML = `🌙 ส่งทุกคนเข้านอน`;
+            DOM.statusLabel.className = 'font-semibold text-rose-400 text-sm md:text-base tracking-wide whitespace-nowrap';
         }
+    };
+
+    window.nextTurn = function() { 
+        // วงจร 3 เฟส: NIGHT ➔ DAY ➔ VOTE ➔ วนกลับไป NIGHT
+        if (window.currentGamePhase === "NIGHT") {
+            window.currentGamePhase = "DAY";
+            window.isNight = false;
+            window.addLog(`-- ☀️ รุ่งเช้า วันที่ ${dayCount}: ร่วมกันอภิปรายหาตัวหมาป่า --`);
+        } else if (window.currentGamePhase === "DAY") {
+            window.currentGamePhase = "VOTE";
+            window.isNight = false;
+            window.addLog(`-- 🗳️ GM เปิดระบบโหวต: โปรดลงคะแนนผ่านมือถือ --`);
+        } else if (window.currentGamePhase === "VOTE") {
+            window.currentGamePhase = "NIGHT";
+            window.isNight = true;
+            dayCount++; // เข้านอนปุ๊บ นับเป็นคืนถัดไปทันที
+            window.addLog(`-- 🌙 มืดค่ำ คืนที่ ${dayCount}: ทุกคนหลับตาลง --`);
+        }
+
+        window.updateGamePhaseUI(); 
+
+        // 📡 ส่งสเตตัสเฟสปัจจุบันไปที่ Firebase
+        if (window.currentPin && window.db) {
+            window.set(window.ref(window.db, `rooms/${window.currentPin}/state`), {
+                phase: window.currentGamePhase,
+                round: dayCount
+            });
+            
+            // ล้างข้อมูลการกดเลือกของรอบเก่าเมื่อเปลี่ยนเฟส
+            if (window.currentPlayersData) {
+                Object.keys(window.currentPlayersData).forEach(key => {
+                    window.set(window.ref(window.db, `rooms/${window.currentPin}/players/${key}/actionTarget`), "");
+                    window.set(window.ref(window.db, `rooms/${window.currentPin}/players/${key}/voteTarget`), "");
+                });
+            }
+        }
+    };
     };
     window.nextTurn = function() { isNight = !isNight; if (isNight) dayCount++; window.updateGamePhaseUI(); window.addLog(`-- เข้าสู่${isNight ? 'กลางคืน' : 'กลางวัน'} ที่ ${dayCount} --`); };
 window.endGameAndCloseRoom = function() {
