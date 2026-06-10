@@ -13,7 +13,6 @@
 
     <div class="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-[#0b0f19] to-[#0b0f19]"></div>
 
-    <!-- 1. หน้ากรอกรหัส -->
     <div id="join-section" class="w-full max-w-sm bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 shadow-2xl z-10 relative">
         <div class="text-center mb-8">
             <div class="inline-flex items-center justify-center p-3 bg-indigo-500/10 text-indigo-400 rounded-2xl mb-4"><i class="ph-fill ph-users-three text-4xl"></i></div>
@@ -26,19 +25,16 @@
         </div>
     </div>
 
-    <!-- 2. หน้ารอ GM -->
     <div id="waiting-section" class="hidden w-full max-w-sm text-center z-10 relative">
         <div class="relative w-24 h-24 mx-auto mb-6"><i class="ph-fill ph-hourglass-high text-6xl text-amber-400 animate-pulse absolute inset-0 flex items-center justify-center"></i></div>
         <h2 class="text-2xl font-bold text-white mb-2" id="welcome-name">รอสักครู่...</h2>
         <p class="text-slate-400 mb-8">กำลังรอ GM เลือกโหมดและแจกบทบาท</p>
         
-        <!-- 🌟 ปุ่มขอตัวกลับบ้าน (หน้ารอ) -->
         <button onclick="leaveRoom()" class="mx-auto flex items-center justify-center gap-2 px-6 py-3 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 hover:text-rose-400 rounded-xl transition-all border border-rose-500/20 font-medium shadow-[0_0_15px_rgba(244,63,94,0.1)]">
             <i class="ph-bold ph-sign-out text-lg"></i> ยกเลิก / ออกจากห้อง
         </button>
     </div>
 
-    <!-- 3. หน้าโชว์การ์ดบทบาท -->
     <div id="role-section" class="hidden w-full max-w-sm z-10 relative">
         <div id="role-card" class="bg-slate-900 border-2 rounded-3xl p-6 text-center shadow-2xl transform transition-all duration-500 scale-90 opacity-0 relative overflow-hidden mb-6">
             <img id="role-image" src="" alt="Role Card" class="w-full h-auto rounded-xl mb-4 shadow-lg hidden">
@@ -55,13 +51,18 @@
             <div id="role-loading-hint" class="absolute inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center gap-3 rounded-3xl z-20"><i class="ph-bold ph-spinner-gap animate-spin text-4xl text-indigo-400"></i><p class="text-slate-400 text-sm font-medium">กำลังวาดการ์ดบทบาท...</p></div>
         </div>
 
-        <!-- 🌟 ปุ่มขอตัวกลับบ้าน (หน้าดูไพ่แล้ว) -->
+        <div id="action-box" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 text-center shadow-2xl mb-6 hidden">
+            <h2 id="action-title" class="text-base font-bold text-indigo-400 mb-4 flex items-center justify-center gap-2">⚙️ กำลังโหลดระบบการเลือก...</h2>
+            <div id="action-list" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-1">
+                </div>
+            <p id="action-status" class="text-xs text-emerald-400 font-medium mt-3 hidden">🎯 เลือกเป้าหมายเรียบร้อยแล้ว!</p>
+        </div>
+
         <button onclick="leaveRoom()" class="w-full flex items-center justify-center gap-2 px-6 py-4 bg-slate-900 hover:bg-slate-800 text-rose-500 hover:text-rose-400 rounded-xl transition-all border border-slate-800 font-medium">
             <i class="ph-bold ph-sign-out text-xl"></i> เลิกเล่นเกม / ออกจากห้อง
         </button>
     </div>
 
-    <!-- 🔥 Firebase Setup & Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
         import { getDatabase, ref, get, set, push, child, onValue, remove } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
@@ -76,7 +77,6 @@
         const roleSection = document.getElementById('role-section'); 
         const roleCard = document.getElementById('role-card');
 
-        // 🌟 1. ฟังก์ชันขอออกจากห้อง (ทำงานเมื่อกดปุ่มเลิกเล่น)
         window.leaveRoom = function() {
             const pin = sessionStorage.getItem('wolf_pin'); 
             const pId = sessionStorage.getItem('wolf_playerId');
@@ -94,7 +94,6 @@
             }
         };
 
-        // 🌟 2. ฟังก์ชันสลับกลับไปหน้ารอ (เมื่อ GM กดเล่นรอบใหม่)
         function showWaitingScreen() {
             roleSection.classList.add('hidden'); 
             waitingSection.classList.remove('hidden');
@@ -103,9 +102,10 @@
             rImage.classList.add('hidden');
             roleCard.classList.remove('scale-100', 'opacity-100'); 
             roleCard.classList.add('scale-90', 'opacity-0');
+            document.getElementById('action-box').classList.add('hidden');
         }
 
-        // 🌟 3. ฟังก์ชันหลักในการเชื่อมต่อและดักฟังห้อง
+        // 🌟 ฟังก์ชันหลักในการเชื่อมต่อและดักฟังห้อง
         function listenToRoom(pin, playerId, playerName) {
             joinSection.classList.add('hidden'); 
             waitingSection.classList.remove('hidden');
@@ -114,7 +114,6 @@
             onValue(ref(db, `rooms/${pin}/players/${playerId}`), (snap) => {
                 const myData = snap.val();
                 
-                // กรณี 1: ข้อมูลเราหายไป
                 if (myData === null) {
                     sessionStorage.clear(); 
                     alert("📢 ข้อมูลของคุณไม่อยู่ในห้องแล้ว (GM ปิดห้อง หรือคุณถูกนำออกจากเกม)"); 
@@ -122,15 +121,98 @@
                     return;
                 }
 
-                // กรณี 2: GM เปลี่ยนกลับเป็น waiting
+                // บันทึกสถานะผู้เล่นปัจจุบันลงตัวแปร Window โกลบอล
+                window.myRole = myData.role;
+                window.myStatus = myData.status || "รอด";
+
                 if (myData.role === "waiting" || myData.role === "waiting_for_players") {
                     showWaitingScreen();
-                } 
-                // กรณี 3: GM แจกบทบาทแล้ว โชว์ไพ่
-                else {
+                } else {
                     showMyRole(myData.role);
+                    
+                    // 🎧 เปิดระบบสแกนเฟสเกม 3 สเตปเพื่อควบควบคุมปุ่มโหวต/สกิล
+                    if (!window.hasStateListener) {
+                        window.hasStateListener = true;
+                        onValue(ref(db, `rooms/${pin}/state`), (stateSnap) => {
+                            const state = stateSnap.val() || { phase: "NIGHT" };
+                            handleGamePhaseUI(pin, playerId, state);
+                        });
+                    }
                 }
             });
+        }
+
+        // 🔄 ฟังก์ชันประมวลผลอินเตอร์เฟสตามเฟสเกมปัจจุบัน
+        function handleGamePhaseUI(pin, playerId, state) {
+            const actionBox = document.getElementById('action-box');
+            const actionTitle = document.getElementById('action-title');
+            const actionList = document.getElementById('action-list');
+            const actionStatus = document.getElementById('action-status');
+
+            actionStatus.classList.add('hidden');
+            actionBox.classList.remove('hidden');
+            actionList.innerHTML = "";
+
+            // 💀 กฎเหล็ก: ถ้าผู้เล่นเสียชีวิตแล้ว ให้ตัดสิทธิ์การใช้งานทันที
+            if (window.myStatus === "ตาย") {
+                actionTitle.innerHTML = "💀 คุณเสียชีวิตแล้ว (กลายเป็นวิญญาณ)";
+                actionList.innerHTML = `<p class="col-span-2 text-xs text-rose-400 italic py-4">คุณได้หมดลมหายใจแล้ว ทำได้เพียงเฝ้าดูความเคลื่อนไหวเงียบๆ เท่านั้น...</p>`;
+                return;
+            }
+
+            // ดึงรายชื่อผู้เล่นทั้งหมดเพื่อคัดกรองคนรอดมาทำปุ่ม
+            get(ref(db, `rooms/${pin}/players`)).then((allPlayersSnap) => {
+                const allPlayers = allPlayersSnap.val();
+                if (!allPlayers) return;
+
+                if (state.phase === "NIGHT") {
+                    actionTitle.innerHTML = `🌙 คืนที่ ${state.round || 1}: เลือกใช้พลังตามบทบาท`;
+                    // ตรวจเช็คเฉพาะบทที่มีสกิลกลางคืน
+                    if (["werewolf", "seer", "bodyguard", "witch"].includes(window.myRole)) {
+                        renderTargetButtons(allPlayers, pin, playerId, "actionTarget", actionList, actionStatus);
+                    } else {
+                        actionList.innerHTML = `<p class="col-span-2 text-xs text-slate-500 italic py-4">บทบาทของคุณกำลังนอนหลับฝันดีในค่ำคืนนี้...</p>`;
+                    }
+                } 
+                else if (state.phase === "DAY") {
+                    // ☀️ ช่วงพูดคุย: ล็อกระบบไม่ให้มีปุ่มกดโหวตงอกขึ้นมา
+                    actionTitle.innerHTML = `☀️ วันที่ ${state.round || 1}: ช่วงอภิปรายหารือ`;
+                    actionList.innerHTML = `<p class="col-span-2 text-xs text-amber-400 font-medium py-4 flex flex-col items-center gap-2"><i class="ph-bold ph-chats text-xl"></i> ร่วมกันแลกเปลี่ยนเบาะแสก่อน เมื่อถึงเวลา GM จะเปิดปุ่มโหวตให้ครับ</p>`;
+                } 
+                else if (state.phase === "VOTE") {
+                    // 🗳️ ช่วงโหวตประหาร: GM ปลดล็อก ปุ่มรายชื่อเด้งพร้อมกันทุกคน
+                    actionTitle.innerHTML = `🗳️ วันที่ ${state.round || 1}: ลงคะแนนเสียงประหารชีวิต!`;
+                    renderTargetButtons(allPlayers, pin, playerId, "voteTarget", actionList, actionStatus);
+                }
+            });
+        }
+
+        // 🎨 ฟังก์ชันวาดปุ่มรายชื่อเป้าหมาย
+        function renderTargetButtons(allPlayers, pin, playerId, targetField, actionList, actionStatus) {
+            actionList.innerHTML = "";
+            let hasTargets = false;
+
+            Object.keys(allPlayers).forEach(pKey => {
+                const p = allPlayers[pKey];
+                // เงื่อนไข: ไม่สามารถเลือกตัวเองได้ และเป้าหมายต้องมีสถานะไม่เท่ากับ "ตาย"
+                if (pKey !== playerId && p.status !== "ตาย") {
+                    hasTargets = true;
+                    const btn = document.createElement('button');
+                    btn.className = "bg-slate-950 hover:bg-indigo-600 border border-slate-800 text-white text-xs font-semibold py-2.5 px-3 rounded-xl transition-all truncate shadow active:scale-95";
+                    btn.innerText = p.name;
+                    btn.onclick = () => {
+                        set(ref(db, `rooms/${pin}/players/${playerId}/${targetField}`), p.name).then(() => {
+                            actionStatus.innerText = `✅ ส่งคะแนนใส่ [${p.name}] เรียบร้อย!`;
+                            actionStatus.classList.remove('hidden');
+                        });
+                    };
+                    actionList.appendChild(btn);
+                }
+            });
+
+            if (!hasTargets) {
+                actionList.innerHTML = `<p class="col-span-2 text-xs text-slate-500 italic py-4">ไม่มีเป้าหมายที่สามารถเลือกได้</p>`;
+            }
         }
 
         // 🌟 4. ระบบ Auto-Reconnect
@@ -179,7 +261,7 @@
             });
         });
 
-        // 🧠 ฐานข้อมูลหน้าตาการ์ดสำรอง
+        // 🧠 ฐานข้อมูลหน้าตาการ์ดสำรอง (ครบถ้วนทั้ง 38 บทบาท)
         const fallbackCards = {
             'villager': { name: "ชาวบ้าน", desc: "ไม่มีความสามารถพิเศษ ใช้ทักษะการจับโกหกเพื่อหาตัวหมาป่า", nameClass: "text-emerald-400", icon: "ph-user", boxColor: "bg-emerald-500", borderClass: "border-emerald-500/50", shadow: "shadow-[0_0_30px_rgba(16,185,129,0.2)]" },
             'werewolf': { name: "มนุษย์หมาป่า", desc: "ตื่นขึ้นมาในตอนกลางคืนเพื่อเลือกเหยื่อที่จะกำจัด", nameClass: "text-rose-500", icon: "ph-paw-print", boxColor: "bg-rose-600", borderClass: "border-rose-500/50", shadow: "shadow-[0_0_30px_rgba(225,29,72,0.2)]" },
@@ -193,7 +275,6 @@
             'revealer': { name: "ผู้เผยตัวตน", desc: "ทายผู้เล่น 1 คน ถ้าเขาเป็นหมาป่า หมาป่าตายและได้ทานต่อในคืนถัดไป แต่ถ้าทายผิด คุณจะตายแทน *จะเลือกทายหรือไม่ก็ได้", nameClass: "text-orange-400", icon: "ph-mask-happy", boxColor: "bg-orange-500", borderClass: "border-orange-500/50", shadow: "shadow-[0_0_30px_rgba(249,115,22,0.2)]" },
             'toughguy': { name: "หนุ่มถึก", desc: "หากคุณถูกหมาป่ากัด คุณจะยังไม่ตายทันที แต่จะไปตายเอาในคืนถัดไป", nameClass: "text-stone-400", icon: "ph-barbell", boxColor: "bg-stone-600", borderClass: "border-stone-500/50", shadow: "shadow-[0_0_30px_rgba(120,113,108,0.2)]" },
             'cursed': { name: "ผู้ต้องคำสาป", desc: "ตอนแรกคุณเป็นชาวบ้าน แต่ถ้าถูกหมาป่ากัด คุณจะกลายเป็นหมาป่าทันที", nameClass: "text-zinc-400", icon: "ph-ghost", boxColor: "bg-zinc-600", borderClass: "border-zinc-500/50", shadow: "shadow-[0_0_30px_rgba(161,161,170,0.2)]" },
-        // 🧠 ฐานข้อมูลการ์ดฉุกเฉิน (ครบ 38 บทบาท)
             'auraseer': { name: "ญาณทิพย์", desc: "ตรวจสอบตัวละครพิเศษหรือไม่ แสดงเฉพาะฝั่งชาวบ้าน", nameClass: "text-blue-300", icon: "ph-sparkle", boxColor: "bg-blue-400", borderClass: "border-blue-400/50" },
             'priest': { name: "นักบวช", desc: "ให้พรผู้เล่น 1 คน ยกเว้นตัวเองให้กันตายจากทุกสิ่งได้ 1 ครั้ง", nameClass: "text-yellow-200", icon: "ph-cross", boxColor: "bg-yellow-400", borderClass: "border-yellow-400/50" },
             'elder': { name: "แม่เฒ่า", desc: "ไล่ 1 คนออกจากหมู่บ้านในตอนเช้า และจะกลับเข้ามาในตอนกลางคืน", nameClass: "text-stone-300", icon: "ph-users", boxColor: "bg-stone-500", borderClass: "border-stone-500/50" },
@@ -222,7 +303,7 @@
             'drunk': { name: "คนเมา", desc: "บทบาทจริงจะเปิดเผยในคืนที่ 3", nameClass: "text-yellow-500", icon: "ph-beer-bottle", boxColor: "bg-yellow-700", borderClass: "border-yellow-600/50" }
         };
 
-        // 🌟 แก้ไขบั๊กเรียบร้อย
+        // 🌟 ฟังก์ชันวาดข้อมูลการ์ดบทบาทลงจอ
         function showMyRole(roleCode) {
             waitingSection.classList.add('hidden'); 
             roleSection.classList.remove('hidden');
