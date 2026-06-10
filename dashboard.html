@@ -408,6 +408,7 @@
                         <option value="ปกป้อง" class="bg-slate-800 text-white" ${player.status === 'ปกป้อง' ? 'selected' : ''}>🛡️ ปกป้อง</option>
                         <option value="คู่รัก" class="bg-slate-800 text-white" ${player.status === 'คู่รัก' ? 'selected' : ''}>❤️ คู่รัก</option>
                     </select>
+                    <div id="live-action-${index}" class="mt-2 text-[11px] font-mono text-indigo-300 bg-slate-950/60 p-1.5 rounded-md border border-slate-800 hidden"></div>
                 </div>`;
             DOM.grid.appendChild(card);
         });
@@ -472,7 +473,7 @@
     window.openResetModal = function() { DOM.resetModal.classList.add('active'); };
     window.closeResetModal = function() { DOM.resetModal.classList.remove('active'); };
     window.executeReset = function() {
-        dayCount = 1; isNight = true; DOM.log.innerHTML = '';
+        dayCount = 1; window.currentGamePhase = "NIGHT"; window.isNight = true; DOM.log.innerHTML = '';
         window.players.forEach(p => { p.role = "➖ เลือกบทบาท"; p.status = "รอด"; });
         window.renderPlayerCards(); window.updateGamePhaseUI(); window.addLog("รีเซ็ตกระดานเริ่มคืนที่ 1"); window.resetTimer(); window.closeResetModal(); window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -505,7 +506,7 @@
     };
     window.closeInGameRolesModal = function() { DOM.rolesModal.classList.remove('active'); document.body.style.overflow = ''; };
 
-    // กำหนดตัวแปรสถานะเฟสเกมเพิ่มเติมไว้ด้านบนสุดของสคริปต์
+    // 🔄 ระบบ 3 เฟสเกมหลัก (กลางคืน -> พูดคุยกลางวัน -> เปิดระบบโหวต)
     window.currentGamePhase = "NIGHT"; 
 
     window.updateGamePhaseUI = function() {
@@ -533,7 +534,6 @@
     };
 
     window.nextTurn = function() { 
-        // วงจร 3 เฟส: NIGHT ➔ DAY ➔ VOTE ➔ วนกลับไป NIGHT
         if (window.currentGamePhase === "NIGHT") {
             window.currentGamePhase = "DAY";
             window.isNight = false;
@@ -545,20 +545,18 @@
         } else if (window.currentGamePhase === "VOTE") {
             window.currentGamePhase = "NIGHT";
             window.isNight = true;
-            dayCount++; // เข้านอนปุ๊บ นับเป็นคืนถัดไปทันที
+            dayCount++; 
             window.addLog(`-- 🌙 มืดค่ำ คืนที่ ${dayCount}: ทุกคนหลับตาลง --`);
         }
 
         window.updateGamePhaseUI(); 
 
-        // 📡 ส่งสเตตัสเฟสปัจจุบันไปที่ Firebase
         if (window.currentPin && window.db) {
             window.set(window.ref(window.db, `rooms/${window.currentPin}/state`), {
                 phase: window.currentGamePhase,
                 round: dayCount
             });
             
-            // ล้างข้อมูลการกดเลือกของรอบเก่าเมื่อเปลี่ยนเฟส
             if (window.currentPlayersData) {
                 Object.keys(window.currentPlayersData).forEach(key => {
                     window.set(window.ref(window.db, `rooms/${window.currentPin}/players/${key}/actionTarget`), "");
@@ -567,12 +565,10 @@
             }
         }
     };
-    };
-    window.nextTurn = function() { isNight = !isNight; if (isNight) dayCount++; window.updateGamePhaseUI(); window.addLog(`-- เข้าสู่${isNight ? 'กลางคืน' : 'กลางวัน'} ที่ ${dayCount} --`); };
-window.endGameAndCloseRoom = function() {
+
+    window.endGameAndCloseRoom = function() {
         if (confirm("คุณต้องการปิดห้องนี้ใช่หรือไม่? ข้อมูลทั้งหมดในห้องจะถูกลบ")) {
             if (window.currentPin && window.db) {
-                // ลบข้อมูลห้องจาก Firebase (อ้างอิง path ที่คุณใช้งานอยู่คือ 'rooms/')
                 window.set(window.ref(window.db, 'rooms/' + window.currentPin), null)
                 .then(() => {
                     sessionStorage.removeItem('wolf_gm_pin');
@@ -584,12 +580,12 @@ window.endGameAndCloseRoom = function() {
                     alert("เกิดข้อผิดพลาดในการปิดห้อง");
                 });
             } else {
-                // ถ้าไม่มี pin ก็รีเฟรชหน้าไปเลย
                 sessionStorage.removeItem('wolf_gm_pin');
                 window.location.reload();
             }
         }
     };
+
     window.addLog = function(message) {
         if(!DOM.log) return;
         const now = new Date(); const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
@@ -612,9 +608,8 @@ window.endGameAndCloseRoom = function() {
     window.pauseTimer = function() { clearInterval(timerInterval); timerInterval = null; };
     window.resetTimer = function() { window.pauseTimer(); window.setTimer(600); };
 
-    // 🛠️ ระบบเตรียมแสดงผลหน้าต่าง "จัดไพ่เอง"
     window.customDeck = {};
-    window.gameMode = 'auto'; // 'auto' หรือ 'custom'
+    window.gameMode = 'auto'; 
 
     window.dictGlobal = { 
         'villager': "🧑‍🌾 ชาวบ้าน", 'seer': "🔮 เทพพยากรณ์", 'auraseer': "👁️ ญาณทิพย์", 'revealer': "🔥 ผู้เผยตัวตน",
@@ -637,10 +632,13 @@ window.endGameAndCloseRoom = function() {
         const pCountEl = document.getElementById('custom-deck-players');
         if(pCountEl) pCountEl.innerText = pCount;
 
-        if(total < pCount) { totalEl.className = 'text-rose-500'; } 
-        else if (total > pCount) { totalEl.className = 'text-amber-400'; } // เกินได้ (เป็นไพ่กองกลาง)
-        else { totalEl.className = 'text-emerald-400'; }
-    }
+        // 🛡️ ป้องกันระบบแครชหากไม่พบ Element ตัวเลขสำรับไพ่
+        if (totalEl) {
+            if(total < pCount) { totalEl.className = 'text-rose-500'; } 
+            else if (total > pCount) { totalEl.className = 'text-amber-400'; } 
+            else { totalEl.className = 'text-emerald-400'; }
+        }
+    };
 
     window.changeDeckCount = function(code, delta) {
         window.customDeck[code] = (window.customDeck[code] || 0) + delta;
@@ -658,12 +656,11 @@ window.endGameAndCloseRoom = function() {
             resetModal: document.getElementById('confirm-reset-modal'), rolesModal: document.getElementById('in-game-roles-modal'), rolesContainer: document.getElementById('in-game-roles-container')
         };
 
-        // สร้างหน้า UI จัดไพ่เอง
         const customContainer = document.getElementById('custom-roles-list');
         if(customContainer) {
             let html = '';
             for(let code in window.dictGlobal) {
-                window.customDeck[code] = 0; // ค่าเริ่มต้น
+                window.customDeck[code] = 0; 
                 let thaiName = window.dictGlobal[code];
                 html += `
                     <div class="flex items-center justify-between bg-slate-900/60 border border-slate-700/50 p-2 rounded-lg">
@@ -679,7 +676,6 @@ window.endGameAndCloseRoom = function() {
             customContainer.innerHTML = html;
         }
 
-        // ปุ่มสลับโหมด
         const tabAuto = document.getElementById('tab-auto');
         const tabCustom = document.getElementById('tab-custom');
         const contentAuto = document.getElementById('mode-auto-content');
@@ -747,12 +743,33 @@ window.endGameAndCloseRoom = function() {
             if (window.currentPlayersData) {
                 const keys = Object.keys(window.currentPlayersData);
                 playerCountText.innerText = keys.length;
-                window.updateCustomDeckCounter(); // อัปเดตตัวนับยอดคน
+                window.updateCustomDeckCounter(); 
                 
                 playerListContainer.innerHTML = keys.map(key => {
                     const p = window.currentPlayersData[key];
                     return `<div class="bg-indigo-500/20 border border-indigo-500/50 text-indigo-300 pl-4 pr-2 py-1.5 rounded-xl flex items-center gap-3 font-medium shadow-lg"><i class="ph-fill ph-user"></i> ${p.name}<button onclick="kickPlayerFromLobby('${key}', '${p.name}')" class="bg-rose-500/20 hover:bg-rose-500 p-1 rounded-lg text-rose-400 hover:text-white transition-colors flex items-center justify-center ml-1" title="เตะผู้เล่น"><i class="ph-bold ph-x"></i></button></div>`
                 }).join('');
+
+                // 🟢 ดึงผลโหวตและข้อมูลสกิลฝั่งผู้เล่นขึ้นมาโชว์ที่การ์ด GM แบบสดๆ ทันที
+                if (window.players && window.players.length > 0) {
+                    window.players.forEach((p, idx) => {
+                        for (let key in window.currentPlayersData) {
+                            if (window.currentPlayersData[key].name === p.name) {
+                                const actEl = document.getElementById(`live-action-${idx}`);
+                                if (actEl) {
+                                    const act = window.currentPlayersData[key].actionTarget || "";
+                                    const vote = window.currentPlayersData[key].voteTarget || "";
+                                    let txt = "";
+                                    if (act) txt += `🎯 สกิลใส่: ${act} `;
+                                    if (vote) txt += `🗳️ โหวตฆ่า: ${vote}`;
+                                    
+                                    if (txt) { actEl.innerText = txt; actEl.classList.remove('hidden'); }
+                                    else { actEl.classList.add('hidden'); }
+                                }
+                            }
+                        }
+                    });
+                }
 
                 if(keys.length > 0 && window.players.length === 0) { startGameBtn.classList.remove('hidden'); startGameBtn.classList.add('flex'); }
             } else {
@@ -785,7 +802,6 @@ window.endGameAndCloseRoom = function() {
             window.bindRoomListener(pin);
         });
 
-        // 🧠 ระบบเริ่มเกม (ควบรวม AI V5 และ Custom Mode)
         startGameBtn.addEventListener('click', () => {
             if(!window.currentPlayersData) return;
             const playerKeys = Object.keys(window.currentPlayersData);
@@ -793,18 +809,15 @@ window.endGameAndCloseRoom = function() {
             let deck = [];
 
             if(window.gameMode === 'custom') {
-                // 🛠️ โหมดจัดไพ่เอง
                 let totalSelected = Object.values(window.customDeck).reduce((a, b) => a + b, 0);
                 if(totalSelected < playerCount) {
                     alert(`กรุณาเลือกไพ่อย่างน้อย ${playerCount} ใบ (ตอนนี้เลือกไป ${totalSelected} ใบ)`);
                     return;
                 }
-                // ดึงไพ่ที่ GM จัดไว้ลงกอง
                 for(let code in window.customDeck) {
                     for(let i=0; i<window.customDeck[code]; i++) deck.push(code);
                 }
             } else {
-                // 🤖 โหมด AI จัดให้
                 const villagerMode = document.querySelector('input[name="villager-mode"]:checked').value;
                 if (playerCount >= 1) deck.push('seer'); 
                 if (playerCount >= 2) deck.push('bodyguard'); 
@@ -841,15 +854,18 @@ window.endGameAndCloseRoom = function() {
                 }
             }
 
-            // สับไพ่และแจก
             deck.sort(() => Math.random() - 0.5);
             startGameBtn.innerHTML = `<i class="ph-bold ph-spinner-gap animate-spin text-xl"></i> กำลังแจกไพ่...`;
             startGameBtn.disabled = true;
 
             window.players = []; let updatesCount = 0;
-            
-            // ถ้าไพ่เกิน (โหมด Custom) เก็บเป็นกองกลาง
             const extraCards = deck.slice(playerCount);
+
+            // บังคับเปิดเฟส NIGHT เริ่มต้นขึ้นฐานข้อมูลทันทีเมื่อเริ่มเกม
+            window.set(window.ref(window.db, `rooms/${window.currentPin}/state`), {
+                phase: "NIGHT",
+                round: 1
+            });
 
             playerKeys.forEach((key, index) => {
                 const code = deck[index];
@@ -862,7 +878,6 @@ window.endGameAndCloseRoom = function() {
                         window.renderPlayerCards(); window.updateStats();
                         
                         window.addLog(`⭐ เกมเริ่ม! โหมด: ${window.gameMode === 'custom' ? 'จัดไพ่เอง' : 'AI สุ่ม'}`);
-                        // แจ้งเตือน GM ถ้ามีไพ่เหลือ
                         if(extraCards.length > 0) {
                             const extraNames = extraCards.map(c => window.dictGlobal[c]).join(', ');
                             window.addLog(`📦 ไพ่กองกลาง (ไม่ได้แจก): ${extraNames}`);
