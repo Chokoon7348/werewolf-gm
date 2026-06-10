@@ -178,44 +178,6 @@
                 }
             });
         });
-        // 🎧 ระบบดักฟังเฟสเกมจาก GM เพื่อเปิด/ปิดระบบโหวต
-                    onValue(ref(db, `rooms/${pin}/state`), (stateSnap) => {
-                        const state = stateSnap.val() || { phase: "NIGHT" };
-                        const actionBox = document.getElementById('action-box');
-                        const actionTitle = document.getElementById('action-title');
-                        const actionList = document.getElementById('action-list');
-                        const actionStatus = document.getElementById('action-status');
-
-                        actionStatus.classList.add('hidden');
-                        
-                        get(ref(db, `rooms/${pin}/players`)).then((allPlayersSnap) => {
-                            const allPlayers = allPlayersSnap.val();
-                            if (!allPlayers) return;
-
-                            actionBox.classList.remove('hidden');
-                            actionList.innerHTML = ""; 
-
-                            if (state.phase === "NIGHT") {
-                                actionTitle.innerText = "🌙 คืนนี้คุณจะเลือกใช้สกิลใส่ใคร?";
-                                // เฉพาะบทบาทที่มีสกิลตอนกลางคืน
-                                if (["werewolf", "seer", "bodyguard", "witch"].includes(myData.role)) {
-                                    renderTargetButtons(allPlayers, pin, playerId, "actionTarget", actionList, actionStatus);
-                                } else {
-                                    actionList.innerHTML = `<p class="col-span-2 text-xs text-slate-500 italic py-4">คุณกำลังหลับฝันดีในค่ำคืนนี้...</p>`;
-                                }
-                            } 
-                            else if (state.phase === "DAY") {
-                                // ☀️ ช่วงเช้าที่ให้คุยกันเฉยๆ ปุ่มโหวตจะยังไม่ขึ้น
-                                actionTitle.innerText = "☀️ ช่วงอภิปรายหารือ";
-                                actionList.innerHTML = `<p class="col-span-2 text-xs text-amber-400 font-medium py-4 flex flex-col items-center gap-2"><i class="ph-bold ph-chats text-xl"></i> ร่วมกันปรึกษากับหมู่บ้านก่อน เมื่อถึงเวลา GM จะเปิดระบบโหวตให้ครับ</p>`;
-                            } 
-                            else if (state.phase === "VOTE") {
-                                // 🔥 ช่วงที่ GM เปิดโหวต ปุ่มโหวตถึงจะงอกออกมาให้กด
-                                actionTitle.innerText = "🗳️ ลงคะแนนเลือกคนที่จะโดนประหาร!";
-                                renderTargetButtons(allPlayers, pin, playerId, "voteTarget", actionList, actionStatus);
-                            }
-                        });
-                    });
 
         // 🧠 ฐานข้อมูลหน้าตาการ์ดสำรอง
         const fallbackCards = {
