@@ -444,7 +444,30 @@
         }
     };
 
-    window.updatePlayerStatus = function(index, newStatus) { window.players[index].status = newStatus; window.renderPlayerCards(); window.addLog(`[${window.players[index].name}] สถานะ: ${newStatus}`); };
+   window.updatePlayerStatus = function(index, newStatus) { 
+        window.players[index].status = newStatus; 
+        window.renderPlayerCards(); 
+        window.addLog(`[${window.players[index].name}] สถานะ: ${newStatus}`); 
+
+        // 📡 ส่งสถานะใหม่ (รอด/ตาย) ขึ้น Firebase ทันที เพื่อให้จอมือถือผู้เล่นเด้งป๊อปอัปและย้อมจอเทา
+        if (window.currentPin && window.db && window.currentPlayersData) {
+            const playerName = window.players[index].name;
+            let playerKey = null;
+            
+            // วนลูปหาปุ่ม Key ของผู้เล่นคนนี้ในคลัง Firebase
+            for (let key in window.currentPlayersData) {
+                if (window.currentPlayersData[key].name === playerName) { 
+                    playerKey = key; 
+                    break; 
+                }
+            }
+            
+            // ถ้าเจอตัวปุ๊บ ยิงสเตตัสอัปเดตไปที่ Firebase ทันที
+            if (playerKey) {
+                window.set(window.ref(window.db, `rooms/${window.currentPin}/players/${playerKey}/status`), newStatus);
+            }
+        }
+    };
     
     window.removePlayer = function(index) { 
         const name = window.players[index].name; 
