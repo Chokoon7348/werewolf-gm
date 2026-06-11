@@ -71,7 +71,7 @@
         </button>
     </div>
 
-    <!-- ─── SECTION 3: อารีน่าแสดงไพ่บทบาทและระบบแชทแยกห้องขวา (Responsive Grid) ─── -->
+    <!-- ─── SECTION 3: อารีน่าแสดงไพ่บทบาทและระบบแชท (Responsive Grid Layout) ─── -->
     <div id="role-section" class="hidden w-full max-w-md lg:max-w-5xl z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2">
         
         <!-- 🛑 ฝั่งซ้ายของจอ: การ์ดบทบาทลับ 3D และกล่องกดทำหน้าที่สกิล -->
@@ -123,7 +123,7 @@
             <!-- 🔮 กล่องปุ่มใช้สกิล / ปุ่มลงคะแนนโหวตประหาร -->
             <div id="action-box" class="bg-deepSlate/90 border border-slate-800 rounded-3xl p-5 text-center shadow-2xl hidden border-indigo-500/10 shrink-0">
                 <h2 id="action-title" class="text-sm font-bold text-indigo-400 mb-3 flex items-center justify-center gap-2 uppercase tracking-wider">⚙️ กำลังโหลดระบบ...</h2>
-                <div id="action-list" class="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto p-0.5">
+                <div id="action-list" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-0.5">
                 </div>
                 <p id="action-status" class="text-xs text-emerald-400 font-semibold mt-3 hidden bg-emerald-500/10 border border-emerald-500/20 py-2 rounded-xl">🎯 เลือกเป้าหมายเรียบร้อยแล้ว!</p>
             </div>
@@ -138,12 +138,11 @@
                     <i class="ph-bold ph-users-three text-base"></i> ทำเนียบรายชื่อผู้เล่นในห้อง
                 </h2>
                 <div id="status-board-list" class="grid grid-cols-3 gap-2 max-h-32 overflow-y-auto p-0.5 text-center text-[11px] font-bold">
-                    <!-- อัปเดตรายชื่อและสถานะชีวิตสดแบบเรียลไทม์จากฐานข้อมูล -->
                 </div>
             </div>
 
-            <!-- บ็อกซ์แชทสับแท็บ -->
-            <div id="chat-box" class="bg-deepSlate/90 border border-slate-800 rounded-[32px] p-5 flex flex-col gap-4 border-indigo-500/10 h-full min-h-[400px] lg:min-h-[460px] shadow-2xl">
+            <!-- 💬 กล่องแชทสับแท็บ (🟢 ล็อกความสูง h-[460px] ตายตัว ไม่ขยายหลุดจอเด็ดขาด) -->
+            <div id="chat-box" class="bg-deepSlate/90 border border-slate-800 rounded-[32px] p-5 flex flex-col gap-4 border-indigo-500/10 h-[460px] shadow-2xl">
                 <div class="flex bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800 gap-1 shrink-0">
                     <button id="tab-global" onclick="switchChatChannel('global', event)" class="flex-1 py-2.5 text-xs font-bold rounded-xl bg-neonIndigo text-white shadow-md transition-all flex items-center justify-center gap-1.5">
                         <i class="ph-bold ph-globe"></i> หมู่บ้าน
@@ -156,7 +155,8 @@
                     </button>
                 </div>
 
-                <div id="chat-messages" class="flex-1 overflow-y-auto p-4 bg-slate-950/60 rounded-2xl border border-slate-800/80 flex flex-col gap-3 font-medium text-xs min-h-[200px]">
+                <!-- 🟢 ช่องแสดงกระดานข้อความ ล็อกความสูงให้เลื่อนสกรูลด้านในอย่างเดียว -->
+                <div id="chat-messages" class="flex-1 overflow-y-auto p-4 bg-slate-950/60 rounded-2xl border border-slate-800/80 flex flex-col gap-3 font-medium text-xs h-[260px]">
                     <p class="text-slate-600 italic text-center my-auto">กำลังเตรียมเปิดสัญญาณห้องสนทนา...</p>
                 </div>
 
@@ -195,8 +195,10 @@
         window.chatListeners = {};
         window.currentGamePhase = 'NIGHT'; 
         
+        // 🟢 เพิ่มตัวแปรคลังจำสถานะดีเลย์การแสดงผลการตาย
         window.knownDeadPlayers = null;
         window.lastObservedPhase = null;
+        window.uiStatus = "รอด"; // 🟢 ตัวแปรใช้คุมสถานะตายฝั่ง UI (จะเปลี่ยนเฉพาะตอนเช้าและหลังโหวต)
 
         window.toggleCardFlip = function() {
             if (cardInternal) {
@@ -245,14 +247,16 @@
             document.getElementById('action-box').classList.add('hidden');
         }
 
+        // 🎨 ฟังก์ชันอัปเดตบอร์ดรายชื่อ (🟢 เปลี่ยนมาดึงสถานะตายจางลงตามฐานข้อมูลงวดล่าสุุดที่เปิดเผยแล้ว)
         function renderPlayerStatusBoard(allPlayers) {
             const boardList = document.getElementById('status-board-list');
             if (!boardList) return;
             
             boardList.innerHTML = Object.keys(allPlayers).map(k => {
                 const p = allPlayers[k];
-                const isDead = p.status === 'ตาย';
-                if (isDead) {
+                // 🟢 กรองเช็คกับอาร์เรย์ที่อนุมัติเผยรายชื่อศพแล้วเท่านั้น เพื่อไม่ให้บอร์ดสีจางลงก่อนเวลาตื่นนอน
+                const isDeadRevealed = window.knownDeadPlayers && window.knownDeadPlayers.includes(k);
+                if (isDeadRevealed) {
                     return `<div class="bg-slate-950/40 border border-slate-900 text-slate-600 px-2 py-2 rounded-xl opacity-40 line-through flex items-center justify-center gap-1"><i class="ph-fill ph-skull text-xs"></i> ${p.name}</div>`;
                 } else {
                     return `<div class="bg-slate-950 border border-emerald-500/20 text-emerald-400 px-2 py-2 rounded-xl flex items-center justify-center gap-1"><i class="ph-fill ph-heart-beat text-xs animate-pulse text-emerald-500"></i> ${p.name}</div>`;
@@ -260,6 +264,7 @@
             }).join('');
         }
 
+        // 🚨 ฟังก์ชันประมวลผลดีเลย์คนตาย: ทำงานเฉพาะ (NIGHT➔DAY) และ (VOTE➔NIGHT) เท่านั้น
         function checkDelayedDeathAnnouncements(pin, playerId, state) {
             const currentPhase = state.phase;
             const previousPhase = window.lastObservedPhase;
@@ -277,6 +282,7 @@
                                 window.knownDeadPlayers.push(k);
                                 
                                 if (k === playerId) {
+                                    window.uiStatus = "ตาย"; // 🟢 ปรับ UI ตัวเองให้ตายอย่างเป็นทางการพร้อมแจ้งเตือน
                                     alert("💀 คุณได้เสียชีวิตแล้ว!\n\nโปรดงดใช้เสียง บลัฟ หรือส่งสัญญาณบอกใบ้ใดๆ แก่ผู้เล่นที่ยังมีชีวิตอยู่เด็ดขาดจนกว่าเกมจะจบลงครับ");
                                 }
                             }
@@ -310,14 +316,17 @@
                 window.myRole = myData.role;
                 window.myStatus = myData.status || "รอด";
 
+                // กรณีเพิ่งเชื่อมต่อเข้าห้องมากลางคันและตัวเองเคยตายไปแล้วในรอบก่อน ให้จัดลงคลังประวัติทันที
                 if (window.knownDeadPlayers === null) {
                     window.knownDeadPlayers = Object.keys(allPlayers).filter(k => allPlayers[k].status === "ตาย");
+                    window.uiStatus = window.knownDeadPlayers.includes(playerId) ? "ตาย" : "รอด";
                 }
 
                 if (myData.role === "waiting" || myData.role === "waiting_for_players") {
                     showWaitingScreen();
                     window.knownDeadPlayers = null;
                     window.lastObservedPhase = null;
+                    window.uiStatus = "รอด";
                 } else {
                     joinSection.classList.add('hidden');
                     waitingSection.classList.add('hidden');
@@ -448,9 +457,12 @@
                 if (channel === 'graveyard') bubbleClass = isMe ? 'bg-rose-600 text-white rounded-tr-none shadow-[0_0_15px_rgba(225,29,72,0.15)]' : 'bg-slate-950 border border-rose-950 text-rose-300 rounded-tl-none';
                 if (channel === 'werewolf') bubbleClass = isMe ? 'bg-amber-600 text-white rounded-tr-none shadow-[0_0_15px_rgba(217,119,6,0.15)]' : 'bg-slate-950 border border-amber-950 text-amber-300 rounded-tl-none';
 
+                // 🟢 🛠️ ดึงโครงสร้างความต่างเวลามาปั๊มตราประทับชั่วโมงนาฬิกาต่อท้ายชื่อแบบสากล
+                const timeStr = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + ' น.' : '';
+
                 return `
                     <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
-                        <span class="text-[10px] text-slate-500 mb-0.5 font-semibold">${msg.senderName}</span>
+                        <span class="text-[10px] text-slate-500 mb-0.5 font-semibold">${msg.senderName} • <span class="opacity-60">${timeStr}</span></span>
                         <div class="max-w-[85%] px-3.5 py-2.5 rounded-2xl text-xs font-semibold leading-relaxed break-words shadow-sm ${bubbleClass}">
                             ${msg.text}
                         </div>
@@ -475,7 +487,8 @@
             actionBox.classList.remove('hidden');
             actionList.innerHTML = "";
 
-            if (window.myStatus === "ตาย") {
+            // 💀 🟢 เช็คเงื่อนไขล็อกคลาสผ่าน window.uiStatus แทนสเตตัสปกติ เพื่อดีเลย์ภาพสีจางลงตอนเวลาเช้าและหลังโหวต
+            if (window.uiStatus === "ตาย") {
                 actionTitle.innerHTML = "💀 คุณเสียชีวิตแล้ว (สิทธิ์วิญญาณ)";
                 actionList.innerHTML = `<p class="col-span-2 text-xs text-rose-400 border border-rose-500/10 bg-rose-500/5 py-4 rounded-xl font-medium italic">คุณได้หมดลมหายใจแล้ว ทำได้เพียงเฝ้าดูความเคลื่อนไหวเงียบๆ เท่านั้น...</p>`;
                 if (roleCardBackFace) {
@@ -507,7 +520,6 @@
                 actionTitle.innerHTML = `🗳️ วันที่ ${state.round || 1}: ลงคะแนนประหารชีวิต!`;
                 renderTargetButtons(allPlayers, pin, playerId, "voteTarget", actionList, actionStatus);
 
-                // 🟢 รวบรวมและคำนวณคะแนนผลโหวตแบบสดๆ (คัดแสดงผลเฉพาะรายที่มีคะแนนโหวตมากกว่า 0)
                 const votesCountMap = {};
                 Object.keys(allPlayers).forEach(k => {
                     const target = allPlayers[k].voteTarget;
@@ -523,7 +535,6 @@
                     
                     let tallyHtml = `<p class="text-[11px] font-bold text-rose-400 mb-2 uppercase tracking-wider flex items-center gap-1"><i class="ph-bold ph-chart-bar-horizontal"></i> ตารางคะแนนโหวตสดปัจจุบัน</p><div class="flex flex-wrap gap-2">`;
                     votedList.forEach(name => {
-                        // ❌ แยกเคสถ้าข้อมูลปลายทางถูกกดส่งเป็นคำสั่ง "งดออกเสียง" 
                         if (name === "งดออกเสียง") {
                             tallyHtml += `<span class="bg-slate-800 border border-slate-700 text-slate-300 text-[10px] px-2.5 py-1 rounded-xl font-bold flex items-center gap-1"><i class="ph-bold ph-prohibit text-xs"></i> ไม่โหวต: ${votesCountMap[name]} คน</span>`;
                         } else {
@@ -545,7 +556,9 @@
 
             Object.keys(allPlayers).forEach(pKey => {
                 const p = allPlayers[pKey];
-                if (pKey !== playerId && p.status !== "ตาย") {
+                // 🟢 กรองปุ่มกดทำสกิลอ้างอิงรายชื่อศพที่ได้รับการยืนยันเปิดเผยเป็นทางการแล้วใน window.knownDeadPlayers
+                const isDeadRevealed = window.knownDeadPlayers && window.knownDeadPlayers.includes(pKey);
+                if (pKey !== playerId && !isDeadRevealed) {
                     hasTargets = true;
                     const btn = document.createElement('button');
                     btn.className = "bg-slate-950 hover:bg-neonIndigo border border-slate-800 text-white text-xs font-bold py-3 px-3 rounded-2xl transition-all truncate shadow active:scale-95";
@@ -561,7 +574,6 @@
                 }
             });
 
-            // ❌ เพิ่มปุ่มงดออกเสียงสากลแบบ Full-width ท้ายกล่องรายชื่อเพื่อนเฉพาะในช่วงโหวตช่วงกลางวัน
             if (targetField === "voteTarget" && hasTargets) {
                 const noVoteBtn = document.createElement('button');
                 noVoteBtn.className = "bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-bold py-3 px-3 rounded-2xl transition-all shadow active:scale-95 col-span-2 mt-2 flex items-center justify-center gap-1.5 animate-pulse";
