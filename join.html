@@ -21,7 +21,7 @@
 
     <style>
         body { background-color: #070a13; color: #f1f5f9; min-height: 100vh; overflow-y: auto; -webkit-tap-highlight-color: transparent; }
-        ::-webkit-scrollbar { width: 0px; }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
 
         /* มิติระบบ 3D Card Flip CSS */
         .perspective-1000 { perspective: 1000px; }
@@ -67,11 +67,11 @@
         <p class="text-slate-400 text-sm max-w-xs mx-auto mb-8 leading-relaxed">ผู้ดำเนินเกม (GM) กำลังเตรียมจัดสำรับไพ่และเลือกโหมดการเล่นในห้องควบคุม</p>
         
         <button onclick="leaveRoom()" class="w-full flex items-center justify-center gap-2 py-3.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-2xl font-semibold shadow-lg transition-all active:scale-[0.98] text-sm">
-            <i class="ph-bold ph-sign-out text-lg"></i> ยกเลิกการเข้าร่วม
+            <i class="ph-bold ph-sign-out text-lg"></i>  ยกเลิกการเข้าร่วม
         </button>
     </div>
 
-    <!-- ─── SECTION 3: อารีน่าแสดงไพ่บทบาทและระบบแชท (Responsive Grid) ─── -->
+    <!-- ─── SECTION 3: อารีน่าแสดงไพ่บทบาทและระบบแชทแยกห้องขวา (Responsive Grid) ─── -->
     <div id="role-section" class="hidden w-full max-w-md lg:max-w-5xl z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2">
         
         <!-- 🛑 ฝั่งซ้ายของจอ: การ์ดบทบาทลับ 3D และกล่องกดทำหน้าที่สกิล -->
@@ -120,20 +120,30 @@
                 </div>
             </div>
 
-            <!-- กล่องปุ่มใช้สกิล / ปุ่มลงคะแนนโหวตประหาร -->
+            <!-- 🔮 กล่องปุ่มใช้สกิล / ปุ่มลงคะแนนโหวตประหาร -->
             <div id="action-box" class="bg-deepSlate/90 border border-slate-800 rounded-3xl p-5 text-center shadow-2xl hidden border-indigo-500/10 shrink-0">
                 <h2 id="action-title" class="text-sm font-bold text-indigo-400 mb-3 flex items-center justify-center gap-2 uppercase tracking-wider">⚙️ กำลังโหลดระบบ...</h2>
-                <div id="action-list" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-0.5">
+                <div id="action-list" class="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto p-0.5">
                 </div>
                 <p id="action-status" class="text-xs text-emerald-400 font-semibold mt-3 hidden bg-emerald-500/10 border border-emerald-500/20 py-2 rounded-xl">🎯 เลือกเป้าหมายเรียบร้อยแล้ว!</p>
             </div>
         </div>
 
-        <!-- 💬 ฝั่งขวาของจอ: ศูนย์ควบรวมห้องแชทแยกห้องสลับแท็บเรียลไทม์ -->
+        <!-- 💬 ฝั่งขวาของจอ: ศูนย์ควบรวมห้องแชทแยกห้องสลับแท็บเรียลไทม์ และทำเนียบผู้เล่น -->
         <div class="lg:col-span-7 flex flex-col gap-4">
-            <div id="chat-box" class="bg-deepSlate/90 border border-slate-800 rounded-[32px] p-5 flex flex-col gap-4 border-indigo-500/10 h-full min-h-[500px] lg:min-h-[560px] shadow-2xl">
-                
-                <!-- แถบเลือกสลับห้องแชทสไตล์ E-Sports Tabs Buttons -->
+            
+            <!-- 📊 บอร์ดรายงานสถานะชีพผู้เล่นทั้งหมด (Live Player Status Board) -->
+            <div id="status-board-box" class="bg-deepSlate/90 border border-slate-800 rounded-3xl p-4 flex flex-col gap-3 border-indigo-500/10 shrink-0">
+                <h2 class="text-xs font-bold text-emerald-400 flex items-center gap-2 uppercase tracking-wider">
+                    <i class="ph-bold ph-users-three text-base"></i> ทำเนียบรายชื่อผู้เล่นในห้อง
+                </h2>
+                <div id="status-board-list" class="grid grid-cols-3 gap-2 max-h-32 overflow-y-auto p-0.5 text-center text-[11px] font-bold">
+                    <!-- อัปเดตรายชื่อและสถานะชีวิตสดแบบเรียลไทม์จากฐานข้อมูล -->
+                </div>
+            </div>
+
+            <!-- บ็อกซ์แชทสับแท็บ -->
+            <div id="chat-box" class="bg-deepSlate/90 border border-slate-800 rounded-[32px] p-5 flex flex-col gap-4 border-indigo-500/10 h-full min-h-[400px] lg:min-h-[460px] shadow-2xl">
                 <div class="flex bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800 gap-1 shrink-0">
                     <button id="tab-global" onclick="switchChatChannel('global', event)" class="flex-1 py-2.5 text-xs font-bold rounded-xl bg-neonIndigo text-white shadow-md transition-all flex items-center justify-center gap-1.5">
                         <i class="ph-bold ph-globe"></i> หมู่บ้าน
@@ -146,12 +156,10 @@
                     </button>
                 </div>
 
-                <!-- ช่องแสดงกระดานข้อความของห้องแชทที่เลือก -->
-                <div id="chat-messages" class="flex-1 overflow-y-auto p-4 bg-slate-950/60 rounded-2xl border border-slate-800/80 flex flex-col gap-3 font-medium text-xs min-h-[280px]">
+                <div id="chat-messages" class="flex-1 overflow-y-auto p-4 bg-slate-950/60 rounded-2xl border border-slate-800/80 flex flex-col gap-3 font-medium text-xs min-h-[200px]">
                     <p class="text-slate-600 italic text-center my-auto">กำลังเตรียมเปิดสัญญาณห้องสนทนา...</p>
                 </div>
 
-                <!-- กล่องพิมพ์ส่งข้อความท้ายกระดาน -->
                 <div class="flex gap-2 shrink-0">
                     <input type="text" id="chat-input" placeholder="พิมพ์คีย์บอร์ดคุยบลัฟกันที่นี่..." class="flex-1 bg-slate-950 border border-slate-800 text-white text-xs px-4 py-3.5 rounded-xl focus:outline-none focus:border-neonIndigo focus:ring-1 focus:ring-neonIndigo outline-none transition-all placeholder-slate-600">
                     <button id="chat-send-btn" class="bg-neonIndigo hover:bg-indigo-600 text-white px-5 py-3.5 rounded-xl transition-colors flex items-center justify-center active:scale-95 shadow-md shadow-indigo-500/10">
@@ -160,7 +168,6 @@
                 </div>
             </div>
 
-            <!-- ปุ่มถอยทัพออกจากห้องเกม -->
             <button onclick="leaveRoom()" class="w-full flex items-center justify-center gap-2 py-4 bg-deepSlate/40 hover:bg-slate-900 text-slate-400 hover:text-rose-400 rounded-2xl border border-slate-800 transition-all font-bold text-sm shadow shrink-0">
                 <i class="ph-bold ph-sign-out text-lg"></i> ขอยอมแพ้ / ออกจากห้องเกม
             </button>
@@ -186,7 +193,10 @@
         window.activeChatChannel = 'global';
         window.chatData = { global: {}, graveyard: {}, werewolf: {} };
         window.chatListeners = {};
-        window.currentGamePhase = 'NIGHT'; // ตัวแปรเก็บสเตตัสเฟสเกมโกลบอล
+        window.currentGamePhase = 'NIGHT'; 
+        
+        window.knownDeadPlayers = null;
+        window.lastObservedPhase = null;
 
         window.toggleCardFlip = function() {
             if (cardInternal) {
@@ -235,17 +245,62 @@
             document.getElementById('action-box').classList.add('hidden');
         }
 
+        function renderPlayerStatusBoard(allPlayers) {
+            const boardList = document.getElementById('status-board-list');
+            if (!boardList) return;
+            
+            boardList.innerHTML = Object.keys(allPlayers).map(k => {
+                const p = allPlayers[k];
+                const isDead = p.status === 'ตาย';
+                if (isDead) {
+                    return `<div class="bg-slate-950/40 border border-slate-900 text-slate-600 px-2 py-2 rounded-xl opacity-40 line-through flex items-center justify-center gap-1"><i class="ph-fill ph-skull text-xs"></i> ${p.name}</div>`;
+                } else {
+                    return `<div class="bg-slate-950 border border-emerald-500/20 text-emerald-400 px-2 py-2 rounded-xl flex items-center justify-center gap-1"><i class="ph-fill ph-heart-beat text-xs animate-pulse text-emerald-500"></i> ${p.name}</div>`;
+                }
+            }).join('');
+        }
+
+        function checkDelayedDeathAnnouncements(pin, playerId, state) {
+            const currentPhase = state.phase;
+            const previousPhase = window.lastObservedPhase;
+            window.lastObservedPhase = currentPhase;
+
+            if (previousPhase && previousPhase !== currentPhase) {
+                if ((previousPhase === "NIGHT" && currentPhase === "DAY") || (previousPhase === "VOTE" && currentPhase === "NIGHT")) {
+                    get(ref(db, `rooms/${pin}/players`)).then((snap) => {
+                        const players = snap.val() || {};
+                        let newDeathsList = [];
+                        
+                        Object.keys(players).forEach(k => {
+                            if (players[k].status === "ตาย" && window.knownDeadPlayers && !window.knownDeadPlayers.includes(k)) {
+                                newDeathsList.push(players[k].name);
+                                window.knownDeadPlayers.push(k);
+                                
+                                if (k === playerId) {
+                                    alert("💀 คุณได้เสียชีวิตแล้ว!\n\nโปรดงดใช้เสียง บลัฟ หรือส่งสัญญาณบอกใบ้ใดๆ แก่ผู้เล่นที่ยังมีชีวิตอยู่เด็ดขาดจนกว่าเกมจะจบลงครับ");
+                                }
+                            }
+                        });
+
+                        if (newDeathsList.length > 0) {
+                            alert(`📢 รายงานสถานะจากหมู่บ้าน:\n\nผู้เล่น [ ${newDeathsList.join(', ')} ] ได้เสียชีวิตลงแล้ว!`);
+                        }
+                    });
+                }
+            }
+        }
+
         function listenToRoom(pin, playerId, playerName) {
             joinSection.classList.add('hidden'); 
             waitingSection.classList.remove('hidden');
             document.getElementById('welcome-name').innerText = `สวัสดี, ${playerName}!`;
 
-            let previousStatus = "รอด"; 
+            onValue(ref(db, `rooms/${pin}/players`), (snap) => {
+                const allPlayers = snap.val();
+                if (!allPlayers) return;
 
-            onValue(ref(db, `rooms/${pin}/players/${playerId}`), (snap) => {
-                const myData = snap.val();
-                
-                if (myData === null) {
+                const myData = allPlayers[playerId];
+                if (myData === null || !myData) {
                     sessionStorage.clear(); 
                     alert("📢 ข้อมูลของคุณไม่อยู่ในห้องแล้ว (GM ปิดห้อง หรือคุณถูกนำออกจากเกม)"); 
                     window.location.reload(); 
@@ -255,15 +310,14 @@
                 window.myRole = myData.role;
                 window.myStatus = myData.status || "รอด";
 
-                if (window.myStatus === "ตาย" && previousStatus !== "ตาย") {
-                    alert("💀 คุณได้เสียชีวิตแล้ว!\n\nโปรดงดใช้เสียง บลัฟ หรือส่งสัญญาณบอกใบ้ใดๆ แก่ผู้เล่นที่ยังมีชีวิตอยู่เด็ดขาดจนกว่าเกมจะจบลงครับ");
-                    previousStatus = "ตาย";
-                } else if (window.myStatus !== "ตาย") {
-                    previousStatus = "รอด";
+                if (window.knownDeadPlayers === null) {
+                    window.knownDeadPlayers = Object.keys(allPlayers).filter(k => allPlayers[k].status === "ตาย");
                 }
 
                 if (myData.role === "waiting" || myData.role === "waiting_for_players") {
                     showWaitingScreen();
+                    window.knownDeadPlayers = null;
+                    window.lastObservedPhase = null;
                 } else {
                     joinSection.classList.add('hidden');
                     waitingSection.classList.add('hidden');
@@ -271,12 +325,19 @@
                     roleSection.classList.add('grid');
                     
                     showMyRole(myData.role);
-                    
+                    renderPlayerStatusBoard(allPlayers); 
+
                     if (!window.hasStateListener) {
                         window.hasStateListener = true;
                         onValue(ref(db, `rooms/${pin}/state`), (stateSnap) => {
-                            const state = stateSnap.val() || { phase: "NIGHT" };
-                            handleGamePhaseUI(pin, playerId, state);
+                            const state = stateSnap.val() || { phase: "NIGHT", round: 1 };
+                            checkDelayedDeathAnnouncements(pin, playerId, state); 
+                            handleGamePhaseUI(pin, playerId, state, allPlayers);
+                        });
+                    } else {
+                        get(ref(db, `rooms/${pin}/state`)).then((sSnap) => {
+                            const state = sSnap.val() || { phase: "NIGHT", round: 1 };
+                            handleGamePhaseUI(pin, playerId, state, allPlayers);
                         });
                     }
 
@@ -312,23 +373,20 @@
                 const text = chatInput.value.trim();
                 if (!text) return;
 
-                // 🚨 กฎเหล็ก 1: ป้องกันวิญญาณส่งข้อความสปอยล์คนเป็นในห้องหมู่บ้าน
                 if (window.activeChatChannel === 'global' && window.myStatus === "ตาย") {
                     alert("💀 คุณเป็นวิญญาณไปแล้ว! ไม่สามารถคุยแทรกแซงในแชทคนรอดได้ โปรดเลือกสลับแท็บไปคุยที่ห้อง [สุสาน] แทนครับ");
                     chatInput.value = "";
                     return;
                 }
 
-                // 🚨 กฎเหล็ก 2: ป้องกันการแอบคุยในแชทหมู่บ้านตอนกลางคืน (ทุกคนนอนหลับ)
                 if (window.activeChatChannel === 'global' && window.currentGamePhase === 'NIGHT') {
                     alert("🌙 ห้องหมู่บ้านปิดชั่วคราวในเวลากลางคืน... ขณะนี้ทุกคนกำลังหลับใหลอยู่ครับ");
                     chatInput.value = "";
                     return;
                 }
 
-                // 🚨 กฎเหล็ก 3: ป้องกันการคุยในแชตรังหมาป่าตอนกลางวัน (ต้องแอบเนียน)
                 if (window.activeChatChannel === 'werewolf' && window.currentGamePhase !== 'NIGHT') {
-                    alert("☀️ ห้องฝูงหมาป่าเปิดเฉพาะเวลากลางคืนเท่านั้นครับ... ช่วงกลางวันจงออกไปเนียนปั่นหัวหมู่บ้านด้านนอก");
+                    alert("☀️ ห้องฝูงหมาป่าเปิดเฉพาะเวลากลางคืนเท่านั้นครับ... ช่วงกลางวันจงออกไปเนียนกับชาวบ้านด้านนอก");
                     chatInput.value = "";
                     return;
                 }
@@ -364,7 +422,6 @@
             const chatMessages = document.getElementById('chat-messages');
             if(!chatMessages) return;
 
-            // 🔒 แสดงหน้าต่างแจ้งเตือนล็อกแชทชั่วคราวบนหน้าจอตามลูปเวลา
             if (channel === 'global' && window.currentGamePhase === 'NIGHT') {
                 chatMessages.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-slate-500 gap-2 text-center my-auto"><i class="ph-bold ph-moon-stars text-2xl text-slate-600"></i><p class="italic">ห้องหมู่บ้านปิดในเวลากลางคืน...<br>ทุกคนกำลังหลับใหลลงสู่ห้วงนิทรา</p></div>`;
                 return;
@@ -404,7 +461,7 @@
             chatMessages.scrollTop = chatMessages.scrollHeight; 
         }
 
-        function handleGamePhaseUI(pin, playerId, state) {
+        function handleGamePhaseUI(pin, playerId, state, allPlayers) {
             const actionBox = document.getElementById('action-box');
             const actionTitle = document.getElementById('action-title');
             const actionList = document.getElementById('action-list');
@@ -413,9 +470,7 @@
 
             if(!actionBox || !actionTitle || !actionList || !actionStatus) return;
 
-            // บันทึกสถานะเวลาของระบบเพื่อนำไปตรวจสอบสิทธิ์ล็อกแชท
             window.currentGamePhase = state.phase;
-
             actionStatus.classList.add('hidden');
             actionBox.classList.remove('hidden');
             actionList.innerHTML = "";
@@ -427,7 +482,7 @@
                     roleCardBackFace.style.filter = "grayscale(100%) opacity(40%)"; 
                     roleCardBackFace.style.borderColor = "#ef4444";
                 }
-                renderChannelMessages(window.activeChatChannel, playerId); // รีรันข้อความเมื่อสถานะชีพเปลี่ยน
+                renderChannelMessages(window.activeChatChannel, playerId);
                 return;
             } else {
                 if (roleCardBackFace) {
@@ -436,30 +491,52 @@
                 }
             }
 
-            get(ref(db, `rooms/${pin}/players`)).then((allPlayersSnap) => {
-                const allPlayers = allPlayersSnap.val();
-                if (!allPlayers) return;
-
-                if (state.phase === "NIGHT") {
-                    actionTitle.innerHTML = `🌙 คืนที่ ${state.round || 1}: เลือกเป้าหมายตามบทบาท`;
-                    if (["werewolf", "seer", "bodyguard", "witch"].includes(window.myRole)) {
-                        renderTargetButtons(allPlayers, pin, playerId, "actionTarget", actionList, actionStatus);
-                    } else {
-                        actionList.innerHTML = `<p class="col-span-2 text-xs text-slate-500 italic py-4">คุณไม่มีแอคชันในคืนนี้ หลับตาลงอย่างสงบ...</p>`;
-                    }
-                } 
-                else if (state.phase === "DAY") {
-                    actionTitle.innerHTML = `☀️ วันที่ ${state.round || 1}: ช่วงปรึกษาหารือหมู่บ้าน`;
-                    actionList.innerHTML = `<p class="col-span-2 text-xs text-amber-400 border border-amber-500/10 bg-amber-500/5 font-semibold py-4 px-2 rounded-xl flex flex-col items-center gap-2"><i class="ph-bold ph-chats text-xl"></i> แลกเปลี่ยนข้อมูลก่อน เมื่อถึงเวลา GM จะเปิดปุ่มโหวตให้</p>`;
-                } 
-                else if (state.phase === "VOTE") {
-                    actionTitle.innerHTML = `🗳️ วันที่ ${state.round || 1}: ลงคะแนนประหารชีวิต!`;
-                    renderTargetButtons(allPlayers, pin, playerId, "voteTarget", actionList, actionStatus);
+            if (state.phase === "NIGHT") {
+                actionTitle.innerHTML = `🌙 คืนที่ ${state.round || 1}: เลือกเป้าหมายตามบทบาท`;
+                if (["werewolf", "seer", "bodyguard", "witch"].includes(window.myRole)) {
+                    renderTargetButtons(allPlayers, pin, playerId, "actionTarget", actionList, actionStatus);
+                } else {
+                    actionList.innerHTML = `<p class="col-span-2 text-xs text-slate-500 italic py-4">คุณไม่มีแอคชันในคืนนี้ หลับตาลงอย่างสงบ...</p>`;
                 }
+            } 
+            else if (state.phase === "DAY") {
+                actionTitle.innerHTML = `☀️ วันที่ ${state.round || 1}: ช่วงปรึกษาหารือหมู่บ้าน`;
+                actionList.innerHTML = `<p class="col-span-2 text-xs text-amber-400 border border-amber-500/10 bg-amber-500/5 font-semibold py-4 px-2 rounded-xl flex flex-col items-center gap-2"><i class="ph-bold ph-chats text-xl"></i> แลกเปลี่ยนข้อมูลก่อน เมื่อถึงเวลา GM จะเปิดปุ่มโหวตให้</p>`;
+            } 
+            else if (state.phase === "VOTE") {
+                actionTitle.innerHTML = `🗳️ วันที่ ${state.round || 1}: ลงคะแนนประหารชีวิต!`;
+                renderTargetButtons(allPlayers, pin, playerId, "voteTarget", actionList, actionStatus);
 
-                // อัปเดตและเช็คสิทธิ์ล็อกความเคลื่อนไหวในแท็บห้องแชทให้ตรงตามสเตจเวลาปัจจุบันทันที
-                renderChannelMessages(window.activeChatChannel, playerId);
-            });
+                // 🟢 รวบรวมและคำนวณคะแนนผลโหวตแบบสดๆ (คัดแสดงผลเฉพาะรายที่มีคะแนนโหวตมากกว่า 0)
+                const votesCountMap = {};
+                Object.keys(allPlayers).forEach(k => {
+                    const target = allPlayers[k].voteTarget;
+                    if (target) {
+                        votesCountMap[target] = (votesCountMap[target] || 0) + 1;
+                    }
+                });
+
+                const votedList = Object.keys(votesCountMap);
+                if (votedList.length > 0) {
+                    const tallyContainer = document.createElement('div');
+                    tallyContainer.className = "col-span-2 mt-4 p-3 bg-slate-950/80 border border-rose-500/25 rounded-2xl text-left";
+                    
+                    let tallyHtml = `<p class="text-[11px] font-bold text-rose-400 mb-2 uppercase tracking-wider flex items-center gap-1"><i class="ph-bold ph-chart-bar-horizontal"></i> ตารางคะแนนโหวตสดปัจจุบัน</p><div class="flex flex-wrap gap-2">`;
+                    votedList.forEach(name => {
+                        // ❌ แยกเคสถ้าข้อมูลปลายทางถูกกดส่งเป็นคำสั่ง "งดออกเสียง" 
+                        if (name === "งดออกเสียง") {
+                            tallyHtml += `<span class="bg-slate-800 border border-slate-700 text-slate-300 text-[10px] px-2.5 py-1 rounded-xl font-bold flex items-center gap-1"><i class="ph-bold ph-prohibit text-xs"></i> ไม่โหวต: ${votesCountMap[name]} คน</span>`;
+                        } else {
+                            tallyHtml += `<span class="bg-rose-500/10 border border-rose-500/30 text-rose-300 text-[10px] px-2.5 py-1 rounded-xl font-bold flex items-center gap-1"><i class="ph-fill ph-ticket text-xs"></i> ${name}: ${votesCountMap[name]} โหวต</span>`;
+                        }
+                    });
+                    tallyHtml += `</div>`;
+                    tallyContainer.innerHTML = tallyHtml;
+                    actionList.appendChild(tallyContainer);
+                }
+            }
+
+            renderChannelMessages(window.activeChatChannel, playerId);
         }
 
         function renderTargetButtons(allPlayers, pin, playerId, targetField, actionList, actionStatus) {
@@ -483,6 +560,21 @@
                     actionList.appendChild(btn);
                 }
             });
+
+            // ❌ เพิ่มปุ่มงดออกเสียงสากลแบบ Full-width ท้ายกล่องรายชื่อเพื่อนเฉพาะในช่วงโหวตช่วงกลางวัน
+            if (targetField === "voteTarget" && hasTargets) {
+                const noVoteBtn = document.createElement('button');
+                noVoteBtn.className = "bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-bold py-3 px-3 rounded-2xl transition-all shadow active:scale-95 col-span-2 mt-2 flex items-center justify-center gap-1.5 animate-pulse";
+                noVoteBtn.innerHTML = `<i class="ph-bold ph-prohibit text-sm"></i> ❌ งดออกเสียง (ไม่โหวตใคร)`;
+                noVoteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    set(ref(db, `rooms/${pin}/players/${playerId}/${targetField}`), "งดออกเสียง").then(() => {
+                        actionStatus.innerText = `✅ บันทึกการงดออกเสียงสำเร็จ!`;
+                        actionStatus.classList.remove('hidden');
+                    });
+                };
+                actionList.appendChild(noVoteBtn);
+            }
 
             if (!hasTargets) {
                 actionList.innerHTML = `<p class="col-span-2 text-xs text-slate-500 italic py-4">ไม่มีผู้เล่นที่รอดชีวิตเหลือให้เลือก</p>`;
