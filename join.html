@@ -111,6 +111,8 @@
             waitingSection.classList.remove('hidden');
             document.getElementById('welcome-name').innerText = `สวัสดี, ${playerName}!`;
 
+            let previousStatus = "รอด"; // 🟢 เพิ่มตัวดักประวัติสถานะเดิมก่อนรีเฟรชลูปคำสั่ง
+
             onValue(ref(db, `rooms/${pin}/players/${playerId}`), (snap) => {
                 const myData = snap.val();
                 
@@ -125,12 +127,19 @@
                 window.myRole = myData.role;
                 window.myStatus = myData.status || "รอด";
 
+                // 🚨 ระบบยิงแจ้งเตือนแบบกล่องข้อความทันทีที่ผู้เล่นถูก GM เปลี่ยนแปลงสถานะเป็น "ตาย"
+                if (window.myStatus === "ตาย" && previousStatus !== "ตาย") {
+                    alert("💀 คุณได้เสียชีวิตแล้ว!\n\nโปรดงดใช้เสียง บลัฟ หรือส่งสัญญาณบอกใบ้ใดๆ แก่ผู้เล่นที่ยังมีชีวิตอยู่เด็ดขาดจนกว่าเกมจะจบลงครับ");
+                    previousStatus = "ตาย";
+                } else if (window.myStatus !== "ตาย") {
+                    previousStatus = "รอด";
+                }
+
                 if (myData.role === "waiting" || myData.role === "waiting_for_players") {
                     showWaitingScreen();
                 } else {
                     showMyRole(myData.role);
                     
-                    // 🎧 เปิดระบบสแกนเฟสเกม 3 สเตปเพื่อควบควบคุมปุ่มโหวต/สกิล
                     if (!window.hasStateListener) {
                         window.hasStateListener = true;
                         onValue(ref(db, `rooms/${pin}/state`), (stateSnap) => {
@@ -148,16 +157,24 @@
             const actionTitle = document.getElementById('action-title');
             const actionList = document.getElementById('action-list');
             const actionStatus = document.getElementById('action-status');
+            const mainRoleCard = document.getElementById('role-card'); // 🟢 เรียกใช้ Element การ์ดเพื่อเปลี่ยนรูปแบบ
 
             actionStatus.classList.add('hidden');
             actionBox.classList.remove('hidden');
             actionList.innerHTML = "";
 
-            // 💀 กฎเหล็ก: ถ้าผู้เล่นเสียชีวิตแล้ว ให้ตัดสิทธิ์การใช้งานทันที
+            // 💀 กฎเหล็ก: ถ้าผู้เล่นเสียชีวิตแล้ว ให้ตัดสิทธิ์การใช้งานทันที + ย้อมการ์ดบทบาทเป็นสีเทาวิญญาณ
             if (window.myStatus === "ตาย") {
                 actionTitle.innerHTML = "💀 คุณเสียชีวิตแล้ว (กลายเป็นวิญญาณ)";
                 actionList.innerHTML = `<p class="col-span-2 text-xs text-rose-400 italic py-4">คุณได้หมดลมหายใจแล้ว ทำได้เพียงเฝ้าดูความเคลื่อนไหวเงียบๆ เท่านั้น...</p>`;
+                if (mainRoleCard) {
+                    mainRoleCard.style.filter = "grayscale(100%) opacity(40%)"; // 🌌 สไตล์ย้อมสีเทาวิญญาณ
+                }
                 return;
+            } else {
+                if (mainRoleCard) {
+                    mainRoleCard.style.filter = "none"; // คืนค่าสีเดิมถ้ารอบใหม่เริ่มหรือ GM รีเซ็ต
+                }
             }
 
             // ดึงรายชื่อผู้เล่นทั้งหมดเพื่อคัดกรองคนรอดมาทำปุ่ม
@@ -278,7 +295,7 @@
             'auraseer': { name: "ญาณทิพย์", desc: "ตรวจสอบตัวละครพิเศษหรือไม่ แสดงเฉพาะฝั่งชาวบ้าน", nameClass: "text-blue-300", icon: "ph-sparkle", boxColor: "bg-blue-400", borderClass: "border-blue-400/50" },
             'priest': { name: "นักบวช", desc: "ให้พรผู้เล่น 1 คน ยกเว้นตัวเองให้กันตายจากทุกสิ่งได้ 1 ครั้ง", nameClass: "text-yellow-200", icon: "ph-cross", boxColor: "bg-yellow-400", borderClass: "border-yellow-400/50" },
             'elder': { name: "แม่เฒ่า", desc: "ไล่ 1 คนออกจากหมู่บ้านในตอนเช้า และจะกลับเข้ามาในตอนกลางคืน", nameClass: "text-stone-300", icon: "ph-users", boxColor: "bg-stone-500", borderClass: "border-stone-500/50" },
-            'halfblood': { name: "ลูกครึ่งมนุษย์หมาป่า", desc: "อยู่ฝ่ายชาวบ้าน แต่เทพพยากรณ์จะเห็นเป็นหมาป่า", nameClass: "text-red-300", icon: "ph-user-switch", boxColor: "bg-red-400", borderClass: "border-red-400/50" },
+            'halfblood': { name: "ลูกครึ่งมนุษย์หมาป่า", desc: "อยู่ฝ่ายชาวบ้าน แต่เทพพยากรณ์ จะเห็นเป็นหมาป่า", nameClass: "text-red-300", icon: "ph-user-switch", boxColor: "bg-red-400", borderClass: "border-red-400/50" },
             'fool': { name: "ตัวป่วน", desc: "ส่งสัญญาณให้ GM ตอนกลางคืน เพื่อให้โหวตตายได้ 2 คนในตอนเช้า ใช้ได้ครั้งเดียว", nameClass: "text-pink-400", icon: "ph-smiley-wink", boxColor: "bg-pink-500", borderClass: "border-pink-500/50" },
             'idiot': { name: "ไอทึม", desc: "โหวต 'ฆ่า' อย่างเดียว", nameClass: "text-amber-200", icon: "ph-smiley-blank", boxColor: "bg-amber-400", borderClass: "border-amber-400/50" },
             'spellcaster': { name: "จอมเวท", desc: "ปิดปากใครก็ได้ไม่ให้พูดในตอนเช้า", nameClass: "text-purple-300", icon: "ph-magic-wand", boxColor: "bg-purple-500", borderClass: "border-purple-500/50" },
@@ -303,7 +320,6 @@
             'drunk': { name: "คนเมา", desc: "บทบาทจริงจะเปิดเผยในคืนที่ 3", nameClass: "text-yellow-500", icon: "ph-beer-bottle", boxColor: "bg-yellow-700", borderClass: "border-yellow-600/50" }
         };
 
-        // 🌟 ฟังก์ชันวาดข้อมูลการ์ดบทบาทลงจอ
         function showMyRole(roleCode) {
             waitingSection.classList.add('hidden'); 
             roleSection.classList.remove('hidden');
