@@ -13,6 +13,7 @@
 
     <div class="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-[#0b0f19] to-[#0b0f19]"></div>
 
+    <!-- 1. หน้ากรอกรหัส -->
     <div id="join-section" class="w-full max-w-sm bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 shadow-2xl z-10 relative">
         <div class="text-center mb-8">
             <div class="inline-flex items-center justify-center p-3 bg-indigo-500/10 text-indigo-400 rounded-2xl mb-4"><i class="ph-fill ph-users-three text-4xl"></i></div>
@@ -25,16 +26,19 @@
         </div>
     </div>
 
+    <!-- 2. หน้ารอ GM -->
     <div id="waiting-section" class="hidden w-full max-w-sm text-center z-10 relative">
         <div class="relative w-24 h-24 mx-auto mb-6"><i class="ph-fill ph-hourglass-high text-6xl text-amber-400 animate-pulse absolute inset-0 flex items-center justify-center"></i></div>
         <h2 class="text-2xl font-bold text-white mb-2" id="welcome-name">รอสักครู่...</h2>
         <p class="text-slate-400 mb-8">กำลังรอ GM เลือกโหมดและแจกบทบาท</p>
         
+        <!-- 🌟 ปุ่มขอตัวกลับบ้าน (หน้ารอ) -->
         <button onclick="leaveRoom()" class="mx-auto flex items-center justify-center gap-2 px-6 py-3 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 hover:text-rose-400 rounded-xl transition-all border border-rose-500/20 font-medium shadow-[0_0_15px_rgba(244,63,94,0.1)]">
             <i class="ph-bold ph-sign-out text-lg"></i> ยกเลิก / ออกจากห้อง
         </button>
     </div>
 
+    <!-- 3. หน้าโชว์การ์ดบทบาท -->
     <div id="role-section" class="hidden w-full max-w-sm z-10 relative">
         <div id="role-card" class="bg-slate-900 border-2 rounded-3xl p-6 text-center shadow-2xl transform transition-all duration-500 scale-90 opacity-0 relative overflow-hidden mb-6">
             <img id="role-image" src="" alt="Role Card" class="w-full h-auto rounded-xl mb-4 shadow-lg hidden">
@@ -51,21 +55,25 @@
             <div id="role-loading-hint" class="absolute inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center gap-3 rounded-3xl z-20"><i class="ph-bold ph-spinner-gap animate-spin text-4xl text-indigo-400"></i><p class="text-slate-400 text-sm font-medium">กำลังวาดการ์ดบทบาท...</p></div>
         </div>
 
+        <!-- 🔮 กล่องปุ่มใช้สกิล / โหวตประหารสำหรับผู้เล่นออนไลน์ -->
         <div id="action-box" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 text-center shadow-2xl mb-6 hidden">
             <h2 id="action-title" class="text-base font-bold text-indigo-400 mb-4 flex items-center justify-center gap-2">⚙️ กำลังโหลดระบบการเลือก...</h2>
             <div id="action-list" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-1">
-                </div>
+                <!-- รายชื่อผู้เล่นที่รอดชีวิตจะงอกตรงนี้ -->
+            </div>
             <p id="action-status" class="text-xs text-emerald-400 font-medium mt-3 hidden">🎯 เลือกเป้าหมายเรียบร้อยแล้ว!</p>
         </div>
 
+        <!-- 🌟 ปุ่มขอตัวกลับบ้าน (หน้าดูไพ่แล้ว) -->
         <button onclick="leaveRoom()" class="w-full flex items-center justify-center gap-2 px-6 py-4 bg-slate-900 hover:bg-slate-800 text-rose-500 hover:text-rose-400 rounded-xl transition-all border border-slate-800 font-medium">
             <i class="ph-bold ph-sign-out text-xl"></i> เลิกเล่นเกม / ออกจากห้อง
         </button>
     </div>
 
+    <!-- 🔥 Firebase Setup & Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-        import { getDatabase, ref, get, set, push, child, onValue, remove } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+        import { getDatabase, ref, get, set, push, child, onValue, remove } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 
         const firebaseConfig = { apiKey: "AIzaSyBn-t7mx3_Hb8gjL18SgCeRjVJCGG9N_DI", authDomain: "wolf-note.firebaseapp.com", databaseURL: "https://wolf-note-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "wolf-note", storageBucket: "wolf-note.firebasestorage.app", messagingSenderId: "783649820868", appId: "1:783649820868:web:b7bb2a89b94b730c54b991" };
 
@@ -111,6 +119,8 @@
             waitingSection.classList.remove('hidden');
             document.getElementById('welcome-name').innerText = `สวัสดี, ${playerName}!`;
 
+            let previousStatus = "รอด"; // 🟢 สร้างตัวแปรเก็บสเตตัสเก่าเพื่อเช็คจังหวะการตาย
+
             onValue(ref(db, `rooms/${pin}/players/${playerId}`), (snap) => {
                 const myData = snap.val();
                 
@@ -121,16 +131,22 @@
                     return;
                 }
 
-                // บันทึกสถานะผู้เล่นปัจจุบันลงตัวแปร Window โกลบอล
                 window.myRole = myData.role;
                 window.myStatus = myData.status || "รอด";
+
+                // 🚨 ระบบตรวจจับการตายแบบ Real-time (เด้งทันทีที่ GM ปรับสเตตัส)
+                if (window.myStatus === "ตาย" && previousStatus !== "ตาย") {
+                    alert("💀 คุณได้เสียชีวิตแล้ว!\n\nโปรดงดใช้เสียง บลัฟ หรือส่งสัญญาณบอกใบ้ใดๆ แก่ผู้เล่นที่ยังมีชีวิตอยู่เด็ดขาดจนกว่าเกมจะจบลงครับ");
+                    previousStatus = "ตาย";
+                } else if (window.myStatus !== "ตาย") {
+                    previousStatus = "รอด";
+                }
 
                 if (myData.role === "waiting" || myData.role === "waiting_for_players") {
                     showWaitingScreen();
                 } else {
                     showMyRole(myData.role);
                     
-                    // 🎧 เปิดระบบสแกนเฟสเกม 3 สเตปเพื่อควบควบคุมปุ่มโหวต/สกิล
                     if (!window.hasStateListener) {
                         window.hasStateListener = true;
                         onValue(ref(db, `rooms/${pin}/state`), (stateSnap) => {
@@ -148,26 +164,33 @@
             const actionTitle = document.getElementById('action-title');
             const actionList = document.getElementById('action-list');
             const actionStatus = document.getElementById('action-status');
+            const mainRoleCard = document.getElementById('role-card');
 
             actionStatus.classList.add('hidden');
             actionBox.classList.remove('hidden');
             actionList.innerHTML = "";
 
-            // 💀 กฎเหล็ก: ถ้าผู้เล่นเสียชีวิตแล้ว ให้ตัดสิทธิ์การใช้งานทันที
+            // 💀 ถ้าสเตตัสเป็นตาย สั่งย้อมจอให้มืดลงและตัดสิทธิ์ระบบกดทั้งหมด
             if (window.myStatus === "ตาย") {
                 actionTitle.innerHTML = "💀 คุณเสียชีวิตแล้ว (กลายเป็นวิญญาณ)";
                 actionList.innerHTML = `<p class="col-span-2 text-xs text-rose-400 italic py-4">คุณได้หมดลมหายใจแล้ว ทำได้เพียงเฝ้าดูความเคลื่อนไหวเงียบๆ เท่านั้น...</p>`;
+                if (mainRoleCard) {
+                    mainRoleCard.style.filter = "grayscale(100%) opacity(40%)"; // ย้อมการ์ดเป็นสีเทาวิญญาณ
+                }
                 return;
+            } else {
+                if (mainRoleCard) {
+                    mainRoleCard.style.filter = "none"; // คืนสีกรณีรีเซ็ตเกม
+                }
             }
 
-            // ดึงรายชื่อผู้เล่นทั้งหมดเพื่อคัดกรองคนรอดมาทำปุ่ม
+            // ดึงรายชื่อคนรอดชีวิตมาทำปุ่ม
             get(ref(db, `rooms/${pin}/players`)).then((allPlayersSnap) => {
                 const allPlayers = allPlayersSnap.val();
                 if (!allPlayers) return;
 
                 if (state.phase === "NIGHT") {
                     actionTitle.innerHTML = `🌙 คืนที่ ${state.round || 1}: เลือกใช้พลังตามบทบาท`;
-                    // ตรวจเช็คเฉพาะบทที่มีสกิลกลางคืน
                     if (["werewolf", "seer", "bodyguard", "witch"].includes(window.myRole)) {
                         renderTargetButtons(allPlayers, pin, playerId, "actionTarget", actionList, actionStatus);
                     } else {
@@ -175,12 +198,10 @@
                     }
                 } 
                 else if (state.phase === "DAY") {
-                    // ☀️ ช่วงพูดคุย: ล็อกระบบไม่ให้มีปุ่มกดโหวตงอกขึ้นมา
                     actionTitle.innerHTML = `☀️ วันที่ ${state.round || 1}: ช่วงอภิปรายหารือ`;
                     actionList.innerHTML = `<p class="col-span-2 text-xs text-amber-400 font-medium py-4 flex flex-col items-center gap-2"><i class="ph-bold ph-chats text-xl"></i> ร่วมกันแลกเปลี่ยนเบาะแสก่อน เมื่อถึงเวลา GM จะเปิดปุ่มโหวตให้ครับ</p>`;
                 } 
                 else if (state.phase === "VOTE") {
-                    // 🗳️ ช่วงโหวตประหาร: GM ปลดล็อก ปุ่มรายชื่อเด้งพร้อมกันทุกคน
                     actionTitle.innerHTML = `🗳️ วันที่ ${state.round || 1}: ลงคะแนนเสียงประหารชีวิต!`;
                     renderTargetButtons(allPlayers, pin, playerId, "voteTarget", actionList, actionStatus);
                 }
@@ -194,7 +215,6 @@
 
             Object.keys(allPlayers).forEach(pKey => {
                 const p = allPlayers[pKey];
-                // เงื่อนไข: ไม่สามารถเลือกตัวเองได้ และเป้าหมายต้องมีสถานะไม่เท่ากับ "ตาย"
                 if (pKey !== playerId && p.status !== "ตาย") {
                     hasTargets = true;
                     const btn = document.createElement('button');
@@ -261,7 +281,7 @@
             });
         });
 
-        // 🧠 ฐานข้อมูลหน้าตาการ์ดสำรอง (ครบถ้วนทั้ง 38 บทบาท)
+        // 🧠 ฐานข้อมูลหน้าตาการ์ดสำรอง
         const fallbackCards = {
             'villager': { name: "ชาวบ้าน", desc: "ไม่มีความสามารถพิเศษ ใช้ทักษะการจับโกหกเพื่อหาตัวหมาป่า", nameClass: "text-emerald-400", icon: "ph-user", boxColor: "bg-emerald-500", borderClass: "border-emerald-500/50", shadow: "shadow-[0_0_30px_rgba(16,185,129,0.2)]" },
             'werewolf': { name: "มนุษย์หมาป่า", desc: "ตื่นขึ้นมาในตอนกลางคืนเพื่อเลือกเหยื่อที่จะกำจัด", nameClass: "text-rose-500", icon: "ph-paw-print", boxColor: "bg-rose-600", borderClass: "border-rose-500/50", shadow: "shadow-[0_0_30px_rgba(225,29,72,0.2)]" },
@@ -303,7 +323,6 @@
             'drunk': { name: "คนเมา", desc: "บทบาทจริงจะเปิดเผยในคืนที่ 3", nameClass: "text-yellow-500", icon: "ph-beer-bottle", boxColor: "bg-yellow-700", borderClass: "border-yellow-600/50" }
         };
 
-        // 🌟 ฟังก์ชันวาดข้อมูลการ์ดบทบาทลงจอ
         function showMyRole(roleCode) {
             waitingSection.classList.add('hidden'); 
             roleSection.classList.remove('hidden');
