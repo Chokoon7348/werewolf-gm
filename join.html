@@ -54,7 +54,7 @@
         <div id="action-box" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 text-center shadow-2xl mb-6 hidden">
             <h2 id="action-title" class="text-base font-bold text-indigo-400 mb-4 flex items-center justify-center gap-2">⚙️ กำลังโหลดระบบการเลือก...</h2>
             <div id="action-list" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-1">
-                </div>
+            </div>
             <p id="action-status" class="text-xs text-emerald-400 font-medium mt-3 hidden">🎯 เลือกเป้าหมายเรียบร้อยแล้ว!</p>
         </div>
 
@@ -105,13 +105,13 @@
             document.getElementById('action-box').classList.add('hidden');
         }
 
-        // 🌟 ฟังก์ชันหลักในการเชื่อมต่อและดักฟังห้อง
+        // 📡 ฟังก์ชันหลักในการดักฟังความเคลื่อนไหวจากคลัง Firebase
         function listenToRoom(pin, playerId, playerName) {
             joinSection.classList.add('hidden'); 
             waitingSection.classList.remove('hidden');
             document.getElementById('welcome-name').innerText = `สวัสดี, ${playerName}!`;
 
-            let previousStatus = "รอด"; // 🟢 เพิ่มตัวดักประวัติสถานะเดิมก่อนรีเฟรชลูปคำสั่ง
+            let previousStatus = "รอด"; 
 
             onValue(ref(db, `rooms/${pin}/players/${playerId}`), (snap) => {
                 const myData = snap.val();
@@ -123,11 +123,10 @@
                     return;
                 }
 
-                // บันทึกสถานะผู้เล่นปัจจุบันลงตัวแปร Window โกลบอล
                 window.myRole = myData.role;
                 window.myStatus = myData.status || "รอด";
 
-                // 🚨 ระบบยิงแจ้งเตือนแบบกล่องข้อความทันทีที่ผู้เล่นถูก GM เปลี่ยนแปลงสถานะเป็น "ตาย"
+                // 🚨 แจ้งเตือน Pop-up สัญญาณชีพเมื่อโดน GM สั่งฆ่าตายแบบทันที
                 if (window.myStatus === "ตาย" && previousStatus !== "ตาย") {
                     alert("💀 คุณได้เสียชีวิตแล้ว!\n\nโปรดงดใช้เสียง บลัฟ หรือส่งสัญญาณบอกใบ้ใดๆ แก่ผู้เล่นที่ยังมีชีวิตอยู่เด็ดขาดจนกว่าเกมจะจบลงครับ");
                     previousStatus = "ตาย";
@@ -140,6 +139,7 @@
                 } else {
                     showMyRole(myData.role);
                     
+                    // ดักฟังแกนสถานะเฟสเกมหลัก 3 ช่วง (NIGHT -> DAY -> VOTE)
                     if (!window.hasStateListener) {
                         window.hasStateListener = true;
                         onValue(ref(db, `rooms/${pin}/state`), (stateSnap) => {
@@ -151,40 +151,42 @@
             });
         }
 
-        // 🔄 ฟังก์ชันประมวลผลอินเตอร์เฟสตามเฟสเกมปัจจุบัน
+        // 🔄 ฟังก์ชันประมวลผลกล่องจัดการแอคชันตามช่วงเวลาของเกม
         function handleGamePhaseUI(pin, playerId, state) {
             const actionBox = document.getElementById('action-box');
             const actionTitle = document.getElementById('action-title');
             const actionList = document.getElementById('action-list');
             const actionStatus = document.getElementById('action-status');
-            const mainRoleCard = document.getElementById('role-card'); // 🟢 เรียกใช้ Element การ์ดเพื่อเปลี่ยนรูปแบบ
+            const mainRoleCard = document.getElementById('role-card');
+
+            if(!actionBox || !actionTitle || !actionList || !actionStatus) return;
 
             actionStatus.classList.add('hidden');
             actionBox.classList.remove('hidden');
             actionList.innerHTML = "";
 
-            // 💀 กฎเหล็ก: ถ้าผู้เล่นเสียชีวิตแล้ว ให้ตัดสิทธิ์การใช้งานทันที + ย้อมการ์ดบทบาทเป็นสีเทาวิญญาณ
+            // 💀 ย้อมสีกรอบบทบาทเป็นวิญญาณเทาเมื่อตาย และตัดสิทธิ์การควบคุมระบบอย่างเด็ดขาด
             if (window.myStatus === "ตาย") {
                 actionTitle.innerHTML = "💀 คุณเสียชีวิตแล้ว (กลายเป็นวิญญาณ)";
                 actionList.innerHTML = `<p class="col-span-2 text-xs text-rose-400 italic py-4">คุณได้หมดลมหายใจแล้ว ทำได้เพียงเฝ้าดูความเคลื่อนไหวเงียบๆ เท่านั้น...</p>`;
                 if (mainRoleCard) {
-                    mainRoleCard.style.filter = "grayscale(100%) opacity(40%)"; // 🌌 สไตล์ย้อมสีเทาวิญญาณ
+                    mainRoleCard.style.filter = "grayscale(100%) opacity(40%)"; 
                 }
                 return;
             } else {
                 if (mainRoleCard) {
-                    mainRoleCard.style.filter = "none"; // คืนค่าสีเดิมถ้ารอบใหม่เริ่มหรือ GM รีเซ็ต
+                    mainRoleCard.style.filter = "none"; 
                 }
             }
 
-            // ดึงรายชื่อผู้เล่นทั้งหมดเพื่อคัดกรองคนรอดมาทำปุ่ม
+            // ดึงข้อมูลรายชื่อเพื่อนทุกคนในกระดาน
             get(ref(db, `rooms/${pin}/players`)).then((allPlayersSnap) => {
                 const allPlayers = allPlayersSnap.val();
                 if (!allPlayers) return;
 
                 if (state.phase === "NIGHT") {
                     actionTitle.innerHTML = `🌙 คืนที่ ${state.round || 1}: เลือกใช้พลังตามบทบาท`;
-                    // ตรวจเช็คเฉพาะบทที่มีสกิลกลางคืน
+                    // ปลุกปุ่มให้เฉพาะคนที่มีบทบาททำสกิลกลางคืน
                     if (["werewolf", "seer", "bodyguard", "witch"].includes(window.myRole)) {
                         renderTargetButtons(allPlayers, pin, playerId, "actionTarget", actionList, actionStatus);
                     } else {
@@ -192,26 +194,26 @@
                     }
                 } 
                 else if (state.phase === "DAY") {
-                    // ☀️ ช่วงพูดคุย: ล็อกระบบไม่ให้มีปุ่มกดโหวตงอกขึ้นมา
+                    // ☀️ ล็อกกระดานในช่วงพูดคุยเช้าเพื่อไม่ให้มีปุ่มกดโหวตแกล้งกันล่วงหน้า
                     actionTitle.innerHTML = `☀️ วันที่ ${state.round || 1}: ช่วงอภิปรายหารือ`;
                     actionList.innerHTML = `<p class="col-span-2 text-xs text-amber-400 font-medium py-4 flex flex-col items-center gap-2"><i class="ph-bold ph-chats text-xl"></i> ร่วมกันแลกเปลี่ยนเบาะแสก่อน เมื่อถึงเวลา GM จะเปิดปุ่มโหวตให้ครับ</p>`;
                 } 
                 else if (state.phase === "VOTE") {
-                    // 🗳️ ช่วงโหวตประหาร: GM ปลดล็อก ปุ่มรายชื่อเด้งพร้อมกันทุกคน
+                    // 🗳️ ปลดล็อกระบบโหวต แตกปุ่มรายชื่อเป้าหมายคนรอดชีวิตพร้อมกัน
                     actionTitle.innerHTML = `🗳️ วันที่ ${state.round || 1}: ลงคะแนนเสียงประหารชีวิต!`;
                     renderTargetButtons(allPlayers, pin, playerId, "voteTarget", actionList, actionStatus);
                 }
             });
         }
 
-        // 🎨 ฟังก์ชันวาดปุ่มรายชื่อเป้าหมาย
+        // 🎨 ฟังก์ชันดึงรายชื่อคนรอดชีวิตมากระจายตัวทำเป็นปุ่มตัวเลือก
         function renderTargetButtons(allPlayers, pin, playerId, targetField, actionList, actionStatus) {
             actionList.innerHTML = "";
             let hasTargets = false;
 
             Object.keys(allPlayers).forEach(pKey => {
                 const p = allPlayers[pKey];
-                // เงื่อนไข: ไม่สามารถเลือกตัวเองได้ และเป้าหมายต้องมีสถานะไม่เท่ากับ "ตาย"
+                // ป้องกันการโหวตตัวเอง และกรองเอาเฉพาะคนที่รอดชีวิตเท่านั้นมาทำปุ่ม
                 if (pKey !== playerId && p.status !== "ตาย") {
                     hasTargets = true;
                     const btn = document.createElement('button');
@@ -232,7 +234,7 @@
             }
         }
 
-        // 🌟 4. ระบบ Auto-Reconnect
+        // 🔄 ระบบกู้คืนเซสชันเมื่อรีเฟรชหน้าเว็บ (Auto-Reconnect)
         const savedPin = sessionStorage.getItem('wolf_pin'); 
         const savedPlayerId = sessionStorage.getItem('wolf_playerId'); 
         const savedPlayerName = sessionStorage.getItem('wolf_playerName');
@@ -247,7 +249,7 @@
             });
         }
 
-        // 🌟 5. การกดเข้าห้องครั้งแรก
+        // 📥 จังหวะกดเชื่อมต่อเข้าห้องเกมครั้งแรก
         document.getElementById('join-btn').addEventListener('click', () => {
             const pin = document.getElementById('pin-input').value.trim(); 
             const playerName = document.getElementById('name-input').value.trim();
@@ -278,7 +280,7 @@
             });
         });
 
-        // 🧠 ฐานข้อมูลหน้าตาการ์ดสำรอง (ครบถ้วนทั้ง 38 บทบาท)
+        // 🧠 คลังพจนานุกรมสรุปความสามารถตัวละคร (รองรับครบทั้ง 38 บทบาท)
         const fallbackCards = {
             'villager': { name: "ชาวบ้าน", desc: "ไม่มีความสามารถพิเศษ ใช้ทักษะการจับโกหกเพื่อหาตัวหมาป่า", nameClass: "text-emerald-400", icon: "ph-user", boxColor: "bg-emerald-500", borderClass: "border-emerald-500/50", shadow: "shadow-[0_0_30px_rgba(16,185,129,0.2)]" },
             'werewolf': { name: "มนุษย์หมาป่า", desc: "ตื่นขึ้นมาในตอนกลางคืนเพื่อเลือกเหยื่อที่จะกำจัด", nameClass: "text-rose-500", icon: "ph-paw-print", boxColor: "bg-rose-600", borderClass: "border-rose-500/50", shadow: "shadow-[0_0_30px_rgba(225,29,72,0.2)]" },
