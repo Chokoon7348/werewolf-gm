@@ -73,7 +73,8 @@
     <!-- 🔥 Firebase Setup & Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-        import { getDatabase, ref, get, set, push, child, onValue, remove } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+        // 🟢 แก้ไขบรรทัดด้านล่างนี้ให้ดึงข้อมูลจาก firebase-database.js เรียบร้อยแล้วครับ
+        import { getDatabase, ref, get, set, push, child, onValue, remove } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
 
         const firebaseConfig = { apiKey: "AIzaSyBn-t7mx3_Hb8gjL18SgCeRjVJCGG9N_DI", authDomain: "wolf-note.firebaseapp.com", databaseURL: "https://wolf-note-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "wolf-note", storageBucket: "wolf-note.firebasestorage.app", messagingSenderId: "783649820868", appId: "1:783649820868:web:b7bb2a89b94b730c54b991" };
 
@@ -113,13 +114,12 @@
             document.getElementById('action-box').classList.add('hidden');
         }
 
-        // 🌟 ฟังก์ชันหลักในการเชื่อมต่อและดักฟังห้อง
         function listenToRoom(pin, playerId, playerName) {
             joinSection.classList.add('hidden'); 
             waitingSection.classList.remove('hidden');
             document.getElementById('welcome-name').innerText = `สวัสดี, ${playerName}!`;
 
-            let previousStatus = "รอด"; // 🟢 สร้างตัวแปรเก็บสเตตัสเก่าเพื่อเช็คจังหวะการตาย
+            let previousStatus = "รอด"; 
 
             onValue(ref(db, `rooms/${pin}/players/${playerId}`), (snap) => {
                 const myData = snap.val();
@@ -134,7 +134,6 @@
                 window.myRole = myData.role;
                 window.myStatus = myData.status || "รอด";
 
-                // 🚨 ระบบตรวจจับการตายแบบ Real-time (เด้งทันทีที่ GM ปรับสเตตัส)
                 if (window.myStatus === "ตาย" && previousStatus !== "ตาย") {
                     alert("💀 คุณได้เสียชีวิตแล้ว!\n\nโปรดงดใช้เสียง บลัฟ หรือส่งสัญญาณบอกใบ้ใดๆ แก่ผู้เล่นที่ยังมีชีวิตอยู่เด็ดขาดจนกว่าเกมจะจบลงครับ");
                     previousStatus = "ตาย";
@@ -158,7 +157,6 @@
             });
         }
 
-        // 🔄 ฟังก์ชันประมวลผลอินเตอร์เฟสตามเฟสเกมปัจจุบัน
         function handleGamePhaseUI(pin, playerId, state) {
             const actionBox = document.getElementById('action-box');
             const actionTitle = document.getElementById('action-title');
@@ -170,21 +168,19 @@
             actionBox.classList.remove('hidden');
             actionList.innerHTML = "";
 
-            // 💀 ถ้าสเตตัสเป็นตาย สั่งย้อมจอให้มืดลงและตัดสิทธิ์ระบบกดทั้งหมด
             if (window.myStatus === "ตาย") {
                 actionTitle.innerHTML = "💀 คุณเสียชีวิตแล้ว (กลายเป็นวิญญาณ)";
                 actionList.innerHTML = `<p class="col-span-2 text-xs text-rose-400 italic py-4">คุณได้หมดลมหายใจแล้ว ทำได้เพียงเฝ้าดูความเคลื่อนไหวเงียบๆ เท่านั้น...</p>`;
                 if (mainRoleCard) {
-                    mainRoleCard.style.filter = "grayscale(100%) opacity(40%)"; // ย้อมการ์ดเป็นสีเทาวิญญาณ
+                    mainRoleCard.style.filter = "grayscale(100%) opacity(40%)"; 
                 }
                 return;
             } else {
                 if (mainRoleCard) {
-                    mainRoleCard.style.filter = "none"; // คืนสีกรณีรีเซ็ตเกม
+                    mainRoleCard.style.filter = "none"; 
                 }
             }
 
-            // ดึงรายชื่อคนรอดชีวิตมาทำปุ่ม
             get(ref(db, `rooms/${pin}/players`)).then((allPlayersSnap) => {
                 const allPlayers = allPlayersSnap.val();
                 if (!allPlayers) return;
@@ -208,7 +204,6 @@
             });
         }
 
-        // 🎨 ฟังก์ชันวาดปุ่มรายชื่อเป้าหมาย
         function renderTargetButtons(allPlayers, pin, playerId, targetField, actionList, actionStatus) {
             actionList.innerHTML = "";
             let hasTargets = false;
@@ -235,7 +230,6 @@
             }
         }
 
-        // 🌟 4. ระบบ Auto-Reconnect
         const savedPin = sessionStorage.getItem('wolf_pin'); 
         const savedPlayerId = sessionStorage.getItem('wolf_playerId'); 
         const savedPlayerName = sessionStorage.getItem('wolf_playerName');
@@ -250,7 +244,6 @@
             });
         }
 
-        // 🌟 5. การกดเข้าห้องครั้งแรก
         document.getElementById('join-btn').addEventListener('click', () => {
             const pin = document.getElementById('pin-input').value.trim(); 
             const playerName = document.getElementById('name-input').value.trim();
@@ -281,7 +274,6 @@
             });
         });
 
-        // 🧠 ฐานข้อมูลหน้าตาการ์ดสำรอง
         const fallbackCards = {
             'villager': { name: "ชาวบ้าน", desc: "ไม่มีความสามารถพิเศษ ใช้ทักษะการจับโกหกเพื่อหาตัวหมาป่า", nameClass: "text-emerald-400", icon: "ph-user", boxColor: "bg-emerald-500", borderClass: "border-emerald-500/50", shadow: "shadow-[0_0_30px_rgba(16,185,129,0.2)]" },
             'werewolf': { name: "มนุษย์หมาป่า", desc: "ตื่นขึ้นมาในตอนกลางคืนเพื่อเลือกเหยื่อที่จะกำจัด", nameClass: "text-rose-500", icon: "ph-paw-print", boxColor: "bg-rose-600", borderClass: "border-rose-500/50", shadow: "shadow-[0_0_30px_rgba(225,29,72,0.2)]" },
@@ -320,7 +312,7 @@
             'chupacabra': { name: "ชูปาคาบา", desc: "ฆ่าหมาป่าก่อน แล้วค่อยฆ่าคน", nameClass: "text-amber-700", icon: "ph-skull", boxColor: "bg-amber-800", borderClass: "border-amber-700/50" },
             'cultleader': { name: "เจ้าลัทธิ", desc: "ชวน 1 คนต่อคืน ชนะเมื่อทุกคนเข้าลัทธิ", nameClass: "text-fuchsia-300", icon: "ph-person-simple-walk", boxColor: "bg-fuchsia-500", borderClass: "border-fuchsia-500/50" },
             'doppelganger': { name: "ผู้จำแลง", desc: "เลือก 1 คน ในคืนแรกเพื่อสืบทอดบทบาทหลังเค้าตาย", nameClass: "text-teal-400", icon: "ph-masks", boxColor: "bg-teal-600", borderClass: "border-teal-500/50" },
-            'drunk': { name: "คนเมา", desc: "บทบาทจริงจะเปิดเผยในคืนที่ 3", nameClass: "text-yellow-500", icon: "ph-beer-bottle", boxColor: "bg-yellow-700", borderClass: "border-yellow-600/50" }
+            'drunk': { name: "คนเมา", desc: "บทบาทจริงจะเพิ่มเผยในคืนที่ 3", nameClass: "text-yellow-500", icon: "ph-beer-bottle", boxColor: "bg-yellow-700", borderClass: "border-yellow-600/50" }
         };
 
         function showMyRole(roleCode) {
