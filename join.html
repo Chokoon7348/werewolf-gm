@@ -23,7 +23,7 @@
         body { background-color: #070a13; color: #f1f5f9; min-height: 100vh; overflow-y: auto; -webkit-tap-highlight-color: transparent; }
         ::-webkit-scrollbar { width: 0px; }
 
-        /* 👑 มิติสากลระบบ 3D Card Flip CSS */
+        /* มิติระบบ 3D Card Flip CSS */
         .perspective-1000 { perspective: 1000px; }
         .transform-style-3d { transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
         .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
@@ -31,11 +31,13 @@
         .is-flipped { transform: rotateY(180deg); }
     </style>
 </head>
-<body class="flex flex-col items-center justify-start p-4 md:p-6 relative pb-16">
+<body class="min-h-screen flex flex-col items-center justify-start lg:justify-center p-4 md:p-6 relative overflow-y-auto pb-12">
 
+    <!-- แบล็คกราวด์ออร่าไซไฟ -->
     <div class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-indigo-500/10 via-[#070a13] to-[#070a13] pointer-events-none"></div>
 
-    <div id="join-section" class="w-full max-w-md bg-deepSlate/80 backdrop-blur-2xl border border-slate-800 rounded-3xl p-8 shadow-2xl z-10 relative my-auto border-indigo-500/10">
+    <!-- ─── SECTION 1: หน้ากรอกรหัสล็อกอิน ─── -->
+    <div id="join-section" class="w-full max-w-sm bg-deepSlate/80 backdrop-blur-2xl border border-slate-800 rounded-3xl p-8 shadow-2xl z-10 relative my-auto border-indigo-500/10">
         <div class="text-center mb-8">
             <div class="inline-flex items-center justify-center p-4 bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 text-neonIndigo rounded-2xl mb-4 shadow-inner">
                 <i class="ph-fill ph-sword text-4xl animate-pulse"></i>
@@ -52,11 +54,12 @@
                 <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">นามแฝงของคุณ</label>
                 <input type="text" id="name-input" placeholder="ระบุชื่อภาษาไทยหรืออังกฤษ" class="w-full bg-slate-950/60 border border-slate-800 rounded-2xl px-4 py-4 text-white text-base font-semibold focus:border-neonIndigo focus:ring-1 focus:ring-neonIndigo outline-none transition-all placeholder-slate-600 shadow-inner">
             </div>
-            <button id="join-btn" class="w-full bg-neonIndigo hover:bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-xl shadow-indigo-500/10 transition-all active:scale-[0.98] text-base tracking-wide mt-2">เข้าร่วมทัพ</button>
+            <button id="join-btn" class="w-full bg-neonIndigo hover:bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg mt-4 transition-all">เข้าร่วมทัพ</button>
         </div>
     </div>
 
-    <div id="waiting-section" class="hidden w-full max-w-md text-center z-10 relative my-auto p-6 bg-deepSlate/40 border border-slate-800 rounded-3xl backdrop-blur-md">
+    <!-- ─── SECTION 2: หน้ารอ GM เริ่มแจกไพ่ ─── -->
+    <div id="waiting-section" class="hidden w-full max-w-sm text-center z-10 relative my-auto p-6 bg-deepSlate/40 border border-slate-800 rounded-3xl backdrop-blur-md">
         <div class="relative w-28 h-28 mx-auto mb-6 flex items-center justify-center bg-slate-950/50 rounded-full border border-slate-800 shadow-inner">
             <i class="ph-fill ph-hourglass-high text-5xl text-amber-400 animate-spin" style="animation-duration: 3s"></i>
         </div>
@@ -68,62 +71,104 @@
         </button>
     </div>
 
-    <div id="role-section" class="hidden w-full max-w-md z-10 flex flex-col gap-5 pt-2">
+    <!-- ─── SECTION 3: อารีน่าแสดงไพ่บทบาทและระบบแชท (Responsive Grid) ─── -->
+    <div id="role-section" class="hidden w-full max-w-md lg:max-w-5xl z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2">
         
-        <div class="perspective-1000 w-full h-[460px] cursor-pointer" onclick="toggleCardFlip()">
-            <div id="card-3d-internal" class="transform-style-3d relative w-full h-full rounded-[32px] shadow-2xl">
-                
-                <div class="backface-hidden absolute inset-0 w-full h-full bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-slate-800 rounded-[32px] p-6 flex flex-col items-center justify-center gap-4 text-center shadow-inner">
-                    <div class="w-32 h-32 bg-deepSlate rounded-3xl border border-slate-800 flex items-center justify-center shadow-2xl relative overflow-hidden group">
-                        <div class="absolute inset-0 bg-neonIndigo/5 group-hover:scale-110 transition-transform"></div>
-                        <i class="ph-fill ph-question text-6xl text-slate-700"></i>
-                    </div>
-                    <div>
-                        <h4 class="text-white font-extrabold text-xl tracking-tight mb-1">การ์ดบทบาทลับ</h4>
-                        <p class="text-slate-500 text-xs max-w-[200px] leading-relaxed">แตะที่ตัวการ์ดเพื่อพลิกลุ้นใบหน้าการ์ด หรือคว่ำการ์ดเพื่อความปลอดภัย</p>
-                    </div>
-                    <div class="mt-4 px-4 py-2 bg-indigo-500/5 border border-indigo-500/20 rounded-full text-[11px] font-bold text-indigo-400 tracking-wider uppercase animate-pulse">Tap to Reveal</div>
-                </div>
-
-                <div class="backface-hidden rotate-y-180 absolute inset-0 w-full h-full bg-slate-900 border-2 rounded-[32px] p-6 flex flex-col text-center justify-between overflow-hidden" id="role-card-back-face">
-                    <div id="role-loading-hint" class="absolute inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center gap-3 rounded-[30px] z-20">
-                        <i class="ph-bold ph-spinner-gap animate-spin text-4xl text-neonIndigo"></i>
-                        <p class="text-slate-400 text-sm font-medium">กำลังวาดการ์ดบทบาทล้ำสมัย...</p>
+        <!-- 🛑 ฝั่งซ้ายของจอ: การ์ดบทบาทลับ 3D และกล่องกดทำหน้าที่สกิล -->
+        <div class="lg:col-span-5 flex flex-col gap-4">
+            <div class="perspective-1000 w-full h-[440px] cursor-pointer shrink-0" onclick="toggleCardFlip()">
+                <div id="card-3d-internal" class="transform-style-3d relative w-full h-full rounded-[32px] shadow-2xl">
+                    
+                    <!-- หน้าหลังการ์ด -->
+                    <div class="backface-hidden absolute inset-0 w-full h-full bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-slate-800 rounded-[32px] p-6 flex flex-col items-center justify-center gap-4 text-center shadow-inner">
+                        <div class="w-28 h-28 bg-deepSlate rounded-3xl border border-slate-800 flex items-center justify-center shadow-2xl relative overflow-hidden group">
+                            <div class="absolute inset-0 bg-neonIndigo/5 group-hover:scale-110 transition-transform"></div>
+                            <i class="ph-fill ph-question text-5xl text-slate-700"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-white font-extrabold text-xl tracking-tight mb-1">การ์ดบทบาทลับ</h4>
+                            <p class="text-slate-500 text-xs max-w-[200px] leading-relaxed">แตะที่ตัวการ์ดเพื่อพลิกลุ้นใบหน้าการ์ด หรือคว่ำการ์ดเพื่อความปลอดภัย</p>
+                        </div>
+                        <div class="mt-2 px-4 py-2 bg-indigo-500/5 border border-indigo-500/20 rounded-full text-[11px] font-bold text-indigo-400 tracking-wider uppercase animate-pulse">Tap to Reveal</div>
                     </div>
 
-                    <div class="flex flex-col items-center flex-grow justify-center">
-                        <img id="role-image" src="" alt="Role Card" class="w-full h-auto max-h-[220px] object-contain rounded-2xl mb-4 hidden drop-shadow-[0_15px_15px_rgba(0,0,0,0.6)]">
-                        
-                        <div id="role-info-text" class="w-full">
-                            <div id="role-icon-box" class="w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 shadow-xl"><i id="role-icon" class="text-4xl text-white"></i></div>
-                            <span class="text-slate-500 text-[10px] uppercase font-bold tracking-widest block mb-0.5">บทบาทส่วนตัวของคุณ</span>
-                            <h1 id="role-name" class="text-3xl font-black text-white mb-2 tracking-tight">...</h1>
-                            <p id="role-desc" class="text-slate-400 text-xs leading-relaxed px-4">...</p>
+                    <!-- หน้าการ์ดจริง -->
+                    <div class="backface-hidden rotate-y-180 absolute inset-0 w-full h-full bg-slate-900 border-2 rounded-[32px] p-6 flex flex-col text-center justify-between overflow-hidden" id="role-card-back-face">
+                        <div id="role-loading-hint" class="absolute inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center gap-3 rounded-[30px] z-20">
+                            <i class="ph-bold ph-spinner-gap animate-spin text-4xl text-neonIndigo"></i>
+                            <p class="text-slate-400 text-sm font-medium">กำลังวาดการ์ดบทบาท...</p>
+                        </div>
+
+                        <div class="flex flex-col items-center flex-grow justify-center">
+                            <img id="role-image" src="" alt="Role Card" class="w-full h-auto max-h-[200px] object-contain rounded-2xl mb-3 hidden drop-shadow-[0_15px_15px_rgba(0,0,0,0.6)]">
+                            
+                            <div id="role-info-text" class="w-full">
+                                <div id="role-icon-box" class="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-3 shadow-xl"><i id="role-icon" class="text-3xl text-white"></i></div>
+                                <span class="text-slate-500 text-[10px] uppercase font-bold tracking-widest block mb-0.5">บทบาทส่วนตัวของคุณ</span>
+                                <h1 id="role-name" class="text-2xl font-black text-white mb-1.5 tracking-tight">...</h1>
+                                <p id="role-desc" class="text-slate-400 text-xs leading-relaxed px-4">...</p>
+                            </div>
+                        </div>
+
+                        <div class="pt-3 border-t border-slate-800/60 shrink-0">
+                            <p class="text-[11px] text-rose-500 uppercase tracking-widest font-black animate-pulse flex items-center justify-center gap-1">
+                                <i class="ph-fill ph-warning"></i> ห้ามให้ผู้เล่นคนอื่นดูหน้าจอนี้เด็ดขาด!
+                            </p>
                         </div>
                     </div>
 
-                    <div class="pt-3 border-t border-slate-800/60 shrink-0">
-                        <p class="text-[11px] text-rose-500 uppercase tracking-widest font-black animate-pulse flex items-center justify-center gap-1">
-                            <i class="ph-fill ph-warning"></i> ห้ามให้ผู้เล่นคนอื่นดูหน้าจอนี้เด็ดขาด!
-                        </p>
-                    </div>
                 </div>
+            </div>
 
+            <!-- กล่องปุ่มใช้สกิล / ปุ่มลงคะแนนโหวตประหาร -->
+            <div id="action-box" class="bg-deepSlate/90 border border-slate-800 rounded-3xl p-5 text-center shadow-2xl hidden border-indigo-500/10 shrink-0">
+                <h2 id="action-title" class="text-sm font-bold text-indigo-400 mb-3 flex items-center justify-center gap-2 uppercase tracking-wider">⚙️ กำลังโหลดระบบ...</h2>
+                <div id="action-list" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-0.5">
+                </div>
+                <p id="action-status" class="text-xs text-emerald-400 font-semibold mt-3 hidden bg-emerald-500/10 border border-emerald-500/20 py-2 rounded-xl">🎯 เลือกเป้าหมายเรียบร้อยแล้ว!</p>
             </div>
         </div>
 
-        <div id="action-box" class="bg-deepSlate/90 border border-slate-800 rounded-3xl p-5 text-center shadow-2xl hidden border-indigo-500/10">
-            <h2 id="action-title" class="text-sm font-bold text-indigo-400 mb-3 flex items-center justify-center gap-2 uppercase tracking-wider">⚙️ กำลังโหลดระบบ...</h2>
-            <div id="action-list" class="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto p-0.5">
+        <!-- 💬 ฝั่งขวาของจอ: ศูนย์ควบรวมห้องแชทแยกห้องสลับแท็บเรียลไทม์ -->
+        <div class="lg:col-span-7 flex flex-col gap-4">
+            <div id="chat-box" class="bg-deepSlate/90 border border-slate-800 rounded-[32px] p-5 flex flex-col gap-4 border-indigo-500/10 h-full min-h-[500px] lg:min-h-[560px] shadow-2xl">
+                
+                <!-- แถบเลือกสลับห้องแชทสไตล์ E-Sports Tabs Buttons -->
+                <div class="flex bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800 gap-1 shrink-0">
+                    <button id="tab-global" onclick="switchChatChannel('global', event)" class="flex-1 py-2.5 text-xs font-bold rounded-xl bg-neonIndigo text-white shadow-md transition-all flex items-center justify-center gap-1.5">
+                        <i class="ph-bold ph-globe"></i> หมู่บ้าน
+                    </button>
+                    <button id="tab-graveyard" onclick="switchChatChannel('graveyard', event)" class="hidden flex-1 py-2.5 text-xs font-bold rounded-xl bg-slate-950/40 text-slate-400 hover:text-white transition-all flex items-center justify-center gap-1.5">
+                        <i class="ph-bold ph-skull"></i> สุสาน
+                    </button>
+                    <button id="tab-werewolf" onclick="switchChatChannel('werewolf', event)" class="hidden flex-1 py-2.5 text-xs font-bold rounded-xl bg-slate-950/40 text-slate-400 hover:text-white transition-all flex items-center justify-center gap-1.5">
+                        <i class="ph-bold ph-moon"></i> ฝูงหมาป่า
+                    </button>
                 </div>
-            <p id="action-status" class="text-xs text-emerald-400 font-semibold mt-3 hidden bg-emerald-500/10 border border-emerald-500/20 py-2 rounded-xl">🎯 เลือกเป้าหมายเรียบร้อยแล้ว!</p>
+
+                <!-- ช่องแสดงกระดานข้อความของห้องแชทที่เลือก -->
+                <div id="chat-messages" class="flex-1 overflow-y-auto p-4 bg-slate-950/60 rounded-2xl border border-slate-800/80 flex flex-col gap-3 font-medium text-xs min-h-[280px]">
+                    <p class="text-slate-600 italic text-center my-auto">กำลังเตรียมเปิดสัญญาณห้องสนทนา...</p>
+                </div>
+
+                <!-- กล่องพิมพ์ส่งข้อความท้ายกระดาน -->
+                <div class="flex gap-2 shrink-0">
+                    <input type="text" id="chat-input" placeholder="พิมพ์คีย์บอร์ดคุยบลัฟกันที่นี่..." class="flex-1 bg-slate-950 border border-slate-800 text-white text-xs px-4 py-3.5 rounded-xl focus:outline-none focus:border-neonIndigo focus:ring-1 focus:ring-neonIndigo outline-none transition-all placeholder-slate-600">
+                    <button id="chat-send-btn" class="bg-neonIndigo hover:bg-indigo-600 text-white px-5 py-3.5 rounded-xl transition-colors flex items-center justify-center active:scale-95 shadow-md shadow-indigo-500/10">
+                        <i class="ph-bold ph-paper-plane-right text-base"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ปุ่มถอยทัพออกจากห้องเกม -->
+            <button onclick="leaveRoom()" class="w-full flex items-center justify-center gap-2 py-4 bg-deepSlate/40 hover:bg-slate-900 text-slate-400 hover:text-rose-400 rounded-2xl border border-slate-800 transition-all font-bold text-sm shadow shrink-0">
+                <i class="ph-bold ph-sign-out text-lg"></i> ขอยอมแพ้ / ออกจากห้องเกม
+            </button>
         </div>
 
-        <button onclick="leaveRoom()" class="w-full flex items-center justify-center gap-2 py-4 bg-deepSlate/40 hover:bg-slate-900 text-slate-400 hover:text-rose-400 rounded-2xl border border-slate-800 transition-all font-bold text-sm shadow">
-            <i class="ph-bold ph-sign-out text-lg"></i> ขอยอมแพ้ / ออกจากห้องเกม
-        </button>
     </div>
 
+    <!-- 🔥 Firebase Setup & Core Engine Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
         import { getDatabase, ref, get, set, push, child, onValue, remove } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
@@ -136,14 +181,32 @@
         const joinSection = document.getElementById('join-section'); 
         const waitingSection = document.getElementById('waiting-section'); 
         const roleSection = document.getElementById('role-section'); 
-        const roleCard = document.getElementById('role-card');
         const cardInternal = document.getElementById('card-3d-internal');
 
-        // ฟังก์ชันควบคุมการพลิกการ์ด 3 มิติ
+        window.activeChatChannel = 'global';
+        window.chatData = { global: {}, graveyard: {}, werewolf: {} };
+        window.chatListeners = {};
+        window.currentGamePhase = 'NIGHT'; // ตัวแปรเก็บสเตตัสเฟสเกมโกลบอล
+
         window.toggleCardFlip = function() {
             if (cardInternal) {
                 cardInternal.classList.toggle('is-flipped');
             }
+        };
+
+        window.switchChatChannel = function(channel, event) {
+            if(event) event.stopPropagation(); 
+            window.activeChatChannel = channel;
+
+            const tabGlobal = document.getElementById('tab-global');
+            const tabGrave = document.getElementById('tab-graveyard');
+            const tabWolf = document.getElementById('tab-werewolf');
+
+            if(tabGlobal) tabGlobal.className = channel === 'global' ? 'flex-1 py-2.5 text-xs font-bold rounded-xl bg-neonIndigo text-white shadow-md transition-all flex items-center justify-center gap-1.5' : 'flex-1 py-2.5 text-xs font-bold rounded-xl bg-slate-950/40 text-slate-400 hover:text-white transition-all flex items-center justify-center gap-1.5';
+            if(tabGrave) tabGrave.className = channel === 'graveyard' ? 'flex-1 py-2.5 text-xs font-bold rounded-xl bg-rose-600 text-white shadow-md transition-all flex items-center justify-center gap-1.5' : 'flex-1 py-2.5 text-xs font-bold rounded-xl bg-slate-950/40 text-slate-400 hover:text-white transition-all flex items-center justify-center gap-1.5';
+            if(tabWolf) tabWolf.className = channel === 'werewolf' ? 'flex-1 py-2.5 text-xs font-bold rounded-xl bg-amber-600 text-white shadow-md transition-all flex items-center justify-center gap-1.5' : 'flex-1 py-2.5 text-xs font-bold rounded-xl bg-slate-950/40 text-slate-400 hover:text-white transition-all flex items-center justify-center gap-1.5';
+
+            renderChannelMessages(channel, sessionStorage.getItem('wolf_playerId'));
         };
 
         window.leaveRoom = function() {
@@ -192,7 +255,6 @@
                 window.myRole = myData.role;
                 window.myStatus = myData.status || "รอด";
 
-                // 🚨 ตรวจจับสเตตัสการฆ่าจาก GM แบบเรียลไทม์
                 if (window.myStatus === "ตาย" && previousStatus !== "ตาย") {
                     alert("💀 คุณได้เสียชีวิตแล้ว!\n\nโปรดงดใช้เสียง บลัฟ หรือส่งสัญญาณบอกใบ้ใดๆ แก่ผู้เล่นที่ยังมีชีวิตอยู่เด็ดขาดจนกว่าเกมจะจบลงครับ");
                     previousStatus = "ตาย";
@@ -203,6 +265,11 @@
                 if (myData.role === "waiting" || myData.role === "waiting_for_players") {
                     showWaitingScreen();
                 } else {
+                    joinSection.classList.add('hidden');
+                    waitingSection.classList.add('hidden');
+                    roleSection.classList.remove('hidden');
+                    roleSection.classList.add('grid');
+                    
                     showMyRole(myData.role);
                     
                     if (!window.hasStateListener) {
@@ -212,8 +279,129 @@
                             handleGamePhaseUI(pin, playerId, state);
                         });
                     }
+
+                    updateChatChannelsSetup(pin, playerId, playerName);
                 }
             });
+        }
+
+        function updateChatChannelsSetup(pin, playerId, playerName) {
+            const tabGrave = document.getElementById('tab-graveyard');
+            const tabWolf = document.getElementById('tab-werewolf');
+
+            setupChannelDatabaseListener('global', pin, playerId);
+
+            if (window.myStatus === "ตาย") {
+                if(tabGrave) tabGrave.classList.remove('hidden');
+                setupChannelDatabaseListener('graveyard', pin, playerId);
+            } else {
+                if(tabGrave) tabGrave.classList.add('hidden');
+            }
+
+            if (['werewolf', 'wolfcub', 'wolfman', 'alphawolf', 'minion', 'sorceress'].includes(window.myRole)) {
+                if(tabWolf) tabWolf.classList.remove('hidden');
+                setupChannelDatabaseListener('werewolf', pin, playerId);
+            } else {
+                if(tabWolf) tabWolf.classList.add('hidden');
+            }
+
+            const chatInput = document.getElementById('chat-input');
+            const chatSendBtn = document.getElementById('chat-send-btn');
+
+            const sendMessageAction = () => {
+                const text = chatInput.value.trim();
+                if (!text) return;
+
+                // 🚨 กฎเหล็ก 1: ป้องกันวิญญาณส่งข้อความสปอยล์คนเป็นในห้องหมู่บ้าน
+                if (window.activeChatChannel === 'global' && window.myStatus === "ตาย") {
+                    alert("💀 คุณเป็นวิญญาณไปแล้ว! ไม่สามารถคุยแทรกแซงในแชทคนรอดได้ โปรดเลือกสลับแท็บไปคุยที่ห้อง [สุสาน] แทนครับ");
+                    chatInput.value = "";
+                    return;
+                }
+
+                // 🚨 กฎเหล็ก 2: ป้องกันการแอบคุยในแชทหมู่บ้านตอนกลางคืน (ทุกคนนอนหลับ)
+                if (window.activeChatChannel === 'global' && window.currentGamePhase === 'NIGHT') {
+                    alert("🌙 ห้องหมู่บ้านปิดชั่วคราวในเวลากลางคืน... ขณะนี้ทุกคนกำลังหลับใหลอยู่ครับ");
+                    chatInput.value = "";
+                    return;
+                }
+
+                // 🚨 กฎเหล็ก 3: ป้องกันการคุยในแชตรังหมาป่าตอนกลางวัน (ต้องแอบเนียน)
+                if (window.activeChatChannel === 'werewolf' && window.currentGamePhase !== 'NIGHT') {
+                    alert("☀️ ห้องฝูงหมาป่าเปิดเฉพาะเวลากลางคืนเท่านั้นครับ... ช่วงกลางวันจงออกไปเนียนปั่นหัวหมู่บ้านด้านนอก");
+                    chatInput.value = "";
+                    return;
+                }
+
+                const msgRef = push(ref(db, `rooms/${pin}/chats/${window.activeChatChannel}`));
+                set(msgRef, {
+                    senderId: playerId,
+                    senderName: playerName,
+                    text: text,
+                    timestamp: Date.now()
+                }).then(() => {
+                    chatInput.value = "";
+                });
+            };
+
+            if(chatSendBtn) chatSendBtn.onclick = (e) => { e.stopPropagation(); sendMessageAction(); };
+            if(chatInput) chatInput.onkeypress = (e) => { e.stopPropagation(); if (e.key === 'Enter') sendMessageAction(); };
+        }
+
+        function setupChannelDatabaseListener(channel, pin, playerId) {
+            if (window.chatListeners[channel]) return;
+            window.chatListeners[channel] = true;
+
+            onValue(ref(db, `rooms/${pin}/chats/${channel}`), (snapshot) => {
+                window.chatData[channel] = snapshot.val() || {};
+                if (window.activeChatChannel === channel) {
+                    renderChannelMessages(channel, playerId);
+                }
+            });
+        }
+
+        function renderChannelMessages(channel, playerId) {
+            const chatMessages = document.getElementById('chat-messages');
+            if(!chatMessages) return;
+
+            // 🔒 แสดงหน้าต่างแจ้งเตือนล็อกแชทชั่วคราวบนหน้าจอตามลูปเวลา
+            if (channel === 'global' && window.currentGamePhase === 'NIGHT') {
+                chatMessages.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-slate-500 gap-2 text-center my-auto"><i class="ph-bold ph-moon-stars text-2xl text-slate-600"></i><p class="italic">ห้องหมู่บ้านปิดในเวลากลางคืน...<br>ทุกคนกำลังหลับใหลลงสู่ห้วงนิทรา</p></div>`;
+                return;
+            }
+            if (channel === 'werewolf' && window.currentGamePhase !== 'NIGHT') {
+                chatMessages.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-amber-500/50 gap-2 text-center my-auto"><i class="ph-bold ph-sun text-2xl text-amber-600/40"></i><p class="italic">ห้องรังหมาป่าปิดในเวลากลางวัน...<br>จงซ่อนเขี้ยวเล็บแล้วออกไปเนียนกับชาวบ้าน</p></div>`;
+                return;
+            }
+
+            const data = window.chatData[channel];
+            if (!data || Object.keys(data).length === 0) {
+                let hint = "เริ่มเปิดประเด็นพูดคุยกับผู้เล่นในห้อง...";
+                if(channel === 'graveyard') hint = "🤫 ห้องสุสานลับ... เฉพาะวิญญาณคนตายเท่านั้นที่เปิดโปงคุยกันได้";
+                if(channel === 'werewolf') hint = "🐺 เสียงโหยหวนขู่คำราม... ร่วมกันนัดแนะเป้าหมายกินตับหมู่บ้านคืนนี้";
+                chatMessages.innerHTML = `<p class="text-slate-600 italic text-center my-auto">${hint}</p>`;
+                return;
+            }
+
+            chatMessages.innerHTML = Object.keys(data).map(key => {
+                const msg = data[key];
+                const isMe = msg.senderId === playerId;
+                let bubbleClass = isMe ? 'bg-neonIndigo text-white rounded-tr-none' : 'bg-slate-900 border border-slate-800 text-slate-200 rounded-tl-none';
+                
+                if (channel === 'graveyard') bubbleClass = isMe ? 'bg-rose-600 text-white rounded-tr-none shadow-[0_0_15px_rgba(225,29,72,0.15)]' : 'bg-slate-950 border border-rose-950 text-rose-300 rounded-tl-none';
+                if (channel === 'werewolf') bubbleClass = isMe ? 'bg-amber-600 text-white rounded-tr-none shadow-[0_0_15px_rgba(217,119,6,0.15)]' : 'bg-slate-950 border border-amber-950 text-amber-300 rounded-tl-none';
+
+                return `
+                    <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
+                        <span class="text-[10px] text-slate-500 mb-0.5 font-semibold">${msg.senderName}</span>
+                        <div class="max-w-[85%] px-3.5 py-2.5 rounded-2xl text-xs font-semibold leading-relaxed break-words shadow-sm ${bubbleClass}">
+                            ${msg.text}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            chatMessages.scrollTop = chatMessages.scrollHeight; 
         }
 
         function handleGamePhaseUI(pin, playerId, state) {
@@ -225,11 +413,13 @@
 
             if(!actionBox || !actionTitle || !actionList || !actionStatus) return;
 
+            // บันทึกสถานะเวลาของระบบเพื่อนำไปตรวจสอบสิทธิ์ล็อกแชท
+            window.currentGamePhase = state.phase;
+
             actionStatus.classList.add('hidden');
             actionBox.classList.remove('hidden');
             actionList.innerHTML = "";
 
-            // 💀 สภาพวิญญาณสีเทาเมื่อสถานะเป็น "ตาย" ล็อกการเลือกปุ่มทุกกรณี
             if (window.myStatus === "ตาย") {
                 actionTitle.innerHTML = "💀 คุณเสียชีวิตแล้ว (สิทธิ์วิญญาณ)";
                 actionList.innerHTML = `<p class="col-span-2 text-xs text-rose-400 border border-rose-500/10 bg-rose-500/5 py-4 rounded-xl font-medium italic">คุณได้หมดลมหายใจแล้ว ทำได้เพียงเฝ้าดูความเคลื่อนไหวเงียบๆ เท่านั้น...</p>`;
@@ -237,6 +427,7 @@
                     roleCardBackFace.style.filter = "grayscale(100%) opacity(40%)"; 
                     roleCardBackFace.style.borderColor = "#ef4444";
                 }
+                renderChannelMessages(window.activeChatChannel, playerId); // รีรันข้อความเมื่อสถานะชีพเปลี่ยน
                 return;
             } else {
                 if (roleCardBackFace) {
@@ -265,6 +456,9 @@
                     actionTitle.innerHTML = `🗳️ วันที่ ${state.round || 1}: ลงคะแนนประหารชีวิต!`;
                     renderTargetButtons(allPlayers, pin, playerId, "voteTarget", actionList, actionStatus);
                 }
+
+                // อัปเดตและเช็คสิทธิ์ล็อกความเคลื่อนไหวในแท็บห้องแชทให้ตรงตามสเตจเวลาปัจจุบันทันที
+                renderChannelMessages(window.activeChatChannel, playerId);
             });
         }
 
@@ -280,7 +474,7 @@
                     btn.className = "bg-slate-950 hover:bg-neonIndigo border border-slate-800 text-white text-xs font-bold py-3 px-3 rounded-2xl transition-all truncate shadow active:scale-95";
                     btn.innerText = p.name;
                     btn.onclick = (e) => {
-                        e.stopPropagation(); // ห้ามไปรบกวนระบบคลิกพลิกการ์ด
+                        e.stopPropagation(); 
                         set(ref(db, `rooms/${pin}/players/${playerId}/${targetField}`), p.name).then(() => {
                             actionStatus.innerText = `✅ บันทึกคำสั่งใส่ [${p.name}] สำเร็จ!`;
                             actionStatus.classList.remove('hidden');
@@ -316,7 +510,7 @@
             if(pin.length !== 4 || playerName === "") return alert("กรุณากรอกรหัส PIN และชื่อให้ครบ");
             
             const joinBtn = document.getElementById('join-btn'); 
-            joinBtn.innerText = "กำลังเข้าสู่สนามรบ..."; 
+            joinBtn.innerText = "กำลังเข้าสู่สมรภูมิ..."; 
             joinBtn.disabled = true;
 
             get(child(ref(db), `rooms/${pin}`)).then((snapshot) => {
@@ -381,9 +575,6 @@
         };
 
         function showMyRole(roleCode) {
-            waitingSection.classList.add('hidden'); 
-            roleSection.classList.remove('hidden');
-            
             const rImage = document.getElementById('role-image'); 
             const rInfoText = document.getElementById('role-info-text'); 
             const rLoadingHint = document.getElementById('role-loading-hint'); 
