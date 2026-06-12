@@ -260,7 +260,6 @@
                 </div>
             </div>
 
-            <!-- กล่องมอนิเตอร์แชทผู้เล่น 3 ห้องสำหรับ GM -->
             <div class="lg:col-span-4 lg:col-start-1 h-fit bg-slate-900 p-4 md:p-5 rounded-xl border border-slate-800 shadow-md flex flex-col gap-3 order-5">
                 <h2 class="text-xs md:text-sm font-semibold text-indigo-400 uppercase tracking-wider flex items-center gap-2">
                     <i class="ph-bold ph-eye text-base"></i> ดักฟังแชทผู้เล่น (เรียลไทม์)
@@ -287,7 +286,7 @@
             <div class="mb-6">
                 <label class="block text-sm font-medium text-slate-400 mb-2">ชื่อผู้เล่น</label>
                 <input type="text" id="new-player-name-input" placeholder="ระบุชื่อ" class="w-full bg-slate-800 border border-slate-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" onkeypress="handleNewPlayerEnter(event)">
-                <p id="modal-error" class="text-rose-400 text-sm mt-2 hidden">กรุณาะบุชื่อผู้เล่น</p>
+                <p id="modal-error" class="text-rose-400 text-sm mt-2 hidden">กรุณาระบุชื่อผู้เล่น</p>
             </div>
             <div class="flex gap-2 md:gap-3 justify-end">
                 <button onclick="closeAddPlayerModal()" class="flex-1 sm:flex-none px-4 py-2.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors font-medium text-sm md:text-base border border-slate-700">ยกเลิก</button>
@@ -355,7 +354,7 @@
         "🤢 ผู้ป่วยติดเชื้อ": { group: "villager", desc: "ทำหมาป่าท้องเสีย", side: "Village Side" },
         "😴 คนอดนอน": { group: "villager", desc: "เช็คคนตื่นตอนกลางคืน", side: "Village Side" },
         "🧿 ตาทิพย์": { group: "villager", desc: "รู้ว่าใครคือเทพพยากรณ์", side: "Village Side" },
-        "🎓 ลูกศิษย์ของเทพพยากรณ์": { group: "villager", desc: "รับสืบทอดเทพพยากรณ์", side: "Village Side" },
+        "🎓 ลูกศิษย์ของเทพพยากณ์": { group: "villager", desc: "รับสืบทอดเทพพยากรณ์", side: "Village Side" },
         "💘 กามเทพ": { group: "villager", desc: "จับคู่รัก", side: "Village Side" },
         "🏹 นายพรานหญิง": { group: "villager", desc: "กำจัดผู้เล่นได้ 1 คน", side: "Village Side" },
         "🎯 นายพรานธรรมดา": { group: "villager", desc: "ตายแล้วลากคนไปตายด้วย", side: "Village Side" },
@@ -429,7 +428,8 @@
                     </select>
                     <div id="live-action-${index}" class="mt-2 text-[11px] font-mono text-indigo-300 bg-slate-950/60 p-1.5 rounded-md border border-slate-800 hidden"></div>
                     
-                    <!-- 📩 1:1 กล่องพิมพ์ข้อความด่วนลับสุดยอดทะลุมือถือผู้เล่นรายคน -->
+                    <div id="private-chat-log-${index}" class="mt-1 bg-slate-950/50 border border-slate-800 rounded-lg p-1.5 text-[10px] max-h-20 overflow-y-auto flex flex-col gap-1 hidden font-sans select-text"></div>
+
                     <div class="mt-2 flex gap-1 border-t border-slate-700/50 pt-2">
                         <input type="text" id="private-msg-${index}" placeholder="กระซิบส่วนตัว..." class="flex-1 bg-slate-950 border border-slate-700 text-white text-[11px] px-2 py-1.5 rounded-lg focus:outline-none focus:border-indigo-500" onkeypress="if(event.key==='Enter') window.sendPrivateMessage(${index})">
                         <button onclick="window.sendPrivateMessage(${index})" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 rounded-lg text-xs transition-colors flex items-center justify-center" title="ส่งด่วนส่วนตัว"><i class="ph-bold ph-paper-plane-right"></i></button>
@@ -470,7 +470,7 @@
     window.updatePlayerStatus = function(index, newStatus) { 
         window.players[index].status = newStatus; 
         window.renderPlayerCards(); 
-        window.addLog(`[${window.players[index].name}] Status: ${newStatus}`); 
+        window.addLog(`[${window.players[index].name}] สถานะ: ${newStatus}`); 
 
         if (window.currentPin && window.db && window.currentPlayersData) {
             const playerName = window.players[index].name;
@@ -486,7 +486,7 @@
         }
     };
 
-    // 🟢 🛠️ ฟังก์ชันยิงกระซิบความลับส่วนตัวข้ามขอบฟ้าขึ้น Real-time Firebase database
+    // 🟢 🛠️ แก้ไขเรียบร้อย: เปลี่ยนคำสั่งให้ใช้ระบบ push ข้อมูลเก็บลงคลังประวัติสนทนา privateChatLog ร่วมกัน
     window.sendPrivateMessage = function(index) {
         const input = document.getElementById(`private-msg-${index}`);
         const text = input ? input.value.trim() : "";
@@ -499,7 +499,9 @@
                 if (window.currentPlayersData[key].name === playerName) { playerKey = key; break; }
             }
             if (playerKey) {
-                window.set(window.ref(window.db, `rooms/${window.currentPin}/players/${playerKey}/privateMessage`), {
+                const chatLogRef = window.push(window.ref(window.db, `rooms/${window.currentPin}/players/${playerKey}/privateChatLog`));
+                window.set(chatLogRef, {
+                    sender: 'gm',
                     text: text,
                     timestamp: Date.now()
                 }).then(() => {
@@ -835,7 +837,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    window.db = db; window.ref = ref; window.set = set; window.onValue = onValue; window.update = update;
+    window.db = db; window.ref = ref; window.set = set; window.onValue = onValue; window.update = update; window.push = push;
     window.currentPlayersData = {}; 
 
     window.kickPlayerFromLobby = function(key, name) {
@@ -874,6 +876,25 @@
                                     
                                     if (txt) { actEl.innerText = txt; actEl.classList.remove('hidden'); }
                                     else { actEl.classList.add('hidden'); }
+                                }
+
+                                // 🟢 อัปเดตและดึงประวัติแชทลับ 1:1 ระหว่าง GM และผู้เล่นคนนี้มาวาดบนตัวการ์ดแบบเรียลไทม์
+                                const chatLogEl = document.getElementById(`private-chat-log-${idx}`);
+                                const chatLogData = window.currentPlayersData[key].privateChatLog;
+                                if (chatLogEl) {
+                                    if (chatLogData && Object.keys(chatLogData).length > 0) {
+                                        chatLogEl.classList.remove('hidden');
+                                        chatLogEl.innerHTML = Object.keys(chatLogData).map(k => {
+                                            const item = chatLogData[k];
+                                            const isGM = item.sender === 'gm';
+                                            const labelColor = isGM ? 'text-amber-400' : 'text-indigo-300';
+                                            const senderLabel = isGM ? 'GM' : p.name;
+                                            return `<div class="leading-tight"><span class="${labelColor} font-bold">${senderLabel}:</span> <span class="text-slate-200">${item.text}</span></div>`;
+                                        }).join('');
+                                        chatLogEl.scrollTop = chatLogEl.scrollHeight; // ออโต้เลื่อนลงเมื่อมีคนกระซิบหา GM
+                                    } else {
+                                        chatLogEl.classList.add('hidden');
+                                    }
                                 }
                             }
                         }
