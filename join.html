@@ -48,7 +48,7 @@
         <div class="space-y-4">
             <div>
                 <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">รหัสห้องเล่นเกม</label>
-                <input type="number" id="pin-input" placeholder="0 0 0 0" class="w-full bg-slate-950/60 border border-slate-800 rounded-2xl px-4 py-4 text-white text-center text-3xl font-black tracking-widest focus:border-neonIndigo focus:ring-1 focus:ring-neonIndigo outline-none transition-all placeholder-slate-700 shadow-inner">
+                <input type="number" id="pin-input" placeholder="0 0 0 0" class="w-full bg-slate-950/60 border border-slate-800 rounded-2xl px-4 py-4 text-white text-center text-2xl font-black tracking-widest focus:border-neonIndigo focus:ring-1 focus:ring-neonIndigo outline-none transition-all placeholder-slate-700 shadow-inner">
             </div>
             <div>
                 <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">นามแฝงของคุณ</label>
@@ -71,7 +71,7 @@
         </button>
     </div>
 
-    <!-- ─── SECTION 3: อารีน่าแสดงไพ่บทบาทและระบบแชท (Responsive Grid Layout) ─── -->
+    <!-- ─── SECTION 3: อารีน่าแสดงไพ่บทบาทและระบบแชทแยกห้องขวา (Responsive Grid Layout) ─── -->
     <div id="role-section" class="hidden w-full max-w-md lg:max-w-5xl z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2">
         
         <!-- 🛑 ฝั่งซ้ายของจอ: การ์ดบทบาทลับ 3D และกล่องกดทำหน้าที่สกิล -->
@@ -120,7 +120,16 @@
                 </div>
             </div>
 
-            <!-- 🔮 กล่องปุ่มใช้สกิล / ปุ่มลงคะแนนโหวตประหาร -->
+            <!-- 💬 กล่องข้อความลับส่วนตัวแบบด่วนจาก GM (1:1 Whisper Alert) -->
+            <div id="private-alert-box" class="bg-amber-500/10 border-2 border-amber-500/30 rounded-3xl p-4 text-left shadow-xl hidden z-10 relative animate-fade-in animate-bounce-subtle">
+                <div class="flex justify-between items-start gap-2">
+                    <p class="text-xs font-black text-amber-400 flex items-center gap-1 uppercase tracking-wider"><i class="ph-bold ph-envelope-open text-sm"></i> 💬 ข้อความลับส่วนตัวจาก GM</p>
+                    <button onclick="window.clearPrivateMessage()" class="text-amber-500/60 hover:text-amber-400 transition-colors p-1 -mt-1" title="ปิดกล่องข้อความ"><i class="ph-bold ph-x text-sm"></i></button>
+                </div>
+                <p id="private-alert-text" class="text-xs text-amber-100 font-bold mt-2 leading-relaxed break-words">...</p>
+            </div>
+
+            <!-- กล่องปุ่มใช้สกิล / ปุ่มลงคะแนนโหวตประหาร -->
             <div id="action-box" class="bg-deepSlate/90 border border-slate-800 rounded-3xl p-5 text-center shadow-2xl hidden border-indigo-500/10 shrink-0">
                 <h2 id="action-title" class="text-sm font-bold text-indigo-400 mb-3 flex items-center justify-center gap-2 uppercase tracking-wider">⚙️ กำลังโหลดระบบ...</h2>
                 <div id="action-list" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-0.5">
@@ -132,7 +141,7 @@
         <!-- 💬 ฝั่งขวาของจอ: ศูนย์ควบรวมห้องแชทแยกห้องสลับแท็บเรียลไทม์ และทำเนียบผู้เล่น -->
         <div class="lg:col-span-7 flex flex-col gap-4">
             
-            <!-- 📊 บอร์ดรายงานสถานะชีพผู้เล่นทั้งหมด (Live Player Status Board) -->
+            <!-- บอร์ดรายงานสถานะชีพผู้เล่นทั้งหมด -->
             <div id="status-board-box" class="bg-deepSlate/90 border border-slate-800 rounded-3xl p-4 flex flex-col gap-3 border-indigo-500/10 shrink-0">
                 <h2 class="text-xs font-bold text-emerald-400 flex items-center gap-2 uppercase tracking-wider">
                     <i class="ph-bold ph-users-three text-base"></i> ทำเนียบรายชื่อผู้เล่นในห้อง
@@ -141,7 +150,7 @@
                 </div>
             </div>
 
-            <!-- 💬 กล่องแชทสับแท็บ (🟢 ล็อกความสูง h-[460px] ตายตัว ไม่ขยายหลุดจอเด็ดขาด) -->
+            <!-- กล่องแชทสับแท็บ ล็อกความสูง h-[460px] เลื่อนภายใน -->
             <div id="chat-box" class="bg-deepSlate/90 border border-slate-800 rounded-[32px] p-5 flex flex-col gap-4 border-indigo-500/10 h-[460px] shadow-2xl">
                 <div class="flex bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800 gap-1 shrink-0">
                     <button id="tab-global" onclick="switchChatChannel('global', event)" class="flex-1 py-2.5 text-xs font-bold rounded-xl bg-neonIndigo text-white shadow-md transition-all flex items-center justify-center gap-1.5">
@@ -155,7 +164,6 @@
                     </button>
                 </div>
 
-                <!-- 🟢 ช่องแสดงกระดานข้อความ ล็อกความสูงให้เลื่อนสกรูลด้านในอย่างเดียว -->
                 <div id="chat-messages" class="flex-1 overflow-y-auto p-4 bg-slate-950/60 rounded-2xl border border-slate-800/80 flex flex-col gap-3 font-medium text-xs h-[260px]">
                     <p class="text-slate-600 italic text-center my-auto">กำลังเตรียมเปิดสัญญาณห้องสนทนา...</p>
                 </div>
@@ -195,10 +203,9 @@
         window.chatListeners = {};
         window.currentGamePhase = 'NIGHT'; 
         
-        // 🟢 เพิ่มตัวแปรคลังจำสถานะดีเลย์การแสดงผลการตาย
         window.knownDeadPlayers = null;
         window.lastObservedPhase = null;
-        window.uiStatus = "รอด"; // 🟢 ตัวแปรใช้คุมสถานะตายฝั่ง UI (จะเปลี่ยนเฉพาะตอนเช้าและหลังโหวต)
+        window.uiStatus = "รอด"; 
 
         window.toggleCardFlip = function() {
             if (cardInternal) {
@@ -219,6 +226,15 @@
             if(tabWolf) tabWolf.className = channel === 'werewolf' ? 'flex-1 py-2.5 text-xs font-bold rounded-xl bg-amber-600 text-white shadow-md transition-all flex items-center justify-center gap-1.5' : 'flex-1 py-2.5 text-xs font-bold rounded-xl bg-slate-950/40 text-slate-400 hover:text-white transition-all flex items-center justify-center gap-1.5';
 
             renderChannelMessages(channel, sessionStorage.getItem('wolf_playerId'));
+        };
+
+        // 🟢 ฟังก์ชันส่งค่าสั่งลบข้อความกระซิบจาก GM ออกจากฐานข้อมูลเบราว์เซอร์เมื่อคนอ่านกดกากบาท
+        window.clearPrivateMessage = function() {
+            const pin = sessionStorage.getItem('wolf_pin');
+            const pId = sessionStorage.getItem('wolf_playerId');
+            if (pin && pId) {
+                set(ref(db, `rooms/${pin}/players/${pId}/privateMessage`), null);
+            }
         };
 
         window.leaveRoom = function() {
@@ -245,18 +261,17 @@
             if(rImage) { rImage.src = ""; rImage.classList.add('hidden'); }
             if(cardInternal) cardInternal.classList.remove('is-flipped');
             document.getElementById('action-box').classList.add('hidden');
+            document.getElementById('private-alert-box').classList.add('hidden');
         }
 
-        // 🎨 ฟังก์ชันอัปเดตบอร์ดรายชื่อ (🟢 เปลี่ยนมาดึงสถานะตายจางลงตามฐานข้อมูลงวดล่าสุุดที่เปิดเผยแล้ว)
         function renderPlayerStatusBoard(allPlayers) {
             const boardList = document.getElementById('status-board-list');
             if (!boardList) return;
             
             boardList.innerHTML = Object.keys(allPlayers).map(k => {
                 const p = allPlayers[k];
-                // 🟢 กรองเช็คกับอาร์เรย์ที่อนุมัติเผยรายชื่อศพแล้วเท่านั้น เพื่อไม่ให้บอร์ดสีจางลงก่อนเวลาตื่นนอน
-                const isDeadRevealed = window.knownDeadPlayers && window.knownDeadPlayers.includes(k);
-                if (isDeadRevealed) {
+                const isDead = window.knownDeadPlayers && window.knownDeadPlayers.includes(k);
+                if (isDead) {
                     return `<div class="bg-slate-950/40 border border-slate-900 text-slate-600 px-2 py-2 rounded-xl opacity-40 line-through flex items-center justify-center gap-1"><i class="ph-fill ph-skull text-xs"></i> ${p.name}</div>`;
                 } else {
                     return `<div class="bg-slate-950 border border-emerald-500/20 text-emerald-400 px-2 py-2 rounded-xl flex items-center justify-center gap-1"><i class="ph-fill ph-heart-beat text-xs animate-pulse text-emerald-500"></i> ${p.name}</div>`;
@@ -264,7 +279,6 @@
             }).join('');
         }
 
-        // 🚨 ฟังก์ชันประมวลผลดีเลย์คนตาย: ทำงานเฉพาะ (NIGHT➔DAY) และ (VOTE➔NIGHT) เท่านั้น
         function checkDelayedDeathAnnouncements(pin, playerId, state) {
             const currentPhase = state.phase;
             const previousPhase = window.lastObservedPhase;
@@ -282,7 +296,7 @@
                                 window.knownDeadPlayers.push(k);
                                 
                                 if (k === playerId) {
-                                    window.uiStatus = "ตาย"; // 🟢 ปรับ UI ตัวเองให้ตายอย่างเป็นทางการพร้อมแจ้งเตือน
+                                    window.uiStatus = "ตาย"; 
                                     alert("💀 คุณได้เสียชีวิตแล้ว!\n\nโปรดงดใช้เสียง บลัฟ หรือส่งสัญญาณบอกใบ้ใดๆ แก่ผู้เล่นที่ยังมีชีวิตอยู่เด็ดขาดจนกว่าเกมจะจบลงครับ");
                                 }
                             }
@@ -316,7 +330,18 @@
                 window.myRole = myData.role;
                 window.myStatus = myData.status || "รอด";
 
-                // กรณีเพิ่งเชื่อมต่อเข้าห้องมากลางคันและตัวเองเคยตายไปแล้วในรอบก่อน ให้จัดลงคลังประวัติทันที
+                // 🚨 ระบบตรวจสอบข้อความกระซิบ 1:1 จาก GM ป้อนขึ้นตัวกล่องป้ายเตือนแบบ Real-time
+                const alertBox = document.getElementById('private-alert-box');
+                const alertText = document.getElementById('private-alert-text');
+                if (myData.privateMessage && myData.privateMessage.text) {
+                    if (alertBox && alertText) {
+                        alertText.innerText = myData.privateMessage.text;
+                        alertBox.classList.remove('hidden');
+                    }
+                } else {
+                    if (alertBox) alertBox.classList.add('hidden');
+                }
+
                 if (window.knownDeadPlayers === null) {
                     window.knownDeadPlayers = Object.keys(allPlayers).filter(k => allPlayers[k].status === "ตาย");
                     window.uiStatus = window.knownDeadPlayers.includes(playerId) ? "ตาย" : "รอด";
@@ -457,7 +482,6 @@
                 if (channel === 'graveyard') bubbleClass = isMe ? 'bg-rose-600 text-white rounded-tr-none shadow-[0_0_15px_rgba(225,29,72,0.15)]' : 'bg-slate-950 border border-rose-950 text-rose-300 rounded-tl-none';
                 if (channel === 'werewolf') bubbleClass = isMe ? 'bg-amber-600 text-white rounded-tr-none shadow-[0_0_15px_rgba(217,119,6,0.15)]' : 'bg-slate-950 border border-amber-950 text-amber-300 rounded-tl-none';
 
-                // 🟢 🛠️ ดึงโครงสร้างความต่างเวลามาปั๊มตราประทับชั่วโมงนาฬิกาต่อท้ายชื่อแบบสากล
                 const timeStr = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + ' น.' : '';
 
                 return `
@@ -487,7 +511,6 @@
             actionBox.classList.remove('hidden');
             actionList.innerHTML = "";
 
-            // 💀 🟢 เช็คเงื่อนไขล็อกคลาสผ่าน window.uiStatus แทนสเตตัสปกติ เพื่อดีเลย์ภาพสีจางลงตอนเวลาเช้าและหลังโหวต
             if (window.uiStatus === "ตาย") {
                 actionTitle.innerHTML = "💀 คุณเสียชีวิตแล้ว (สิทธิ์วิญญาณ)";
                 actionList.innerHTML = `<p class="col-span-2 text-xs text-rose-400 border border-rose-500/10 bg-rose-500/5 py-4 rounded-xl font-medium italic">คุณได้หมดลมหายใจแล้ว ทำได้เพียงเฝ้าดูความเคลื่อนไหวเงียบๆ เท่านั้น...</p>`;
@@ -556,7 +579,6 @@
 
             Object.keys(allPlayers).forEach(pKey => {
                 const p = allPlayers[pKey];
-                // 🟢 กรองปุ่มกดทำสกิลอ้างอิงรายชื่อศพที่ได้รับการยืนยันเปิดเผยเป็นทางการแล้วใน window.knownDeadPlayers
                 const isDeadRevealed = window.knownDeadPlayers && window.knownDeadPlayers.includes(pKey);
                 if (pKey !== playerId && !isDeadRevealed) {
                     hasTargets = true;
@@ -644,7 +666,7 @@
             'bodyguard': { name: "บอดี้การ์ด", desc: "เลือกปกป้องผู้เล่น 1 คนให้รอดจากการถูกหมาป่ากำจัดในคืนนี้ โดยไม่ซ้ำกับคืนก่อน", nameClass: "text-indigo-400", icon: "ph-shield-check", boxColor: "bg-indigo-500", borderClass: "border-indigo-500/50", shadow: "shadow-[0_0_30px_rgba(99,102,241,0.2)]" },
             'witch': { name: "แม่มด", desc: "รู้ว่าใครโดนหมาป่ากำจัดในคืนนั้น เลือกชุบชีวิตหรือวางยาพิษคนอื่น ใช้ได้ครั้งเดียว", nameClass: "text-fuchsia-400", icon: "ph-flask", boxColor: "bg-fuchsia-600", borderClass: "border-fuchsia-500/50", shadow: "shadow-[0_0_30px_rgba(217,70,239,0.2)]" },
             'hunter': { name: "นายพราน", desc: "หากคุณถูกกำจัด คุณสามารถเลือกยิงใครก็ได้ให้ตายตามไป 1 คน", nameClass: "text-amber-500", icon: "ph-crosshair", boxColor: "bg-amber-600", borderClass: "border-amber-500/50", shadow: "shadow-[0_0_30px_rgba(245,158,11,0.2)]" },
-            'investigator': { name: "นักสืบลึกลับ", desc: "เลือกตรวจผู้เล่น 3 คนที่นั่งติดกัน จะรู้ว่า 1 ในนั้นมีหมาป่าหรือไม่", nameClass: "text-sky-400", icon: "ph-magnifying-glass", boxColor: "bg-sky-500", borderClass: "border-sky-500/50", shadow: "shadow-[0_0_30px_rgba(14,165,233,0.2)]" },
+            'investigator': { name: "นักสืบลึกลับ", desc: "เลือกตรวจผู้เล่น 3 คนที่นั่งติดกัน จะรู้ว่า 1 ในนั้นมีหมาป่าหรือไม่", nameClass: "text-sky-400", icon: "ph-magnifying-glass", boxColor: "bg-sky-500", borderClass: "border-slate-800" },
             'wolfcub': { name: "ลูกหมาป่า", desc: "อยู่ฝ่ายหมาป่า หากคุณตาย คืนถัดไปหมาป่าจะกัดได้ 2 คน", nameClass: "text-red-500", icon: "ph-dog", boxColor: "bg-red-600", borderClass: "border-red-500/50", shadow: "shadow-[0_0_30px_rgba(220,38,38,0.2)]" },
             'sorceress': { name: "แม่หมอมนต์ดำ", desc: "อยู่ฝ่ายหมาป่า ตื่นตอนกลางคืนเพื่อค้นหาว่าใครคือเทพพยากรณ์", nameClass: "text-purple-400", icon: "ph-magic-wand", boxColor: "bg-purple-600", borderClass: "border-purple-500/50", shadow: "shadow-[0_0_30px_rgba(147,51,234,0.2)]" },
             'revealer': { name: "ผู้เผยตัวตน", desc: "ทายผู้เล่น 1 คน ถ้าเขาเป็นหมาป่า หมาป่าตายและได้ทานต่อในคืนถัดไป แต่ถ้าทายผิด คุณจะตายแทน", nameClass: "text-orange-400", icon: "ph-mask-happy", boxColor: "bg-orange-500", borderClass: "border-orange-500/50", shadow: "shadow-[0_0_30px_rgba(249,115,22,0.2)]" },
