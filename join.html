@@ -33,10 +33,8 @@
 </head>
 <body class="min-h-screen flex flex-col items-center justify-start lg:justify-center p-4 md:p-6 relative overflow-y-auto pb-12">
 
-    <!-- แบล็คกราวด์ออร่าไซไฟ -->
     <div class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-indigo-500/10 via-[#070a13] to-[#070a13] pointer-events-none"></div>
 
-    <!-- ─── SECTION 1: หน้ากรอกรหัสล็อกอิน ─── -->
     <div id="join-section" class="w-full max-w-sm bg-deepSlate/80 backdrop-blur-2xl border border-slate-800 rounded-3xl p-8 shadow-2xl z-10 relative my-auto border-indigo-500/10">
         <div class="text-center mb-8">
             <div class="inline-flex items-center justify-center p-4 bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 text-neonIndigo rounded-2xl mb-4 shadow-inner">
@@ -48,7 +46,7 @@
         <div class="space-y-4">
             <div>
                 <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">รหัสห้องเล่นเกม</label>
-                <input type="number" id="pin-input" placeholder="0 0 0 0" class="w-full bg-slate-950/60 border border-slate-800 rounded-2xl px-4 py-4 text-white text-center text-2xl font-black tracking-widest focus:border-neonIndigo focus:ring-1 focus:ring-neonIndigo outline-none transition-all placeholder-slate-700 shadow-inner">
+                <input type="number" id="pin-input" placeholder="0 0 0 0" class="w-full bg-slate-950/60 border border-slate-800 rounded-2xl px-4 py-4 text-white text-center text-3xl font-black tracking-widest focus-border-neonIndigo focus:ring-1 focus:ring-neonIndigo outline-none transition-all placeholder-slate-700 shadow-inner">
             </div>
             <div>
                 <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">นามแฝงของคุณ</label>
@@ -58,7 +56,6 @@
         </div>
     </div>
 
-    <!-- ─── SECTION 2: หน้ารอ GM เริ่มแจกไพ่ ─── -->
     <div id="waiting-section" class="hidden w-full max-w-sm text-center z-10 relative my-auto p-6 bg-deepSlate/40 border border-slate-800 rounded-3xl backdrop-blur-md">
         <div class="relative w-28 h-28 mx-auto mb-6 flex items-center justify-center bg-slate-950/50 rounded-full border border-slate-800 shadow-inner">
             <i class="ph-fill ph-hourglass-high text-5xl text-amber-400 animate-spin" style="animation-duration: 3s"></i>
@@ -71,15 +68,12 @@
         </button>
     </div>
 
-    <!-- ─── SECTION 3: อารีน่าแสดงไพ่บทบาทและระบบแชทแยกห้องขวา (Responsive Grid Layout) ─── -->
     <div id="role-section" class="hidden w-full max-w-md lg:max-w-5xl z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2">
         
-        <!-- 🛑 ฝั่งซ้ายของจอ: การ์ดบทบาทลับ 3D และกล่องกดทำหน้าที่สกิล -->
         <div class="lg:col-span-5 flex flex-col gap-4">
             <div class="perspective-1000 w-full h-[440px] cursor-pointer shrink-0" onclick="toggleCardFlip()">
                 <div id="card-3d-internal" class="transform-style-3d relative w-full h-full rounded-[32px] shadow-2xl">
                     
-                    <!-- หน้าหลังการ์ด -->
                     <div class="backface-hidden absolute inset-0 w-full h-full bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-slate-800 rounded-[32px] p-6 flex flex-col items-center justify-center gap-4 text-center shadow-inner">
                         <div class="w-28 h-28 bg-deepSlate rounded-3xl border border-slate-800 flex items-center justify-center shadow-2xl relative overflow-hidden group">
                             <div class="absolute inset-0 bg-neonIndigo/5 group-hover:scale-110 transition-transform"></div>
@@ -92,7 +86,6 @@
                         <div class="mt-2 px-4 py-2 bg-indigo-500/5 border border-indigo-500/20 rounded-full text-[11px] font-bold text-indigo-400 tracking-wider uppercase animate-pulse">Tap to Reveal</div>
                     </div>
 
-                    <!-- หน้าการ์ดจริง -->
                     <div class="backface-hidden rotate-y-180 absolute inset-0 w-full h-full bg-slate-900 border-2 rounded-[32px] p-6 flex flex-col text-center justify-between overflow-hidden" id="role-card-back-face">
                         <div id="role-loading-hint" class="absolute inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center gap-3 rounded-[30px] z-20">
                             <i class="ph-bold ph-spinner-gap animate-spin text-4xl text-neonIndigo"></i>
@@ -120,16 +113,6 @@
                 </div>
             </div>
 
-            <!-- 💬 กล่องข้อความลับส่วนตัวแบบด่วนจาก GM (1:1 Whisper Alert) -->
-            <div id="private-alert-box" class="bg-amber-500/10 border-2 border-amber-500/30 rounded-3xl p-4 text-left shadow-xl hidden z-10 relative animate-fade-in animate-bounce-subtle">
-                <div class="flex justify-between items-start gap-2">
-                    <p class="text-xs font-black text-amber-400 flex items-center gap-1 uppercase tracking-wider"><i class="ph-bold ph-envelope-open text-sm"></i> 💬 ข้อความลับส่วนตัวจาก GM</p>
-                    <button onclick="window.clearPrivateMessage()" class="text-amber-500/60 hover:text-amber-400 transition-colors p-1 -mt-1" title="ปิดกล่องข้อความ"><i class="ph-bold ph-x text-sm"></i></button>
-                </div>
-                <p id="private-alert-text" class="text-xs text-amber-100 font-bold mt-2 leading-relaxed break-words">...</p>
-            </div>
-
-            <!-- กล่องปุ่มใช้สกิล / ปุ่มลงคะแนนโหวตประหาร -->
             <div id="action-box" class="bg-deepSlate/90 border border-slate-800 rounded-3xl p-5 text-center shadow-2xl hidden border-indigo-500/10 shrink-0">
                 <h2 id="action-title" class="text-sm font-bold text-indigo-400 mb-3 flex items-center justify-center gap-2 uppercase tracking-wider">⚙️ กำลังโหลดระบบ...</h2>
                 <div id="action-list" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-0.5">
@@ -138,10 +121,8 @@
             </div>
         </div>
 
-        <!-- 💬 ฝั่งขวาของจอ: ศูนย์ควบรวมห้องแชทแยกห้องสลับแท็บเรียลไทม์ และทำเนียบผู้เล่น -->
         <div class="lg:col-span-7 flex flex-col gap-4">
             
-            <!-- บอร์ดรายงานสถานะชีพผู้เล่นทั้งหมด -->
             <div id="status-board-box" class="bg-deepSlate/90 border border-slate-800 rounded-3xl p-4 flex flex-col gap-3 border-indigo-500/10 shrink-0">
                 <h2 class="text-xs font-bold text-emerald-400 flex items-center gap-2 uppercase tracking-wider">
                     <i class="ph-bold ph-users-three text-base"></i> ทำเนียบรายชื่อผู้เล่นในห้อง
@@ -150,7 +131,6 @@
                 </div>
             </div>
 
-            <!-- กล่องแชทสับแท็บ ล็อกความสูง h-[460px] เลื่อนภายใน -->
             <div id="chat-box" class="bg-deepSlate/90 border border-slate-800 rounded-[32px] p-5 flex flex-col gap-4 border-indigo-500/10 h-[460px] shadow-2xl">
                 <div class="flex bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800 gap-1 shrink-0">
                     <button id="tab-global" onclick="switchChatChannel('global', event)" class="flex-1 py-2.5 text-xs font-bold rounded-xl bg-neonIndigo text-white shadow-md transition-all flex items-center justify-center gap-1.5">
@@ -183,7 +163,28 @@
 
     </div>
 
-    <!-- 🔥 Firebase Setup & Core Engine Logic -->
+    <div id="gm-whisper-widget" class="fixed bottom-4 right-4 z-50 flex flex-col items-end hidden">
+        <div id="gm-whisper-window" class="hidden w-72 sm:w-80 h-96 bg-slate-900 border border-amber-500/40 rounded-2xl shadow-2xl flex flex-col overflow-hidden mb-2 backdrop-blur-xl">
+            <div class="bg-gradient-to-r from-amber-600/20 to-yellow-600/20 px-4 py-3 border-b border-amber-500/20 flex justify-between items-center shrink-0">
+                <span class="text-xs font-black text-amber-400 flex items-center gap-1.5"><i class="ph-bold ph-headset"></i> ห้องแชทลับกับ GM (1:1)</span>
+                <button onclick="window.toggleGMChat()" class="text-slate-400 hover:text-white p-1"><i class="ph-bold ph-caret-down text-sm"></i></button>
+            </div>
+            <div id="gm-whisper-messages" class="flex-1 overflow-y-auto p-3 flex flex-col gap-2.5 bg-slate-950/70 font-medium text-[11px] h-[260px]">
+                <p class="text-slate-600 italic text-center my-auto">ส่งคำถาม หรือรายงานสถานะลับตรงถึง GM ได้ที่นี่...</p>
+            </div>
+            <div class="p-2 bg-slate-900 border-t border-slate-800/60 flex gap-1.5 shrink-0">
+                <input type="text" id="gm-whisper-input" placeholder="พิมพ์ข้อความด่วนส่งตรงถึง GM..." class="flex-1 bg-slate-950 border border-slate-800 text-white text-xs px-3 py-2.5 rounded-xl focus:outline-none focus:border-amber-500 outline-none placeholder-slate-700">
+                <button id="gm-whisper-send-btn" class="bg-amber-600 hover:bg-amber-500 text-slate-950 p-2.5 rounded-xl transition-all active:scale-95 flex items-center justify-center shadow-md shadow-amber-500/5">
+                    <i class="ph-bold ph-paper-plane-right text-sm"></i>
+                </button>
+            </div>
+        </div>
+        <button onclick="window.toggleGMChat()" class="bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 font-black px-4 py-3 rounded-full flex items-center gap-2 shadow-lg shadow-amber-500/20 active:scale-95 text-xs tracking-wide border border-amber-400/30">
+            <i class="ph-bold ph-chat-teardrop-text text-base animate-bounce"></i> แชทส่วนตัวกับ GM
+            <span id="gm-whisper-badge" class="hidden w-2 h-2 bg-rose-500 rounded-full animate-ping"></span>
+        </button>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
         import { getDatabase, ref, get, set, push, child, onValue, remove } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
@@ -213,6 +214,19 @@
             }
         };
 
+        // 🟢 ฟังก์ชันคุมย่อ-เปิด หน้าต่าง Floating แชทลับ 1:1 กับ GM
+        window.toggleGMChat = function() {
+            const chatWindow = document.getElementById('gm-whisper-window');
+            const whisperBadge = document.getElementById('gm-whisper-badge');
+            if (chatWindow) {
+                chatWindow.classList.toggle('hidden');
+                // หากเปิดหน้าต่างแชทอยู่ ให้เคลียร์จุดแจ้งเตือนสีแดงทิ้งออกไป
+                if(!chatWindow.classList.contains('hidden') && whisperBadge) {
+                    whisperBadge.classList.add('hidden');
+                }
+            }
+        };
+
         window.switchChatChannel = function(channel, event) {
             if(event) event.stopPropagation(); 
             window.activeChatChannel = channel;
@@ -226,15 +240,6 @@
             if(tabWolf) tabWolf.className = channel === 'werewolf' ? 'flex-1 py-2.5 text-xs font-bold rounded-xl bg-amber-600 text-white shadow-md transition-all flex items-center justify-center gap-1.5' : 'flex-1 py-2.5 text-xs font-bold rounded-xl bg-slate-950/40 text-slate-400 hover:text-white transition-all flex items-center justify-center gap-1.5';
 
             renderChannelMessages(channel, sessionStorage.getItem('wolf_playerId'));
-        };
-
-        // 🟢 ฟังก์ชันส่งค่าสั่งลบข้อความกระซิบจาก GM ออกจากฐานข้อมูลเบราว์เซอร์เมื่อคนอ่านกดกากบาท
-        window.clearPrivateMessage = function() {
-            const pin = sessionStorage.getItem('wolf_pin');
-            const pId = sessionStorage.getItem('wolf_playerId');
-            if (pin && pId) {
-                set(ref(db, `rooms/${pin}/players/${pId}/privateMessage`), null);
-            }
         };
 
         window.leaveRoom = function() {
@@ -261,7 +266,7 @@
             if(rImage) { rImage.src = ""; rImage.classList.add('hidden'); }
             if(cardInternal) cardInternal.classList.remove('is-flipped');
             document.getElementById('action-box').classList.add('hidden');
-            document.getElementById('private-alert-box').classList.add('hidden');
+            document.getElementById('gm-whisper-widget').classList.add('hidden');
         }
 
         function renderPlayerStatusBoard(allPlayers) {
@@ -270,8 +275,8 @@
             
             boardList.innerHTML = Object.keys(allPlayers).map(k => {
                 const p = allPlayers[k];
-                const isDead = window.knownDeadPlayers && window.knownDeadPlayers.includes(k);
-                if (isDead) {
+                const isDeadRevealed = window.knownDeadPlayers && window.knownDeadPlayers.includes(k);
+                if (isDeadRevealed) {
                     return `<div class="bg-slate-950/40 border border-slate-900 text-slate-600 px-2 py-2 rounded-xl opacity-40 line-through flex items-center justify-center gap-1"><i class="ph-fill ph-skull text-xs"></i> ${p.name}</div>`;
                 } else {
                     return `<div class="bg-slate-950 border border-emerald-500/20 text-emerald-400 px-2 py-2 rounded-xl flex items-center justify-center gap-1"><i class="ph-fill ph-heart-beat text-xs animate-pulse text-emerald-500"></i> ${p.name}</div>`;
@@ -330,18 +335,6 @@
                 window.myRole = myData.role;
                 window.myStatus = myData.status || "รอด";
 
-                // 🚨 ระบบตรวจสอบข้อความกระซิบ 1:1 จาก GM ป้อนขึ้นตัวกล่องป้ายเตือนแบบ Real-time
-                const alertBox = document.getElementById('private-alert-box');
-                const alertText = document.getElementById('private-alert-text');
-                if (myData.privateMessage && myData.privateMessage.text) {
-                    if (alertBox && alertText) {
-                        alertText.innerText = myData.privateMessage.text;
-                        alertBox.classList.remove('hidden');
-                    }
-                } else {
-                    if (alertBox) alertBox.classList.add('hidden');
-                }
-
                 if (window.knownDeadPlayers === null) {
                     window.knownDeadPlayers = Object.keys(allPlayers).filter(k => allPlayers[k].status === "ตาย");
                     window.uiStatus = window.knownDeadPlayers.includes(playerId) ? "ตาย" : "รอด";
@@ -358,6 +351,9 @@
                     roleSection.classList.remove('hidden');
                     roleSection.classList.add('grid');
                     
+                    // ปลดล็อกเปิดแสดงแผงแชท 1:1 ลับ Floating Widget กับ GM
+                    document.getElementById('gm-whisper-widget').classList.remove('hidden');
+
                     showMyRole(myData.role);
                     renderPlayerStatusBoard(allPlayers); 
 
@@ -376,8 +372,74 @@
                     }
 
                     updateChatChannelsSetup(pin, playerId, playerName);
+                    // 🟢 เริ่มเชื่อมระบบท่อข้อความแชทส่วนตัว 1:1 กับ GM รายคน
+                    bindPrivateGMWhisperSystem(pin, playerId, playerName);
                 }
             });
+        }
+
+        // 🔄 🟢 ฟังก์ชันควบคุมระบบประมวลผลประวัติแชทลับ 1:1 ไปกลับระหว่างผู้เล่นและ GM
+        function bindPrivateGMWhisperSystem(pin, playerId, playerName) {
+            if (window.hasPrivateChatListener) return;
+            window.hasPrivateChatListener = true;
+
+            const messagesBox = document.getElementById('gm-whisper-messages');
+            const inputField = document.getElementById('gm-whisper-input');
+            const sendBtn = document.getElementById('gm-whisper-send-btn');
+            const whisperBadge = document.getElementById('gm-whisper-badge');
+            const chatWindow = document.getElementById('gm-whisper-window');
+
+            // 🎧 เกาะท่อดักฟังความเคลื่อนไหวข้อความ 1:1 ย้อนหลัง
+            onValue(ref(db, `rooms/${pin}/players/${playerId}/privateChatLog`), (snapshot) => {
+                const logs = snapshot.val();
+                if (!logs) {
+                    messagesBox.innerHTML = `<p class="text-slate-600 italic text-center my-auto">ส่งคำถาม หรือรายงานสถานะลับตรงถึง GM ได้ที่นี่...</p>`;
+                    return;
+                }
+
+                // 🚨 ระบบยิงปุ่มแจ้งเตือนสีแดง (Notification Pulse) เมื่อมีแชทใหม่ส่งมาจาก GM ในขณะที่หน้าจอพับปิดอยู่
+                if (chatWindow && chatWindow.classList.contains('hidden') && whisperBadge) {
+                    whisperBadge.classList.remove('hidden');
+                }
+
+                messagesBox.innerHTML = Object.keys(logs).map(k => {
+                    const node = logs[k];
+                    const isMe = node.sender === 'player';
+                    const timeStr = node.timestamp ? new Date(node.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + ' น.' : '';
+                    
+                    let senderLabel = isMe ? playerName : '👑 ผู้ดำเนินเกม (GM)';
+                    let bubbleColor = isMe ? 'bg-slate-800 text-slate-200 border border-slate-700/60 rounded-tr-none' : 'bg-gradient-to-r from-amber-600/90 to-yellow-600/90 text-slate-950 rounded-tl-none font-bold';
+
+                    return `
+                        <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
+                            <span class="text-[9px] text-slate-500 mb-0.5">${senderLabel} • <span class="opacity-60">${timeStr}</span></span>
+                            <div class="max-w-[85%] px-3 py-2 rounded-xl leading-relaxed break-words shadow-sm ${bubbleColor}">
+                                ${node.text}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                messagesBox.scrollTop = messagesBox.scrollHeight; // สกรอลล์ข้อความล่าสุดลงล่างสุด
+            });
+
+            // 📨 ส่งกระซิบ 1:1 กลับหาทาง GM
+            const sendWhisperAction = () => {
+                const text = inputField.value.trim();
+                if (!text) return;
+
+                const msgRef = push(ref(db, `rooms/${pin}/players/${playerId}/privateChatLog`));
+                set(msgRef, {
+                    sender: 'player',
+                    text: text,
+                    timestamp: Date.now()
+                }).then(() => {
+                    inputField.value = "";
+                });
+            };
+
+            if (sendBtn) sendBtn.onclick = (e) => { e.stopPropagation(); sendWhisperAction(); };
+            if (inputField) inputField.onkeypress = (e) => { e.stopPropagation(); if (e.key === 'Enter') sendWhisperAction(); };
         }
 
         function updateChatChannelsSetup(pin, playerId, playerName) {
