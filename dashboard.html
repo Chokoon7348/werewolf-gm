@@ -240,7 +240,7 @@
                 </div>
             </div>
 
-            <div class="lg:col-span-8 lg:col-start-5 lg:row-start-1 lg:row-span-3 order-3 h-fit bg-slate-900 p-4 md:p-6 rounded-xl border border-slate-800 shadow-md">
+            <div class="lg:col-span-8 lg:col-start-5 lg:row-start-1 lg:row-span-4 order-3 h-fit bg-slate-900 p-4 md:p-6 rounded-xl border border-slate-800 shadow-md">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 md:mb-6 gap-3">
                     <h2 class="text-base md:text-lg font-semibold text-white flex items-center gap-1.5 md:gap-2"><i class="ph ph-users-three text-lg md:text-xl text-indigo-400"></i> จัดการผู้เล่น</h2>
                     <div class="flex gap-2 w-full sm:w-auto">
@@ -259,6 +259,21 @@
                     <button onclick="addLogEntry()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-lg transition-colors flex items-center justify-center"><i class="ph ph-paper-plane-right text-lg"></i></button>
                 </div>
             </div>
+
+            <div class="lg:col-span-4 lg:col-start-1 h-fit bg-slate-900 p-4 md:p-5 rounded-xl border border-slate-800 shadow-md flex flex-col gap-3 order-5">
+                <h2 class="text-xs md:text-sm font-semibold text-indigo-400 uppercase tracking-wider flex items-center gap-2">
+                    <i class="ph-bold ph-eye text-base"></i> ดักฟังแชทผู้เล่น (เรียลไทม์)
+                </h2>
+                <div class="flex bg-slate-950 p-1 rounded-lg border border-slate-800 text-[11px] font-bold gap-1">
+                    <button id="gm-tab-global" onclick="window.switchGMChatChannel('global')" class="flex-1 py-1.5 rounded bg-indigo-600 text-white transition-all">หมู่บ้าน</button>
+                    <button id="gm-tab-graveyard" onclick="window.switchGMChatChannel('graveyard')" class="flex-1 py-1.5 rounded text-slate-400 hover:text-white transition-all">สุสาน</button>
+                    <button id="gm-tab-werewolf" onclick="window.switchGMChatChannel('werewolf')" class="flex-1 py-1.5 rounded text-slate-400 hover:text-white transition-all">ฝูงหมาป่า</button>
+                </div>
+                <div id="gm-chat-messages" class="bg-slate-950 border border-slate-800 rounded-lg p-3 h-48 overflow-y-auto flex flex-col gap-2 font-sans text-xs">
+                    <p class="text-slate-600 italic text-center my-auto">ยังไม่มีข้อความส่งมาจากผู้เล่น...</p>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -314,6 +329,10 @@
     let isNight = true;
     let timerInterval;
     let timeRemaining = 600;
+
+    // ระบบจัดเก็บข้อมูลข้อความเพื่อสับเปลี่ยนดูในฝั่ง GM
+    window.activeGMChatChannel = 'global';
+    window.gmChatData = { global: {}, graveyard: {}, werewolf: {} };
 
     const rolesData = {
         "➖ เลือกบทบาท": { group: "default", desc: "-", side: "-" },
@@ -415,7 +434,6 @@
         window.updateStats();
     };
 
-    // 🎲 ฟังก์ชันสุ่มรายคน (ใส่ปุ่มลูกเต๋า)
     window.randomizePlayerRole = function(index) {
         const validRoles = allRoles.filter(r => r !== "➖ เลือกบทบาท" && rolesData[r].group !== "gm");
         const randomRole = validRoles[Math.floor(Math.random() * validRoles.length)];
@@ -424,7 +442,6 @@
 
     window.updatePlayerName = function(index, newName) { if(!newName.trim()) return; const oldName = window.players[index].name; window.players[index].name = newName; window.addLog(`เปลี่ยนชื่อ [${oldName}] ➔ [${newName}]`); };
     
-    // 🌟 ส่งคำสั่งอัปเดตบทให้มือถือเพื่อน Real-time
     window.updatePlayerRole = function(index, newRole) { 
         window.players[index].role = newRole; 
         window.renderPlayerCards(); 
@@ -444,17 +461,15 @@
         }
     };
 
-   window.updatePlayerStatus = function(index, newStatus) { 
+    window.updatePlayerStatus = function(index, newStatus) { 
         window.players[index].status = newStatus; 
         window.renderPlayerCards(); 
         window.addLog(`[${window.players[index].name}] สถานะ: ${newStatus}`); 
 
-        // 📡 ส่งสถานะใหม่ (รอด/ตาย) ขึ้น Firebase ทันที เพื่อให้จอมือถือผู้เล่นเด้งป๊อปอัปและย้อมจอเทา
         if (window.currentPin && window.db && window.currentPlayersData) {
             const playerName = window.players[index].name;
             let playerKey = null;
             
-            // วนลูปหาปุ่ม Key ของผู้เล่นคนนี้ในคลัง Firebase
             for (let key in window.currentPlayersData) {
                 if (window.currentPlayersData[key].name === playerName) { 
                     playerKey = key; 
@@ -462,7 +477,6 @@
                 }
             }
             
-            // ถ้าเจอตัวปุ๊บ ยิงสเตตัสอัปเดตไปที่ Firebase ทันที
             if (playerKey) {
                 window.set(window.ref(window.db, `rooms/${window.currentPin}/players/${playerKey}/status`), newStatus);
             }
@@ -655,7 +669,6 @@
         const pCountEl = document.getElementById('custom-deck-players');
         if(pCountEl) pCountEl.innerText = pCount;
 
-        // 🛡️ ป้องกันระบบแครชหากไม่พบ Element ตัวเลขสำรับไพ่
         if (totalEl) {
             if(total < pCount) { totalEl.className = 'text-rose-500'; } 
             else if (total > pCount) { totalEl.className = 'text-amber-400'; } 
@@ -668,6 +681,56 @@
         if(window.customDeck[code] < 0) window.customDeck[code] = 0;
         document.getElementById(`count-${code}`).innerText = window.customDeck[code];
         window.updateCustomDeckCounter();
+    };
+
+    // 🟢 ฟังก์ชันสลับแท็บช่องแชทผู้เล่นฝั่ง GM Monitor
+    window.switchGMChatChannel = function(channel) {
+        window.activeGMChatChannel = channel;
+        const btnGlobal = document.getElementById('gm-tab-global');
+        const btnGrave = document.getElementById('gm-tab-graveyard');
+        const btnWolf = document.getElementById('gm-tab-werewolf');
+        
+        if(btnGlobal) btnGlobal.className = channel === 'global' ? 'flex-1 py-1.5 rounded bg-indigo-600 text-white transition-all' : 'flex-1 py-1.5 rounded text-slate-400 hover:text-white transition-all';
+        if(btnGrave) btnGrave.className = channel === 'graveyard' ? 'flex-1 py-1.5 rounded bg-rose-600 text-white transition-all' : 'flex-1 py-1.5 rounded text-slate-400 hover:text-white transition-all';
+        if(btnWolf) btnWolf.className = channel === 'werewolf' ? 'flex-1 py-1.5 rounded bg-amber-600 text-white transition-all' : 'flex-1 py-1.5 rounded text-slate-400 hover:text-white transition-all';
+        
+        window.renderGMChatMessages(channel);
+    };
+
+    // 🟢 ฟังก์ชันวาดสายธารข้อความแชทของผู้เล่นขึ้นบนจอ GM มอนิเตอร์
+    window.renderGMChatMessages = function(channel) {
+        const messagesBox = document.getElementById('gm-chat-messages');
+        if(!messagesBox) return;
+
+        const data = window.gmChatData[channel];
+        if(!data || Object.keys(data).length === 0) {
+            let hint = "ห้องนี้ยังไม่มีการพิมพ์สนทนา...";
+            if(channel === 'graveyard') hint = "💀 สุสานเงียบสงบ... ยังไม่มีวิญญาณคนตายพ่นแชทระบายความแค้น";
+            if(channel === 'werewolf') hint = "🐺 รังหมาป่าเงียบเชียบ... ฝูงหมาป่ายังไม่ได้วางแผนพิมพ์นัดแนะสกิล";
+            messagesBox.innerHTML = `<p class="text-slate-600 italic text-center my-auto">${hint}</p>`;
+            return;
+        }
+
+        messagesBox.innerHTML = Object.keys(data).map(key => {
+            const msg = data[key];
+            const timeStr = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + ' น.' : '';
+            
+            let accentColor = 'text-indigo-400';
+            if(channel === 'graveyard') accentColor = 'text-rose-400';
+            if(channel === 'werewolf') accentColor = 'text-amber-400';
+
+            return `
+                <div class="py-1 border-b border-slate-800/40 last:border-0 flex flex-col gap-0.5">
+                    <div class="flex justify-between items-center text-[10px]">
+                        <span class="font-bold ${accentColor}">${msg.senderName}</span>
+                        <span class="text-slate-500 font-medium">${timeStr}</span>
+                    </div>
+                    <p class="text-slate-200 break-words font-medium mt-0.5">${msg.text}</p>
+                </div>
+            `;
+        }).join('');
+
+        messagesBox.scrollTop = messagesBox.scrollHeight; // ออโต้เลื่อนลงท้ายกล่อง
     };
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -773,7 +836,6 @@
                     return `<div class="bg-indigo-500/20 border border-indigo-500/50 text-indigo-300 pl-4 pr-2 py-1.5 rounded-xl flex items-center gap-3 font-medium shadow-lg"><i class="ph-fill ph-user"></i> ${p.name}<button onclick="kickPlayerFromLobby('${key}', '${p.name}')" class="bg-rose-500/20 hover:bg-rose-500 p-1 rounded-lg text-rose-400 hover:text-white transition-colors flex items-center justify-center ml-1" title="เตะผู้เล่น"><i class="ph-bold ph-x"></i></button></div>`
                 }).join('');
 
-                // 🟢 ดึงผลโหวตและข้อมูลสกิลฝั่งผู้เล่นขึ้นมาโชว์ที่การ์ด GM แบบสดๆ ทันที
                 if (window.players && window.players.length > 0) {
                     window.players.forEach((p, idx) => {
                         for (let key in window.currentPlayersData) {
@@ -800,6 +862,17 @@
                 playerListContainer.innerHTML = '<span class="text-slate-500 text-sm">ยังไม่มีผู้เล่น...</span>';
                 if(window.players.length === 0) { startGameBtn.classList.add('hidden'); startGameBtn.classList.remove('flex'); }
             }
+        });
+
+        // 🟢 🎧 ปลั๊กอินควบคุมดักฟังข้อความแชททั้ง 3 ห้องย่อยแบบ Real-time ให้ GM แอบส่องสปอยล์
+        const channels = ['global', 'graveyard', 'werewolf'];
+        channels.forEach(ch => {
+            window.onValue(window.ref(window.db, `rooms/${pin}/chats/${ch}`), (chatSnap) => {
+                window.gmChatData[ch] = chatSnap.val() || {};
+                if (window.activeGMChatChannel === ch) {
+                    window.renderGMChatMessages(ch);
+                }
+            });
         });
     };
 
@@ -884,7 +957,6 @@
             window.players = []; let updatesCount = 0;
             const extraCards = deck.slice(playerCount);
 
-            // บังคับเปิดเฟส NIGHT เริ่มต้นขึ้นฐานข้อมูลทันทีเมื่อเริ่มเกม
             window.set(window.ref(window.db, `rooms/${window.currentPin}/state`), {
                 phase: "NIGHT",
                 round: 1
