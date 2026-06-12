@@ -63,6 +63,10 @@
         .modal-backdrop.active { display: flex; }
         #mobile-menu { transition: transform 0.3s ease-in-out; transform: translateY(-100%); }
         #mobile-menu.open { transform: translateY(0); }
+
+        /* 👑 แอนิเมชันสำหรับแผงสไลด์กล่องแชทส่วนตัวโต้ตอบประหยัดพื้นที่ */
+        .chat-drawer { transition: max-height 0.3s ease-in-out, opacity 0.2s ease-in-out; max-height: 0px; opacity: 0; overflow: hidden; }
+        .chat-drawer.open { max-height: 240px; opacity: 1; }
     </style>
 </head>
 <body class="antialiased min-h-screen pt-16 md:pt-20">
@@ -256,10 +260,12 @@
                 <div id="game-log" class="bg-slate-950 border border-slate-800 rounded-lg p-3 h-32 md:h-48 overflow-y-auto space-y-2 mb-3 md:mb-4 font-mono text-xs md:text-sm"></div>
                 <div class="flex gap-2">
                     <input type="text" id="log-input" placeholder="พิมพ์บันทึก..." class="flex-1 bg-slate-800 border border-slate-700 text-white text-sm px-3 py-2 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" onkeypress="handleLogEnter(event)">
+                    <input type="hidden" id="gm-unread-tracking" value="{}">
                     <button onclick="addLogEntry()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-lg transition-colors flex items-center justify-center"><i class="ph ph-paper-plane-right text-lg"></i></button>
                 </div>
             </div>
 
+            <!-- กล่องมอนิเตอร์แชทผู้เล่น 3 ห้องสำหรับ GM -->
             <div class="lg:col-span-4 lg:col-start-1 h-fit bg-slate-900 p-4 md:p-5 rounded-xl border border-slate-800 shadow-md flex flex-col gap-3 order-5">
                 <h2 class="text-xs md:text-sm font-semibold text-indigo-400 uppercase tracking-wider flex items-center gap-2">
                     <i class="ph-bold ph-eye text-base"></i> ดักฟังแชทผู้เล่น (เรียลไทม์)
@@ -354,7 +360,7 @@
         "🤢 ผู้ป่วยติดเชื้อ": { group: "villager", desc: "ทำหมาป่าท้องเสีย", side: "Village Side" },
         "😴 คนอดนอน": { group: "villager", desc: "เช็คคนตื่นตอนกลางคืน", side: "Village Side" },
         "🧿 ตาทิพย์": { group: "villager", desc: "รู้ว่าใครคือเทพพยากรณ์", side: "Village Side" },
-        "🎓 ลูกศิษย์ของเทพพยากณ์": { group: "villager", desc: "รับสืบทอดเทพพยากรณ์", side: "Village Side" },
+        "🎓 ลูกศิษย์ของเทพพยากรณ์": { group: "villager", desc: "รับสืบทอดเทพพยากรณ์", side: "Village Side" },
         "💘 กามเทพ": { group: "villager", desc: "จับคู่รัก", side: "Village Side" },
         "🏹 นายพรานหญิง": { group: "villager", desc: "กำจัดผู้เล่นได้ 1 คน", side: "Village Side" },
         "🎯 นายพรานธรรมดา": { group: "villager", desc: "ตายแล้วลากคนไปตายด้วย", side: "Village Side" },
@@ -372,7 +378,7 @@
         "🛐 เจ้าลัทธิ": { group: "special", desc: "ชวนทุกคนเข้าลัทธิ", side: "Neutral" },
         "👻 ผู้ต้องคำสาป": { group: "special", desc: "โดนกัดจะกลายเป็นหมาป่า", side: "Mixed" },
         "🎭 ผู้จำแลง": { group: "special", desc: "สืบทอดบทบาทคนตาย", side: "Mixed" },
-        "🍺 คนเมา": { group: "special", desc: "บทบาทจริงคว่ำไว้", side: "Mixed" },
+        "🍺 คนเมา": { group: "special", desc: "บทบาทจริงจะเปิดเผยในคืนที่ 3", side: "Mixed" },
         "🎲 ผู้ดำเนินเกม": { group: "gm", desc: "ผู้คุมเกม", side: "GM" }
     };
     const allRoles = Object.keys(rolesData);
@@ -384,6 +390,20 @@
         DOM.statTotal.textContent = window.players.length;
         DOM.statAlive.textContent = window.players.filter(p => p.status !== 'ตาย').length;
         DOM.statDead.textContent = window.players.filter(p => p.status === 'ตาย').length;
+    };
+
+    // 🟢 ควบคุมพับเปิด-ปิดแผงสไลด์กล่องแชทกระซิบแบบแมนนวลในการ์ด
+    window.togglePrivateChatDrawer = function(index) {
+        const drawer = document.getElementById(`chat-drawer-${index}`);
+        const icon = document.getElementById(`chat-icon-${index}`);
+        if(drawer) {
+            drawer.classList.toggle('open');
+            // หากเปิดอยู่ ให้ล้างจุดส้มแจ้งเตือนออกทันที
+            const badge = document.getElementById(`chat-badge-${index}`);
+            if(drawer.classList.contains('open') && badge) {
+                badge.classList.add('hidden');
+            }
+        }
     };
 
     window.renderPlayerCards = function() {
@@ -409,9 +429,17 @@
             const card = document.createElement('div');
             card.className = `player-card bg-slate-800 rounded-xl p-3 md:p-4 border border-slate-700 relative flex flex-col gap-2 md:gap-3 ${isDead ? 'is-dead' : ''} ${borderClass}`;
             card.innerHTML = `
-                <div class="flex justify-between items-center gap-2 mb-1">
+                <div class="flex justify-between items-center gap-2 mb-1 relative">
                     <input type="text" value="${player.name}" class="bg-transparent border-b border-transparent focus:border-indigo-500 hover:border-slate-600 outline-none text-white font-semibold text-base w-full transition-colors pb-1" onchange="window.updatePlayerName(${index}, this.value)" placeholder="ชื่อผู้เล่น">
-                    <button onclick="window.removePlayer(${index})" class="text-slate-500 hover:text-rose-400 transition-colors p-1.5 -mr-1"><i class="ph ph-trash text-xl"></i></button>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <!-- 🟢 ปุ่มแคปซูลแชทสลับปิดเปิด ป้องกันกล่องยืดบังหน้ากระดานตามรูป IMG_20260612_110929.jpg -->
+                        <button onclick="window.togglePrivateChatDrawer(${index})" class="bg-slate-950 border border-slate-700 hover:bg-slate-900 text-indigo-400 p-2 rounded-lg text-xs flex items-center justify-center relative active:scale-95 transition-all" title="เปิด/ปิด แชทลับกับผู้เล่น">
+                            <i id="chat-icon-${index}" class="ph-bold ph-chat-teardrop-dots text-base"></i>
+                            <!-- จุดแจ้งเตือนส้มเนออนกะพริบ -->
+                            <span id="chat-badge-${index}" class="hidden absolute -top-0.5 -right-0.5 w-2 h-2 bg-amber-500 rounded-full animate-pulse shadow-[0_0_8px_#f59e0b]"></span>
+                        </button>
+                        <button onclick="window.removePlayer(${index})" class="text-slate-500 hover:text-rose-400 transition-colors p-1.5"><i class="ph ph-trash text-xl"></i></button>
+                    </div>
                 </div>
                 <div class="flex flex-col gap-2 mt-auto">
                     <div class="flex gap-1">
@@ -428,11 +456,14 @@
                     </select>
                     <div id="live-action-${index}" class="mt-2 text-[11px] font-mono text-indigo-300 bg-slate-950/60 p-1.5 rounded-md border border-slate-800 hidden"></div>
                     
-                    <div id="private-chat-log-${index}" class="mt-1 bg-slate-950/50 border border-slate-800 rounded-lg p-1.5 text-[10px] max-h-20 overflow-y-auto flex flex-col gap-1 hidden font-sans select-text"></div>
-
-                    <div class="mt-2 flex gap-1 border-t border-slate-700/50 pt-2">
-                        <input type="text" id="private-msg-${index}" placeholder="กระซิบส่วนตัว..." class="flex-1 bg-slate-950 border border-slate-700 text-white text-[11px] px-2 py-1.5 rounded-lg focus:outline-none focus:border-indigo-500" onkeypress="if(event.key==='Enter') window.sendPrivateMessage(${index})">
-                        <button onclick="window.sendPrivateMessage(${index})" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 rounded-lg text-xs transition-colors flex items-center justify-center" title="ส่งด่วนส่วนตัว"><i class="ph-bold ph-paper-plane-right"></i></button>
+                    <!-- 🟢 📁 กล่องลิ้นชักสไลด์ซ่อนเก็บแชท 1:1 ประหยัดพื้นที่ ปิดเปิดสับเปลี่ยนได้อิสระตามคำขอ -->
+                    <div id="chat-drawer-${index}" class="chat-drawer flex flex-col gap-2 border-t border-slate-700/40 mt-1 pt-1">
+                        <div id="private-chat-log-${index}" class="bg-slate-950/80 border border-slate-800 rounded-lg p-2 text-[10px] h-28 overflow-y-auto flex flex-col gap-1 font-sans select-text">
+                        </div>
+                        <div class="flex gap-1">
+                            <input type="text" id="private-msg-${index}" placeholder="พิมพ์กระซิบส่วนตัว..." class="flex-1 bg-slate-950 border border-slate-700 text-white text-[11px] px-2 py-1.5 rounded-lg focus:outline-none focus:border-indigo-500" onkeypress="if(event.key==='Enter') window.sendPrivateMessage(${index})">
+                            <button onclick="window.sendPrivateMessage(${index})" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 rounded-lg text-xs transition-colors flex items-center justify-center" title="ส่งด่วนส่วนตัว"><i class="ph-bold ph-paper-plane-right"></i></button>
+                        </div>
                     </div>
                 </div>`;
             DOM.grid.appendChild(card);
@@ -486,7 +517,6 @@
         }
     };
 
-    // 🟢 🛠️ แก้ไขเรียบร้อย: เปลี่ยนคำสั่งให้ใช้ระบบ push ข้อมูลเก็บลงคลังประวัติสนทนา privateChatLog ร่วมกัน
     window.sendPrivateMessage = function(index) {
         const input = document.getElementById(`private-msg-${index}`);
         const text = input ? input.value.trim() : "";
@@ -522,7 +552,7 @@
             }
             if (playerKey) window.set(window.ref(window.db, `rooms/${window.currentPin}/players/${playerKey}`), null);
         }
-        window.players.splice(index, 1); window.renderPlayerCards(); window.addLog(`เตะผู้เล่น: ${name}`); 
+        window.players.splice(index, 1); window.renderPlayerCards(); window.addLog("เตะผู้เล่น: " + name); 
     };
 
     window.openAddPlayerModal = function() { DOM.modal.classList.add('active'); DOM.modalInput.value = ''; DOM.modalError.classList.add('hidden'); setTimeout(() => DOM.modalInput.focus(), 100); };
@@ -841,7 +871,7 @@
     window.currentPlayersData = {}; 
 
     window.kickPlayerFromLobby = function(key, name) {
-        if(confirm(`⚠️ เตะ [${name}] ออกจากห้องใช่หรือไม่?`)) window.set(window.ref(window.db, `rooms/${window.currentPin}/players/${key}`), null);
+        if(confirm(`⚠️ ต้องการเตะ [${name}] ออกจากห้องใช่หรือไม่?`)) window.set(window.ref(window.db, `rooms/${window.currentPin}/players/${key}`), null);
     };
 
     window.bindRoomListener = function(pin) {
@@ -878,12 +908,28 @@
                                     else { actEl.classList.add('hidden'); }
                                 }
 
-                                // 🟢 อัปเดตและดึงประวัติแชทลับ 1:1 ระหว่าง GM และผู้เล่นคนนี้มาวาดบนตัวการ์ดแบบเรียลไทม์
+                                // อัปเดตข้อมูลประวัติแชทลับ 1:1 ระหว่าง GM และผู้เล่นรายคนลงตัวลิ้นชักการ์ด
                                 const chatLogEl = document.getElementById(`private-chat-log-${idx}`);
                                 const chatLogData = window.currentPlayersData[key].privateChatLog;
+                                const chatDrawer = document.getElementById(`chat-drawer-${idx}`);
+                                const chatBadge = document.getElementById(`chat-badge-${idx}`);
+                                
                                 if (chatLogEl) {
                                     if (chatLogData && Object.keys(chatLogData).length > 0) {
-                                        chatLogEl.classList.remove('hidden');
+                                        // 🚨 ตรวจสอบยอดนับจำนวนข้อความเพื่อแอบแจ้งเตือนจุดส้มกะพริบเรียลไทม์กรณี GM พับซ่อนลิ้นชักอยู่
+                                        const trackingInput = document.getElementById('gm-unread-tracking');
+                                        let currentTrack = JSON.parse(trackingInput.value || "{}");
+                                        const msgCount = Object.keys(chatLogData).length;
+
+                                        if (currentTrack[key] !== undefined && msgCount > currentTrack[key]) {
+                                            // หากแผงแชทของคนนี้ปิดอยู่ ให้เด้งจุดกลมสีส้มกะพริบทันที
+                                            if (chatDrawer && !chatDrawer.classList.contains('open') && chatBadge) {
+                                                chatBadge.classList.remove('hidden');
+                                            }
+                                        }
+                                        currentTrack[key] = msgCount;
+                                        trackingInput.value = JSON.stringify(currentTrack);
+
                                         chatLogEl.innerHTML = Object.keys(chatLogData).map(k => {
                                             const item = chatLogData[k];
                                             const isGM = item.sender === 'gm';
@@ -891,9 +937,9 @@
                                             const senderLabel = isGM ? 'GM' : p.name;
                                             return `<div class="leading-tight"><span class="${labelColor} font-bold">${senderLabel}:</span> <span class="text-slate-200">${item.text}</span></div>`;
                                         }).join('');
-                                        chatLogEl.scrollTop = chatLogEl.scrollHeight; // ออโต้เลื่อนลงเมื่อมีคนกระซิบหา GM
+                                        chatLogEl.scrollTop = chatLogEl.scrollHeight;
                                     } else {
-                                        chatLogEl.classList.add('hidden');
+                                        chatLogEl.innerHTML = `<p class="text-slate-600 italic text-center my-auto">ไม่มีประวัติการส่งกระซิบ...</p>`;
                                     }
                                 }
                             }
