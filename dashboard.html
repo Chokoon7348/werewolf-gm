@@ -260,6 +260,7 @@
                 </div>
             </div>
 
+            <!-- กล่องมอนิเตอร์แชทผู้เล่น 3 ห้องสำหรับ GM -->
             <div class="lg:col-span-4 lg:col-start-1 h-fit bg-slate-900 p-4 md:p-5 rounded-xl border border-slate-800 shadow-md flex flex-col gap-3 order-5">
                 <h2 class="text-xs md:text-sm font-semibold text-indigo-400 uppercase tracking-wider flex items-center gap-2">
                     <i class="ph-bold ph-eye text-base"></i> ดักฟังแชทผู้เล่น (เรียลไทม์)
@@ -286,7 +287,7 @@
             <div class="mb-6">
                 <label class="block text-sm font-medium text-slate-400 mb-2">ชื่อผู้เล่น</label>
                 <input type="text" id="new-player-name-input" placeholder="ระบุชื่อ" class="w-full bg-slate-800 border border-slate-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" onkeypress="handleNewPlayerEnter(event)">
-                <p id="modal-error" class="text-rose-400 text-sm mt-2 hidden">กรุณาระบุชื่อผู้เล่น</p>
+                <p id="modal-error" class="text-rose-400 text-sm mt-2 hidden">กรุณาะบุชื่อผู้เล่น</p>
             </div>
             <div class="flex gap-2 md:gap-3 justify-end">
                 <button onclick="closeAddPlayerModal()" class="flex-1 sm:flex-none px-4 py-2.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors font-medium text-sm md:text-base border border-slate-700">ยกเลิก</button>
@@ -330,7 +331,6 @@
     let timerInterval;
     let timeRemaining = 600;
 
-    // ระบบจัดเก็บข้อมูลข้อความเพื่อสับเปลี่ยนดูในฝั่ง GM
     window.activeGMChatChannel = 'global';
     window.gmChatData = { global: {}, graveyard: {}, werewolf: {} };
 
@@ -428,6 +428,12 @@
                         <option value="คู่รัก" class="bg-slate-800 text-white" ${player.status === 'คู่รัก' ? 'selected' : ''}>❤️ คู่รัก</option>
                     </select>
                     <div id="live-action-${index}" class="mt-2 text-[11px] font-mono text-indigo-300 bg-slate-950/60 p-1.5 rounded-md border border-slate-800 hidden"></div>
+                    
+                    <!-- 📩 1:1 กล่องพิมพ์ข้อความด่วนลับสุดยอดทะลุมือถือผู้เล่นรายคน -->
+                    <div class="mt-2 flex gap-1 border-t border-slate-700/50 pt-2">
+                        <input type="text" id="private-msg-${index}" placeholder="กระซิบส่วนตัว..." class="flex-1 bg-slate-950 border border-slate-700 text-white text-[11px] px-2 py-1.5 rounded-lg focus:outline-none focus:border-indigo-500" onkeypress="if(event.key==='Enter') window.sendPrivateMessage(${index})">
+                        <button onclick="window.sendPrivateMessage(${index})" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 rounded-lg text-xs transition-colors flex items-center justify-center" title="ส่งด่วนส่วนตัว"><i class="ph-bold ph-paper-plane-right"></i></button>
+                    </div>
                 </div>`;
             DOM.grid.appendChild(card);
         });
@@ -464,21 +470,42 @@
     window.updatePlayerStatus = function(index, newStatus) { 
         window.players[index].status = newStatus; 
         window.renderPlayerCards(); 
-        window.addLog(`[${window.players[index].name}] สถานะ: ${newStatus}`); 
+        window.addLog(`[${window.players[index].name}] Status: ${newStatus}`); 
 
         if (window.currentPin && window.db && window.currentPlayersData) {
             const playerName = window.players[index].name;
             let playerKey = null;
             
             for (let key in window.currentPlayersData) {
-                if (window.currentPlayersData[key].name === playerName) { 
-                    playerKey = key; 
-                    break; 
-                }
+                if (window.currentPlayersData[key].name === playerName) { playerKey = key; break; }
             }
             
             if (playerKey) {
                 window.set(window.ref(window.db, `rooms/${window.currentPin}/players/${playerKey}/status`), newStatus);
+            }
+        }
+    };
+
+    // 🟢 🛠️ ฟังก์ชันยิงกระซิบความลับส่วนตัวข้ามขอบฟ้าขึ้น Real-time Firebase database
+    window.sendPrivateMessage = function(index) {
+        const input = document.getElementById(`private-msg-${index}`);
+        const text = input ? input.value.trim() : "";
+        if (!text) return;
+
+        if (window.currentPin && window.db && window.currentPlayersData) {
+            const playerName = window.players[index].name;
+            let playerKey = null;
+            for (let key in window.currentPlayersData) {
+                if (window.currentPlayersData[key].name === playerName) { playerKey = key; break; }
+            }
+            if (playerKey) {
+                window.set(window.ref(window.db, `rooms/${window.currentPin}/players/${playerKey}/privateMessage`), {
+                    text: text,
+                    timestamp: Date.now()
+                }).then(() => {
+                    window.addLog(`📩 [GM ส่วนตัว] ส่งข้อความถึง [${playerName}]: ${text}`);
+                    if(input) input.value = "";
+                });
             }
         }
     };
@@ -543,7 +570,6 @@
     };
     window.closeInGameRolesModal = function() { DOM.rolesModal.classList.remove('active'); document.body.style.overflow = ''; };
 
-    // 🔄 ระบบ 3 เฟสเกมหลัก (กลางคืน -> พูดคุยกลางวัน -> เปิดระบบโหวต)
     window.currentGamePhase = "NIGHT"; 
 
     window.updateGamePhaseUI = function() {
@@ -683,7 +709,6 @@
         window.updateCustomDeckCounter();
     };
 
-    // 🟢 ฟังก์ชันสลับแท็บช่องแชทผู้เล่นฝั่ง GM Monitor
     window.switchGMChatChannel = function(channel) {
         window.activeGMChatChannel = channel;
         const btnGlobal = document.getElementById('gm-tab-global');
@@ -697,7 +722,6 @@
         window.renderGMChatMessages(channel);
     };
 
-    // 🟢 ฟังก์ชันวาดสายธารข้อความแชทของผู้เล่นขึ้นบนจอ GM มอนิเตอร์
     window.renderGMChatMessages = function(channel) {
         const messagesBox = document.getElementById('gm-chat-messages');
         if(!messagesBox) return;
@@ -730,7 +754,7 @@
             `;
         }).join('');
 
-        messagesBox.scrollTop = messagesBox.scrollHeight; // ออโต้เลื่อนลงท้ายกล่อง
+        messagesBox.scrollTop = messagesBox.scrollHeight; 
     };
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -864,7 +888,6 @@
             }
         });
 
-        // 🟢 🎧 ปลั๊กอินควบคุมดักฟังข้อความแชททั้ง 3 ห้องย่อยแบบ Real-time ให้ GM แอบส่องสปอยล์
         const channels = ['global', 'graveyard', 'werewolf'];
         channels.forEach(ch => {
             window.onValue(window.ref(window.db, `rooms/${pin}/chats/${ch}`), (chatSnap) => {
