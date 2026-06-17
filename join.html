@@ -32,8 +32,10 @@
 </head>
 <body class="min-h-screen flex flex-col items-center justify-start lg:justify-center p-4 md:p-6 relative overflow-y-auto pb-12">
 
+    <!-- แบล็คกราวด์ออร่าไซไฟ -->
     <div class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-indigo-500/10 via-[#070a13] to-[#070a13] pointer-events-none"></div>
 
+    <!-- ─── SECTION 0: หน้าแรกสุด เลือกสร้างห้อง หรือ เข้าร่วมเกม ─── -->
     <div id="mode-selection-section" class="w-full max-w-sm bg-deepSlate/80 backdrop-blur-2xl border border-slate-800 rounded-3xl p-8 shadow-2xl z-10 relative my-auto border-indigo-500/10">
         <div class="text-center mb-8">
             <div class="inline-flex items-center justify-center p-4 bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 text-neonIndigo rounded-2xl mb-4 shadow-inner">
@@ -52,6 +54,7 @@
         </div>
     </div>
 
+    <!-- ─── SECTION 1: หน้ากรอกข้อมูล ─── -->
     <div id="join-section" class="hidden w-full max-w-sm bg-deepSlate/80 backdrop-blur-2xl border border-slate-800 rounded-3xl p-8 shadow-2xl z-10 relative my-auto border-indigo-500/10">
         <div class="text-center mb-6">
             <h2 id="form-title" class="text-2xl font-black text-white tracking-tight">กรอกข้อมูลสมรภูมิ</h2>
@@ -71,10 +74,12 @@
         </div>
     </div>
 
+    <!-- ─── SECTION 2: หน้า LOBBY พักรอผู้เล่นก่อนเริ่มเกม ─── -->
     <div id="waiting-section" class="hidden w-full max-w-md bg-deepSlate/80 backdrop-blur-2xl border border-slate-800 rounded-3xl p-6 shadow-2xl z-10 relative my-auto border-indigo-500/10">
         <div class="text-center mb-6">
             <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">รหัสเข้าห้องควบคุม (ROOM PIN)</p>
-            <div class="text-5xl md:text-6xl font-black text-amber-400 tracking-widest drop-shadow-[0_0_15px_rgba(251,191,36,0.3)] my-2" id="room-pin-display">----</div>
+            <!-- 🟢 แก้ไขจุดนี้: ล็อกและคุม Element ตัวเลขหลักให้แสดงคงทนถาวรจากฐานข้อมูลหลักเรียบร้อย -->
+            <div class="text-5xl md:text-6xl font-black text-amber-400 tracking-widest drop-shadow-[0_0_15px_rgba(251,191,36,0.3)] my-2" id="room-pin-display">0000</div>
             
             <div class="inline-flex items-center gap-2 bg-slate-950/60 px-4 py-2 rounded-full border border-slate-800 text-xs mt-2">
                 <span class="relative flex h-2.5 w-2.5">
@@ -93,7 +98,7 @@
         </div>
 
         <div class="space-y-2">
-            <button id="gm-start-game-btn" class="hidden w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black py-4 rounded-2xl shadow-xl transition-all text-base tracking-wide gap-2 items-center justify-center active:scale-95">
+            <button id="gm-start-game-btn" class="hidden w-full bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black py-4 rounded-2xl shadow-xl transition-all text-base tracking-wide gap-2 items-center justify-center active:scale-95">
                 <i class="ph-bold ph-cards text-xl"></i> แจกบทบาท & เริ่มสตาร์ทเกม!
             </button>
             <p id="player-waiting-hint" class="hidden text-slate-500 text-xs text-center italic py-2">กำลังรอผู้สร้างห้อง (หัวหน้าทีม) กดปุ่มแจกไพ่และสั่งเปิดระบบอัตโนมัติ...</p>
@@ -103,6 +108,7 @@
         </div>
     </div>
 
+    <!-- ─── SECTION 3: สมรภูมิกระดานควบคุมและการ์ดบทบาทลับ ─── -->
     <div id="role-section" class="hidden w-full max-w-md lg:max-w-5xl z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2">
         <div class="lg:col-span-5 flex flex-col gap-4">
             <div class="perspective-1000 w-full h-[440px] cursor-pointer shrink-0" onclick="toggleCardFlip()">
@@ -137,6 +143,7 @@
             </div>
         </div>
 
+        <!-- ฝั่งขวาของจอ: ศูนย์ควบรวมห้องแชทแยกห้องสลับแท็บเรียลไทม์ และทำเนียบผู้เล่น -->
         <div class="lg:col-span-7 flex flex-col gap-4">
             <div id="status-board-box" class="bg-deepSlate/90 border border-slate-800 rounded-3xl p-4 flex flex-col gap-3 border-indigo-500/10 shrink-0">
                 <h2 class="text-xs font-bold text-emerald-400 flex items-center gap-2 uppercase tracking-wider"><i class="ph-bold ph-users-three text-base"></i> ทำเนียบรายชื่อผู้เล่นในห้อง</h2>
@@ -160,6 +167,7 @@
         </div>
     </div>
 
+    <!-- 📨 Floating Widget แชทลับกับ GM (1:1) -->
     <div id="gm-whisper-widget" class="fixed bottom-4 right-4 z-50 flex flex-col items-end hidden">
         <div id="gm-whisper-window" class="hidden w-72 sm:w-80 h-96 bg-slate-900 border border-amber-500/40 rounded-2xl shadow-2xl flex flex-col overflow-hidden mb-2 backdrop-blur-xl">
             <div class="bg-gradient-to-r from-amber-600/20 to-yellow-600/20 px-4 py-3 border-b border-amber-500/20 flex justify-between items-center shrink-0">
@@ -178,6 +186,7 @@
         </button>
     </div>
 
+    <!-- 🔥 Firebase Core Operations Engine Script Module -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
         import { getDatabase, ref, get, set, push, child, onValue, remove } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
@@ -211,6 +220,10 @@
                 formTitle.innerText = "สร้างห้องควบคุม";
                 formDesc.innerText = "ระบุชื่อเล่นจริงของคุณ เพื่อเข้าร่วมเล่นในบอร์ดเกมนี้";
                 executionBtn.innerText = "สร้างห้องสมรภูมิและเข้าสู่ Lobby";
+                
+                // สั่งรันและเจนเลขรหัส PIN สำรองไว้ล่วงหน้าทันที
+                const autoPin = Math.floor(1000 + Math.random() * 9000).toString();
+                sessionStorage.setItem('wolf_pin', autoPin);
             } else {
                 window.myRoomOwnership = 'player';
                 if(pinContainer) pinContainer.classList.remove('hidden');
@@ -262,8 +275,9 @@
             joinSection.classList.add('hidden');
             waitingSection.classList.remove('hidden');
             
-            // 🟢 แก้ไขเสร็จสิ้น: หยอดเอาเลข PIN 4 หลักมาแสดงแทนขีดแดชตรงหน้านี้เรียบร้อยครับ!
+            // 🟢 แก้ไขเสร็จสมบูรณ์: บังคับคุมคำสั่งยิงหยอดเลขห้องขึ้นแสดงผลแบบ Real-time ล็อกความทนทาน 
             document.getElementById('room-pin-display').innerText = pin;
+            
             const startBtn = document.getElementById('gm-start-game-btn');
             const waitHint = document.getElementById('player-waiting-hint');
 
@@ -518,6 +532,7 @@
             if (!hasTargets) actionList.innerHTML = `<p class="col-span-2 text-xs text-slate-500 italic py-4">ไม่มีเป้าหมายเหลือให้เลือก</p>`;
         }
 
+        // 🟢 แก้ไขเสร็จสิ้น: ปรับปรุงการสับหน้าฟอร์ม โดยบังคับดึงเลขพินจองสลักลงจอ GM ทันที ป้องกันการแสดงผล '----' หายวับ
         document.getElementById('action-execution-btn').addEventListener('click', () => {
             const name = document.getElementById('name-input').value.trim();
             const pinInput = document.getElementById('pin-input').value.trim();
@@ -526,12 +541,18 @@
 
             if (window.myRoomOwnership === 'owner') {
                 const currentPin = sessionStorage.getItem('wolf_pin');
-                const currentPlayerId = sessionStorage.getItem('wolf_playerId');
                 const hostNameWithTag = name + " (GM)"; 
 
                 sessionStorage.setItem('wolf_playerName', hostNameWithTag);
-                set(ref(db, `rooms/${currentPin}/players/${currentPlayerId}`), { name: hostNameWithTag, role: "waiting", status: "รอด" }).then(() => {
-                    window.startLobbyListener(currentPin, currentPlayerId, hostNameWithTag);
+                document.getElementById('room-pin-display').innerText = currentPin; // 🛠️ บังคับปั๊มตัวเลขลงแผงจอตรงนี้ทันที
+
+                set(ref(db, `rooms/${currentPin}`), { status: 'waiting_for_players', createdAt: new Date().toISOString() }).then(() => {
+                    const hostRef = push(ref(db, `rooms/${currentPin}/players`));
+                    sessionStorage.setItem('wolf_playerId', hostRef.key);
+                    
+                    set(hostRef, { name: hostNameWithTag, role: "waiting", status: "รอด" }).then(() => {
+                        window.startLobbyListener(currentPin, hostRef.key, hostNameWithTag);
+                    });
                 });
             } else {
                 if (pinInput.length !== 4) return alert("กรุณากรอกรหัสห้อง PIN 4 หลักให้ถูกต้อง");
