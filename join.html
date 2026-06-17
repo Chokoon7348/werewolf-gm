@@ -32,10 +32,8 @@
 </head>
 <body class="min-h-screen flex flex-col items-center justify-start lg:justify-center p-4 md:p-6 relative overflow-y-auto pb-12">
 
-    <!-- แบล็คกราวด์ออร่าไซไฟ -->
     <div class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-indigo-500/10 via-[#070a13] to-[#070a13] pointer-events-none"></div>
 
-    <!-- ─── SECTION 0: หน้าแรกสุด เลือกสร้างห้อง หรือ เข้าร่วมเกม ─── -->
     <div id="mode-selection-section" class="w-full max-w-sm bg-deepSlate/80 backdrop-blur-2xl border border-slate-800 rounded-3xl p-8 shadow-2xl z-10 relative my-auto border-indigo-500/10">
         <div class="text-center mb-8">
             <div class="inline-flex items-center justify-center p-4 bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 text-neonIndigo rounded-2xl mb-4 shadow-inner">
@@ -54,7 +52,6 @@
         </div>
     </div>
 
-    <!-- ─── SECTION 1: หน้ากรอกข้อมูล ─── -->
     <div id="join-section" class="hidden w-full max-w-sm bg-deepSlate/80 backdrop-blur-2xl border border-slate-800 rounded-3xl p-8 shadow-2xl z-10 relative my-auto border-indigo-500/10">
         <div class="text-center mb-6">
             <h2 id="form-title" class="text-2xl font-black text-white tracking-tight">กรอกข้อมูลสมรภูมิ</h2>
@@ -74,11 +71,9 @@
         </div>
     </div>
 
-    <!-- ─── SECTION 2: หน้า LOBBY พักรอผู้เล่นก่อนเริ่มเกม ─── -->
     <div id="waiting-section" class="hidden w-full max-w-md bg-deepSlate/80 backdrop-blur-2xl border border-slate-800 rounded-3xl p-6 shadow-2xl z-10 relative my-auto border-indigo-500/10">
         <div class="text-center mb-6">
             <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">รหัสเข้าห้องควบคุม (ROOM PIN)</p>
-            <!-- 🟢 แก้ไขจุดนี้: ล็อกและคุม Element ตัวเลขหลักให้แสดงคงทนถาวรจากฐานข้อมูลหลักเรียบร้อย -->
             <div class="text-5xl md:text-6xl font-black text-amber-400 tracking-widest drop-shadow-[0_0_15px_rgba(251,191,36,0.3)] my-2" id="room-pin-display">0000</div>
             
             <div class="inline-flex items-center gap-2 bg-slate-950/60 px-4 py-2 rounded-full border border-slate-800 text-xs mt-2">
@@ -108,7 +103,6 @@
         </div>
     </div>
 
-    <!-- ─── SECTION 3: สมรภูมิกระดานควบคุมและการ์ดบทบาทลับ ─── -->
     <div id="role-section" class="hidden w-full max-w-md lg:max-w-5xl z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2">
         <div class="lg:col-span-5 flex flex-col gap-4">
             <div class="perspective-1000 w-full h-[440px] cursor-pointer shrink-0" onclick="toggleCardFlip()">
@@ -136,6 +130,7 @@
                     </div>
                 </div>
             </div>
+            
             <div id="action-box" class="bg-deepSlate/90 border border-slate-800 rounded-3xl p-5 text-center shadow-2xl hidden border-indigo-500/10 shrink-0">
                 <h2 id="action-title" class="text-sm font-bold text-indigo-400 mb-3 flex items-center justify-center gap-2 uppercase">⚙️ กำลังโหลดระบบ...</h2>
                 <div id="action-list" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-0.5"></div>
@@ -143,7 +138,6 @@
             </div>
         </div>
 
-        <!-- ฝั่งขวาของจอ: ศูนย์ควบรวมห้องแชทแยกห้องสลับแท็บเรียลไทม์ และทำเนียบผู้เล่น -->
         <div class="lg:col-span-7 flex flex-col gap-4">
             <div id="status-board-box" class="bg-deepSlate/90 border border-slate-800 rounded-3xl p-4 flex flex-col gap-3 border-indigo-500/10 shrink-0">
                 <h2 class="text-xs font-bold text-emerald-400 flex items-center gap-2 uppercase tracking-wider"><i class="ph-bold ph-users-three text-base"></i> ทำเนียบรายชื่อผู้เล่นในห้อง</h2>
@@ -167,7 +161,6 @@
         </div>
     </div>
 
-    <!-- 📨 Floating Widget แชทลับกับ GM (1:1) -->
     <div id="gm-whisper-widget" class="fixed bottom-4 right-4 z-50 flex flex-col items-end hidden">
         <div id="gm-whisper-window" class="hidden w-72 sm:w-80 h-96 bg-slate-900 border border-amber-500/40 rounded-2xl shadow-2xl flex flex-col overflow-hidden mb-2 backdrop-blur-xl">
             <div class="bg-gradient-to-r from-amber-600/20 to-yellow-600/20 px-4 py-3 border-b border-amber-500/20 flex justify-between items-center shrink-0">
@@ -186,7 +179,6 @@
         </button>
     </div>
 
-    <!-- 🔥 Firebase Core Operations Engine Script Module -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
         import { getDatabase, ref, get, set, push, child, onValue, remove } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
@@ -201,9 +193,67 @@
         const cardInternal = document.getElementById('card-3d-internal');
 
         window.activeChatChannel = 'global'; window.chatData = { global: {}, graveyard: {}, werewolf: {} };
-        window.chatListeners = {}; window.currentGamePhase = 'NIGHT';
+        window.chatListeners = {}; window.currentGamePhase = 'NIGHT'; window.currentRound = 1;
         window.knownDeadPlayers = null; window.lastObservedPhase = null; window.uiStatus = "รอด";
         window.myRoomOwnership = 'player'; 
+
+        // 🧠 🌟 ฟังก์ชันคำนวณและประมวลผลเปลี่ยนเฟสเกมอัตโนมัติ (Automated Client-Side Core Loop Calculation)
+        function processAutomatedEngineRules(pin, state, allPlayers) {
+            if (window.myRoomOwnership !== 'owner') return; // ล็อกสิทธิ์ให้รันคิดเงินเฉพาะบนมือถือเครื่อง GM เท่านั้นเพื่อไม่ให้ข้อมูลแครชชนกัน
+            
+            const pKeys = Object.keys(allPlayers);
+            const alivePlayers = pKeys.filter(k => allPlayers[k].status !== "ตาย" && allPlayers[k].role !== "waiting");
+            if (alivePlayers.length === 0) return;
+
+            // 🛑 1. ออโต้ตัดเข้าช่วงเช้าตอนกลางคืน (NIGHT -> DAY)
+            if (state.phase === "NIGHT") {
+                const activeRoles = alivePlayers.filter(k => ["werewolf", "seer", "bodyguard", "mystic"].includes(allPlayers[k].role));
+                const submitted = activeRoles.filter(k => allPlayers[k].actionTarget !== undefined && allPlayers[k].actionTarget !== "");
+                
+                if (activeRoles.length > 0 && submitted.length === activeRoles.length) {
+                    let killTarget = null; let protectTarget = null;
+                    activeRoles.forEach(k => {
+                        if (allPlayers[k].role === "werewolf") killTarget = allPlayers[k].actionTarget;
+                        if (allPlayers[k].role === "bodyguard") protectTarget = allPlayers[k].actionTarget;
+                    });
+
+                    if (killTarget && killTarget !== protectTarget) {
+                        const deadId = pKeys.find(k => allPlayers[k].name === killTarget);
+                        if (deadId) set(ref(db, `rooms/${pin}/players/${deadId}/status`), "ตาย");
+                    }
+
+                    setTimeout(() => {
+                        set(ref(db, `rooms/${pin}/state`), { phase: "DAY", round: state.round });
+                    }, 1500);
+                }
+            }
+
+            // 🛑 2. ออโต้ตัดจากเฟสลงมติโหวตขึ้นคืนถัดไป (VOTE -> NIGHT)
+            if (state.phase === "VOTE") {
+                const submitted = alivePlayers.filter(k => allPlayers[k].voteTarget !== undefined && allPlayers[k].voteTarget !== "");
+                if (alivePlayers.length > 0 && submitted.length === alivePlayers.length) {
+                    const votesMap = {};
+                    alivePlayers.forEach(k => {
+                        const target = allPlayers[k].voteTarget;
+                        if (target && target !== "งดออกเสียง") votesMap[target] = (votesMap[target] || 0) + 1;
+                    });
+
+                    let topVoted = null; let maxV = 0;
+                    Object.keys(votesMap).forEach(name => {
+                        if (votesMap[name] > maxV) { maxV = votesMap[name]; topVoted = name; }
+                    });
+
+                    if (topVoted) {
+                        const deadId = pKeys.find(k => allPlayers[k].name === topVoted);
+                        if (deadId) set(ref(db, `rooms/${pin}/players/${deadId}/status`), "ตาย");
+                    }
+
+                    setTimeout(() => {
+                        set(ref(db, `rooms/${pin}/state`), { phase: "NIGHT", round: state.round + 1 });
+                    }, 1500);
+                }
+            }
+        }
 
         window.chooseAppMode = function(mode) {
             selectionSection.classList.add('hidden');
@@ -221,7 +271,6 @@
                 formDesc.innerText = "ระบุชื่อเล่นจริงของคุณ เพื่อเข้าร่วมเล่นในบอร์ดเกมนี้";
                 executionBtn.innerText = "สร้างห้องสมรภูมิและเข้าสู่ Lobby";
                 
-                // สั่งรันและเจนเลขรหัส PIN สำรองไว้ล่วงหน้าทันที
                 const autoPin = Math.floor(1000 + Math.random() * 9000).toString();
                 sessionStorage.setItem('wolf_pin', autoPin);
             } else {
@@ -271,11 +320,7 @@
         };
 
         window.startLobbyListener = function(pin, playerId, playerName) {
-            selectionSection.classList.add('hidden');
-            joinSection.classList.add('hidden');
-            waitingSection.classList.remove('hidden');
-            
-            // 🟢 แก้ไขเสร็จสมบูรณ์: บังคับคุมคำสั่งยิงหยอดเลขห้องขึ้นแสดงผลแบบ Real-time ล็อกความทนทาน 
+            selectionSection.classList.add('hidden'); joinSection.classList.add('hidden'); waitingSection.classList.remove('hidden');
             document.getElementById('room-pin-display').innerText = pin;
             
             const startBtn = document.getElementById('gm-start-game-btn');
@@ -288,6 +333,18 @@
                 startBtn.classList.add('hidden'); startBtn.classList.remove('flex');
                 if(waitHint) waitHint.classList.remove('hidden');
             }
+
+            // 🟢 ผูกท่อตรวจสอบสเตจห้องควบคุมส่วนกลางร่วมกับระบบคำนวณเงินออโตเมติก
+            onValue(ref(db, `rooms/${pin}/state`), (stateSnap) => {
+                const state = stateSnap.val();
+                if(state) {
+                    window.currentGamePhase = state.phase; window.currentRound = state.round;
+                    get(ref(db, `rooms/${pin}/players`)).then((pSnap) => {
+                        const allPlayers = pSnap.val();
+                        if(allPlayers) processAutomatedEngineRules(pin, state, allPlayers);
+                    });
+                }
+            });
 
             onValue(ref(db, `rooms/${pin}/players`), (snapshot) => {
                 const players = snapshot.val(); if(!players) return;
@@ -312,7 +369,10 @@
                     deckPool.sort(() => Math.random() - 0.5);
 
                     set(ref(db, `rooms/${pin}/state`), { phase: "NIGHT", round: 1 });
-                    lobbyKeys.forEach((k, idx) => { set(ref(db, `rooms/${pin}/players/${k}/role`), deckPool[idx]); });
+                    lobbyKeys.forEach((k, idx) => { 
+                        set(ref(db, `rooms/${pin}/players/${k}/role`), deckPool[idx]); 
+                        set(ref(db, `rooms/${pin}/players/${k}/status`), "รอด"); 
+                    });
                 });
             };
         };
@@ -345,8 +405,7 @@
         }
 
         function listenToRoom(pin, playerId, playerName) {
-            waitingSection.classList.add('hidden');
-            roleSection.classList.remove('hidden'); roleSection.classList.add('grid');
+            waitingSection.classList.add('hidden'); roleSection.classList.remove('hidden'); roleSection.classList.add('grid');
             document.getElementById('gm-whisper-widget').classList.remove('hidden');
 
             onValue(ref(db, `rooms/${pin}/players`), (snap) => {
@@ -359,19 +418,15 @@
                 }
 
                 showMyRole(myData.role); renderPlayerStatusBoard(allPlayers); 
-                if (!window.hasStateListener) {
-                    window.hasStateListener = true;
-                    onValue(ref(db, `rooms/${pin}/state`), (stateSnap) => {
-                        const state = stateSnap.val() || { phase: "NIGHT", round: 1 };
-                        checkDelayedDeathAnnouncements(pin, playerId, state); handleGamePhaseUI(pin, playerId, state, allPlayers);
-                    });
-                } else {
-                    get(ref(db, `rooms/${pin}/state`)).then((sSnap) => {
-                        const state = sSnap.val() || { phase: "NIGHT", round: 1 }; handleGamePhaseUI(pin, playerId, state, allPlayers);
-                    });
-                }
-                updateChatChannelsSetup(pin, playerId, playerName);
-                bindPrivateGMWhisperSystem(pin, playerId, playerName);
+                
+                // สั่งประมวลผลออโต้ลูปซิงค์จับตาดูสเตจเวลา
+                get(ref(db, `rooms/${pin}/state`)).then((stateSnap) => {
+                    const state = stateSnap.val() || { phase: "NIGHT", round: 1 };
+                    checkDelayedDeathAnnouncements(pin, playerId, state); handleGamePhaseUI(pin, playerId, state, allPlayers);
+                    processAutomatedEngineRules(pin, state, allPlayers);
+                });
+
+                updateChatChannelsSetup(pin, playerId, playerName); bindPrivateGMWhisperSystem(pin, playerId, playerName);
             });
         }
 
@@ -391,8 +446,7 @@
                     let senderLabel = isMe ? playerName : '👑 ผู้ดำเนินเกม (GM)';
                     let bubbleColor = isMe ? 'bg-slate-800 text-slate-200 border border-slate-700/60 rounded-tr-none' : 'bg-gradient-to-r from-amber-600/90 to-yellow-600/90 text-slate-950 rounded-tl-none font-bold';
                     return `<div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}"><span class="text-[9px] text-slate-500 mb-0.5">${senderLabel} • <span class="opacity-60">${timeStr}</span></span><div class="max-w-[85%] px-3 py-2 rounded-xl leading-relaxed break-words shadow-sm ${bubbleColor}">${node.text}</div></div>`;
-                }).join('');
-                messagesBox.scrollTop = messagesBox.scrollHeight;
+                }).join(''); messagesBox.scrollTop = messagesBox.scrollHeight;
             });
 
             const sendWhisperAction = () => {
@@ -453,8 +507,7 @@
                 if (channel === 'werewolf') bubbleClass = isMe ? 'bg-amber-600 text-white rounded-tr-none' : 'bg-slate-950 border border-amber-950 text-amber-300 rounded-tl-none';
                 const timeStr = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + ' น.' : '';
                 return `<div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}"><span class="text-[10px] text-slate-500 mb-0.5 font-semibold">${msg.senderName} • <span class="opacity-60">${timeStr}</span></span><div class="max-w-[85%] px-3.5 py-2.5 rounded-2xl text-xs font-semibold leading-relaxed break-words shadow-sm ${bubbleClass}">${msg.text}</div></div>`;
-            }).join('');
-            chatMessages.scrollTop = chatMessages.scrollHeight; 
+            }).join(''); chatMessages.scrollTop = chatMessages.scrollHeight; 
         }
 
         function handleGamePhaseUI(pin, playerId, state, allPlayers) {
@@ -472,6 +525,33 @@
                 renderChannelMessages(window.activeChatChannel, playerId); return;
             } else { if (roleCardBackFace) { roleCardBackFace.style.filter = "none"; roleCardBackFace.style.borderColor = "#1e293b"; } }
 
+            // 👑 สิทธิ์ปุ่มเปลี่ยนเฟสแมนนวลฉุกเฉินสำหรับ Host หัวห้อง เผื่อคุยในโต๊ะแล้วอยากข้ามเฟสเอง
+            if (window.myRoomOwnership === 'owner') {
+                const manualTriggerBtn = document.createElement('button');
+                manualTriggerBtn.className = "w-full bg-slate-950 border border-indigo-500/30 text-indigo-400 text-[10px] font-black py-1 px-2 rounded-xl mb-3 flex items-center justify-center gap-1 active:scale-95";
+                
+                let nextLabel = "☀️ บังคับตื่นเช้า";
+                if(state.phase === "DAY") nextLabel = "🗳️ บังคับเปิดระบบโหวต";
+                if(state.phase === "VOTE") nextLabel = "🌙 บังคับส่งเข้านอน (ขึ้นวันใหม่)";
+                
+                manualTriggerBtn.innerHTML = `⚙️ GM CONTROL: ${nextLabel}`;
+                manualTriggerBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    let nextP = "NIGHT"; let nextR = state.round;
+                    if(state.phase === "NIGHT") nextP = "DAY";
+                    else if(state.phase === "DAY") nextP = "VOTE";
+                    else { nextP = "NIGHT"; nextR++; }
+                    
+                    // สั่งเคลียร์ความสะอาดล้างช่องเป้าหมายเดิมออกทั้งหมด
+                    Object.keys(allPlayers).forEach(k => {
+                        set(ref(db, `rooms/${pin}/players/${k}/actionTarget`), "");
+                        set(ref(db, `rooms/${pin}/players/${k}/voteTarget`), "");
+                    });
+                    set(ref(db, `rooms/${pin}/state`), { phase: nextP, round: nextR });
+                };
+                actionList.appendChild(manualTriggerBtn);
+            }
+
             if (state.phase === "NIGHT") {
                 actionTitle.innerHTML = `🌙 คืนที่ ${state.round || 1}: เลือกเป้าหมายตามบทบาท`;
                 if (["werewolf", "seer", "bodyguard", "mystic"].includes(window.myRole)) renderTargetButtons(allPlayers, pin, playerId, "actionTarget", actionList, actionStatus);
@@ -479,7 +559,7 @@
             } 
             else if (state.phase === "DAY") {
                 actionTitle.innerHTML = `☀️ วันที่ ${state.round || 1}: ช่วงปรึกษาหารือหมู่บ้าน`;
-                actionList.innerHTML = `<p class="col-span-2 text-xs text-amber-400 border border-amber-500/10 bg-amber-500/5 font-semibold py-4 px-2 rounded-xl flex flex-col items-center gap-2"><i class="ph-bold ph-chats text-xl"></i> แลกเปลี่ยนข้อมูลก่อน เมื่อถึงเวลาเปิดระบบโหวตให้</p>`;
+                actionList.innerHTML = `<p class="col-span-2 text-xs text-amber-400 border border-amber-500/10 bg-amber-500/5 font-semibold py-4 px-2 rounded-xl flex items-center gap-2"><i class="ph-bold ph-chats text-xl"></i> แลกเปลี่ยนข้อมูลก่อน เมื่อถึงเวลาเปิดระบบโหวตให้</p>`;
             } 
             else if (state.phase === "VOTE") {
                 actionTitle.innerHTML = `🗳️ วันที่ ${state.round || 1}: ลงคะแนนประหารชีวิต!`;
@@ -489,7 +569,7 @@
                 Object.keys(allPlayers).forEach(k => { const target = allPlayers[k].voteTarget; if (target) votesCountMap[target] = (votesCountMap[target] || 0) + 1; });
                 const votedList = Object.keys(votesCountMap);
                 if (votedList.length > 0) {
-                    const tallyContainer = document.createElement('div'); tallyContainer.className = "col-span-2 mt-4 p-3 bg-slate-950/80 border border-rose-500/25 rounded-2xl text-left";
+                    const tallyContainer = document.createElement('div'); tallyContainer.className = "col-span-2 mt-2 p-3 bg-slate-950/80 border border-rose-500/25 rounded-2xl text-left";
                     let tallyHtml = `<p class="text-[11px] font-bold text-rose-400 mb-2 uppercase flex items-center gap-1"><i class="ph-bold ph-chart-bar-horizontal"></i> ตารางคะแนนโหวตสดปัจจุบัน</p><div class="flex flex-wrap gap-2">`;
                     votedList.forEach(name => {
                         if (name === "งดออกเสียง") tallyHtml += `<span class="bg-slate-800 border border-slate-700 text-slate-300 text-[10px] px-2.5 py-1 rounded-xl font-bold flex items-center gap-1"><i class="ph-bold ph-prohibit text-xs"></i> ไม่โหวต: ${votesCountMap[name]} คน</span>`;
@@ -502,7 +582,7 @@
         }
 
         function renderTargetButtons(allPlayers, pin, playerId, targetField, actionList, actionStatus) {
-            actionList.innerHTML = ""; let hasTargets = false;
+            let hasTargets = false;
             Object.keys(allPlayers).forEach(pKey => {
                 const p = allPlayers[pKey]; const isDeadRevealed = window.knownDeadPlayers && window.knownDeadPlayers.includes(pKey);
                 if (pKey !== playerId && !isDeadRevealed && !p.name.includes('(GM)')) {
@@ -529,10 +609,8 @@
                 };
                 actionList.appendChild(noVoteBtn);
             }
-            if (!hasTargets) actionList.innerHTML = `<p class="col-span-2 text-xs text-slate-500 italic py-4">ไม่มีเป้าหมายเหลือให้เลือก</p>`;
         }
 
-        // 🟢 แก้ไขเสร็จสิ้น: ปรับปรุงการสับหน้าฟอร์ม โดยบังคับดึงเลขพินจองสลักลงจอ GM ทันที ป้องกันการแสดงผล '----' หายวับ
         document.getElementById('action-execution-btn').addEventListener('click', () => {
             const name = document.getElementById('name-input').value.trim();
             const pinInput = document.getElementById('pin-input').value.trim();
@@ -544,7 +622,7 @@
                 const hostNameWithTag = name + " (GM)"; 
 
                 sessionStorage.setItem('wolf_playerName', hostNameWithTag);
-                document.getElementById('room-pin-display').innerText = currentPin; // 🛠️ บังคับปั๊มตัวเลขลงแผงจอตรงนี้ทันที
+                document.getElementById('room-pin-display').innerText = currentPin; 
 
                 set(ref(db, `rooms/${currentPin}`), { status: 'waiting_for_players', createdAt: new Date().toISOString() }).then(() => {
                     const hostRef = push(ref(db, `rooms/${currentPin}/players`));
