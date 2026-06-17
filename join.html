@@ -112,7 +112,7 @@
         <!-- ฝั่งซ้ายของจอ: การ์ดบทบาทลับ 3D และกล่องจับเวลา -->
         <div class="lg:col-span-5 flex flex-col gap-4">
             
-            <!-- ⏱️ กล่องแสดงเวลานับถอยหลัง Real-time ประจำเฟสเกมสไตล์ E-Sports -->
+            <!-- กล่องแสดงเวลานับถอยหลัง Real-time -->
             <div class="bg-deepSlate/90 border border-slate-800 rounded-3xl p-4 flex items-center justify-between border-indigo-500/10 shadow-xl shrink-0">
                 <div class="flex items-center gap-2">
                     <div class="bg-indigo-500/20 p-2.5 rounded-xl text-indigo-400 flex items-center justify-center"><i class="ph-bold ph-timer text-lg animate-pulse"></i></div>
@@ -121,9 +121,19 @@
                         <h3 id="phase-name-display" class="text-xs font-black text-white mt-0.5">🌙 ช่วงเวลากลางคืน...</h3>
                     </div>
                 </div>
-                <div class="bg-slate-950 px-4 py-2 rounded-2xl border border-slate-800/80 font-mono text-2xl font-black tracking-tight text-amber-400 shadow-inner drop-shadow-[0_0_10px_rgba(251,191,36,0.15)]" id="timer-display">
-                    00:00
-                </div>
+                <div class="bg-slate-950 px-4 py-2 rounded-2xl border border-slate-800/80 font-mono text-2xl font-black tracking-tight text-amber-400" id="timer-display">00:00</div>
+            </div>
+
+            <!-- 🟢 🐺 UI ชิ้นใหม่: กล่องแสดงรายชื่อพวกพ้องฝ่ายเดียวกัน (เช่น หมาป่าด้วยกันจะเห็นรายชื่อขึ้นที่นี่ทันที) -->
+            <div id="team-visibility-box" class="bg-rose-950/20 border border-rose-500/20 rounded-3xl p-4 text-left shadow-md hidden animate-fade-in">
+                <p class="text-[10px] font-black text-rose-400 uppercase tracking-wider flex items-center gap-1"><i class="ph-fill ph-paw-print"></i> สมาชิกฝูงหมาป่าในคืนนี้</p>
+                <div id="team-members-list" class="flex flex-wrap gap-1.5 mt-2 text-[11px] font-bold text-rose-200"></div>
+            </div>
+
+            <!-- 🟢 🔮 UI ชิ้นใหม่: กล่องแบนเนอร์แสดงผลการตรวจเทพพยากรณ์สไตล์เนออนไซไฟ -->
+            <div id="oracle-result-banner" class="bg-cyan-500/10 border-2 border-cyan-500/30 rounded-3xl p-4 text-left shadow-xl hidden animate-pulse">
+                <p class="text-[10px] font-black text-cyan-400 uppercase tracking-wider flex items-center gap-1"><i class="ph-bold ph-eye"></i> 🔮 ผลลัพธ์เนตรพยากรณ์เรียลไทม์</p>
+                <p id="oracle-result-text" class="text-xs font-black text-white mt-2 leading-relaxed bg-slate-950/60 px-3 py-2.5 rounded-xl border border-slate-800/80"></p>
             </div>
 
             <div class="perspective-1000 w-full h-[440px] cursor-pointer shrink-0" onclick="toggleCardFlip()">
@@ -151,7 +161,6 @@
                     </div>
                 </div>
             </div>
-            
             <div id="action-box" class="bg-deepSlate/90 border border-slate-800 rounded-3xl p-5 text-center shadow-2xl hidden border-indigo-500/10 shrink-0">
                 <h2 id="action-title" class="text-sm font-bold text-indigo-400 mb-3 flex items-center justify-center gap-2 uppercase">⚙️ กำลังโหลดระบบ...</h2>
                 <div id="action-list" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-0.5"></div>
@@ -202,10 +211,9 @@
         window.knownDeadPlayers = null; window.lastObservedPhase = null; window.uiStatus = "รอด";
         window.myRoomOwnership = 'player'; 
         
-        // ตัวแปรระบบนับนาฬิกาถอยหลังฝั่ง Client
         let localTimerInterval = null;
 
-        // 🧠 🌟 สมองกลคำนวณและประมวลผลเปลี่ยนเฟสอัตโนมัติ (Automated Calculation Rules Engine)
+        // 🧠 🌟 สมองกลคำนวณและประมวลผลเปลี่ยนเฟสเกมอัตโนมัติ (Automated Client-Side Core Loop Calculation)
         function processAutomatedEngineRules(pin, state, allPlayers) {
             if (window.myRoomOwnership !== 'owner') return; 
             
@@ -213,12 +221,11 @@
             const alivePlayers = pKeys.filter(k => allPlayers[k].status !== "ตาย" && allPlayers[k].role !== "waiting");
             if (alivePlayers.length === 0) return;
 
-            // 🛑 กฎข้อที่ 1: เฟสกลางคืน (NIGHT ➔ DAY)
+            // 🛑 1. ออโต้ตัดเข้าช่วงเช้าตอนกลางคืน (NIGHT ➔ DAY)
             if (state.phase === "NIGHT") {
                 const activeRoles = alivePlayers.filter(k => ["werewolf", "seer", "bodyguard", "mystic"].includes(allPlayers[k].role));
                 const submitted = activeRoles.filter(k => allPlayers[k].actionTarget !== undefined && allPlayers[k].actionTarget !== "");
                 
-                // ตรวจคำสั่ง: เมื่อกดยืนยันครบทุกคน หรือ ถ้านาฬิกาวิ่งจนเหลือ 0 วินาที
                 if ((activeRoles.length > 0 && submitted.length === activeRoles.length) || state.secondsLeft === 0) {
                     let killTarget = null; let protectTarget = null;
                     activeRoles.forEach(k => {
@@ -231,24 +238,21 @@
                         if (deadId) set(ref(db, `rooms/${pin}/players/${deadId}/status`), "ตาย");
                     }
 
-                    // ออโต้ขยับตัดเฟสเข้าสู่ตอนเช้า (DAY) และรีเซ็ตตั้งเวลานับถอยหลังใหม่เป็น 5 นาที (300 วินาที)
                     setTimeout(() => {
                         set(ref(db, `rooms/${pin}/state`), { phase: "DAY", round: state.round, secondsLeft: 300 });
                     }, 1500);
                 }
             }
 
-            // 🛑 กฎข้อที่ 2: เฟสปรึกษาหารือหมู่บ้าน (DAY ➔ VOTE)
+            // 🛑 2. ออโต้ตัดจากเฟสปรึกษาหารือเข้าสู่ระบบโหวต (DAY ➔ VOTE)
             if (state.phase === "DAY" && state.secondsLeft === 0) {
                 set(ref(db, `rooms/${pin}/state`), { phase: "VOTE", round: state.round, secondsLeft: 60 });
             }
 
-            // 🛑 กฎข้อที่ 3: เฟสลงมติแขวนคอ (VOTE ➔ NIGHT)
+            // 🛑 3. ออโต้ตัดจากเฟสลงมติโหวตขึ้นคืนถัดไป (VOTE ➔ NIGHT)
             if (state.phase === "VOTE") {
                 const submitted = alivePlayers.filter(k => allPlayers[k].voteTarget !== undefined && allPlayers[k].voteTarget !== "");
-                
-                // เมื่อทุกคนโหวตเสร็จหมดคน หรือ ถ้านาฬิกาเหลือ 0 วินาทีเดดล็อก
-                if ((alivePlayers.length > 0 && submitted.length === alivePlayers.length) || state.secondsLeft === 0) {
+                if (alivePlayers.length > 0 && submitted.length === alivePlayers.length) {
                     const votesMap = {};
                     alivePlayers.forEach(k => {
                         const target = allPlayers[k].voteTarget;
@@ -265,7 +269,6 @@
                         if (deadId) set(ref(db, `rooms/${pin}/players/${deadId}/status`), "ตาย");
                     }
 
-                    // ล้างคำสั่งสกิลเก่า ดันรอบเพิ่ม 1 เทิร์น และตั้งเวลากลางคืนถัดไป 1 นาที (60 วินาที)
                     setTimeout(() => {
                         pKeys.forEach(k => {
                             set(ref(db, `rooms/${pin}/players/${k}/actionTarget`), "");
@@ -277,7 +280,6 @@
             }
         }
 
-        // 🟢 ⏰ ฟังก์ชันลูปเดินนาฬิกาถอยหลังฝั่งคลาวด์ (เฉพาะมือถือ Host เครื่องแรกผู้สร้างห้องเท่านั้นที่เป็นคนรันส่งค่า)
         function startGMRoomTimerCountdowns(pin, initialSeconds) {
             if (window.myRoomOwnership !== 'owner') return;
             if (localTimerInterval) clearInterval(localTimerInterval);
@@ -362,24 +364,20 @@
                 if(waitHint) waitHint.classList.remove('hidden');
             }
 
-            // 📡 เกาะท่อดักฟังโหนดบอกเวลาและสถานะเฟสเกมหลักส่วนกลางแบบเรียลไทม์
             onValue(ref(db, `rooms/${pin}/state`), (stateSnap) => {
                 const state = stateSnap.val();
                 if(state) {
                     window.currentGamePhase = state.phase; window.currentRound = state.round;
                     
-                    // วาดการแสดงผลตัวนับเวลาสากลลงบนหน้าจอทุกเครื่องตรงกัน
                     const min = String(Math.floor((state.secondsLeft || 0) / 60)).padStart(2, '0');
                     const sec = String((state.secondsLeft || 0) % 60).padStart(2, '0');
                     document.getElementById('timer-display').innerText = `${min}:${sec}`;
 
-                    // อัปเดตชื่อสัญลักษณ์หัวเฟสเวลาปัจจุบัน
                     const titleLabel = document.getElementById('phase-name-display');
                     if (state.phase === "NIGHT") titleLabel.innerHTML = `🌙 คืนที่ ${state.round} (ช่วงสวดมนต์ใช้สกิล)`;
                     else if (state.phase === "DAY") titleLabel.innerHTML = `☀️ วันที่ ${state.round} (ช่วงปรึกษาหารือ)`;
                     else titleLabel.innerHTML = `🗳️ วันที่ ${state.round} (เปิดคูหาลงคะแนน)`;
 
-                    // ทริกเกอร์ลูปเดินนาฬิกาอัตโนมัติเฉพาะเครื่อง Host
                     if (window.myRoomOwnership === 'owner' && window.lastSyncedPhaseDataAlert !== state.phase + '-' + state.round) {
                         window.lastSyncedPhaseDataAlert = state.phase + '-' + state.round;
                         startGMRoomTimerCountdowns(pin, state.secondsLeft || 60);
@@ -414,7 +412,6 @@
                     while(deckPool.length < lobbyKeys.length) deckPool.push('villager');
                     deckPool.sort(() => Math.random() - 0.5);
 
-                    // ตั้งค่าเวลากลางคืนรอบแรกเริ่มต้นที่ 1 นาที (60 วินาที)
                     set(ref(db, `rooms/${pin}/state`), { phase: "NIGHT", round: 1, secondsLeft: 60 });
                     lobbyKeys.forEach((k, idx) => { 
                         set(ref(db, `rooms/${pin}/players/${k}/role`), deckPool[idx]); 
@@ -463,6 +460,18 @@
                     window.uiStatus = window.knownDeadPlayers.includes(playerId) ? "ตาย" : "รอด";
                 }
 
+                // 🟢 🛠️ ตรรกะแสดงผลรายชื่อพวกพ้องทีมหมาป่า (Werewolf Sync)
+                const teamBox = document.getElementById('team-visibility-box');
+                const teamList = document.getElementById('team-members-list');
+                if (teamBox && teamList && ["werewolf"].includes(window.myRole)) {
+                    teamBox.classList.remove('hidden');
+                    teamList.innerHTML = Object.keys(allPlayers)
+                        .filter(k => ["werewolf"].includes(allPlayers[k].role))
+                        .map(k => `<span>🐺 ${allPlayers[k].name}</span>`).join(' , ');
+                } else if(teamBox) {
+                    teamBox.classList.add('hidden');
+                }
+
                 showMyRole(myData.role); renderPlayerStatusBoard(allPlayers); 
                 
                 get(ref(db, `rooms/${pin}/state`)).then((stateSnap) => {
@@ -481,7 +490,7 @@
             if (window.myStatus === "ตาย") { if(tabGrave) tabGrave.classList.remove('hidden'); setupChannelDatabaseListener('graveyard', pin, playerId); } 
             else { if(tabGrave) tabGrave.classList.add('hidden'); }
 
-            if (['werewolf', 'wolfcub', 'wolfman', 'alphawolf', 'minion', 'sorceress'].includes(window.myRole)) { if(tabWolf) tabWolf.classList.remove('hidden'); setupChannelDatabaseListener('werewolf', pin, playerId); } 
+            if (['werewolf'].includes(window.myRole)) { if(tabWolf) tabWolf.classList.remove('hidden'); setupChannelDatabaseListener('werewolf', pin, playerId); } 
             else { if(tabWolf) tabWolf.classList.add('hidden'); }
 
             const chatInput = document.getElementById('chat-input'); const chatSendBtn = document.getElementById('chat-send-btn');
@@ -534,7 +543,7 @@
             const roleCardBackFace = document.getElementById('role-card-back-face');
             if(!actionBox || !actionTitle || !actionList || !actionStatus) return;
 
-            window.currentGamePhase = state.phase; actionStatus.classList.add('hidden'); actionBox.classList.remove('hidden'); actionList.innerHTML = "";
+            window.currentGamePhase = state.phase; actionStatus.className = "hidden"; actionBox.classList.remove('hidden'); actionList.innerHTML = "";
 
             if (window.uiStatus === "ตาย") {
                 actionTitle.innerHTML = "💀 คุณเสียชีวิตแล้ว (สิทธิ์วิญญาณ)";
@@ -542,6 +551,11 @@
                 if (roleCardBackFace) { roleCardBackFace.style.filter = "grayscale(100%) opacity(40%)"; roleCardBackFace.style.borderColor = "#ef4444"; }
                 renderChannelMessages(window.activeChatChannel, playerId); return;
             } else { if (roleCardBackFace) { roleCardBackFace.style.filter = "none"; roleCardBackFace.style.borderColor = "#1e293b"; } }
+
+            // ซ่อนกล่องแบนเนอร์แจ้งผลตรวจของเทพพยากรณ์ทุกครั้งเมื่อขึ้นกลางวัน เพื่อความสะอาดของ UI
+            if(state.phase !== "NIGHT") {
+                document.getElementById('oracle-result-banner').classList.add('hidden');
+            }
 
             if (window.myRoomOwnership === 'owner') {
                 const manualTriggerBtn = document.createElement('button');
@@ -575,7 +589,7 @@
             } 
             else if (state.phase === "DAY") {
                 actionTitle.innerHTML = `☀️ วันที่ ${state.round || 1}: ช่วงปรึกษาหารือหมู่บ้าน`;
-                actionList.innerHTML = `<p class="col-span-2 text-xs text-amber-400 border border-amber-500/10 bg-amber-500/5 font-semibold py-4 px-2 rounded-xl flex items-center gap-2"><i class="ph-bold ph-chats text-xl"></i> แลกเปลี่ยนข้อมูลก่อน เมื่อนาฬิกาหมดจะเปิดปุ่มโหวตให้</p>`;
+                actionList.innerHTML = `<p class="col-span-2 text-xs text-amber-400 border border-amber-500/10 bg-amber-500/5 font-semibold py-4 px-2 rounded-xl flex flex-col items-center gap-2"><i class="ph-bold ph-chats text-xl"></i> แลกเปลี่ยนข้อมูลก่อน เมื่อนาฬิกาหมดจะเปิดปุ่มโหวตให้</p>`;
             } 
             else if (state.phase === "VOTE") {
                 actionTitle.innerHTML = `🗳️ วันที่ ${state.round || 1}: ลงคะแนนประหารชีวิต!`;
@@ -597,6 +611,26 @@
             renderChannelMessages(window.activeChatChannel, playerId);
         }
 
+        // 🟢 🔮 ตรรกะกระบวนการแสดงผลตรวจสอบของเซียร์รายบุคคลแบบออนไลน์ (Seer Real-time Oracle Logic Engine)
+        function executeSeerCheckOracleResult(allPlayers, targetName) {
+            if (window.myRole !== "seer") return;
+            const targetId = Object.keys(allPlayers).find(k => allPlayers[k].name === targetName);
+            const banner = document.getElementById('oracle-result-banner');
+            const textEl = document.getElementById('oracle-result-text');
+
+            if (targetId && banner && textEl) {
+                const targetRole = allPlayers[targetId].role;
+                banner.classList.remove('hidden');
+                
+                // ตรวจเงื่อนไขฝ่าย: หากชื่อบทขึ้นกลุ่ม werewolf ถือเป็นฝ่ายร้าย นอกนั้นเป็นชาวบ้าน
+                if (["werewolf"].includes(targetRole)) {
+                    textEl.innerHTML = `🎯 สัญญาณแจ้ง: <span class="text-rose-500 font-bold">[${targetName}]</span> เป็น <span class="text-rose-500 font-extrabold underline">ฝ่ายหมาป่า 🔴</span>`;
+                } else {
+                    textEl.innerHTML = `🧑‍🌾 สัญญาณแจ้ง: <span class="text-emerald-400 font-bold">[${targetName}]</span> เป็น <span class="text-emerald-400 font-extrabold underline">ฝ่ายชาวบ้าน 🟢</span>`;
+                }
+            }
+        }
+
         function renderTargetButtons(allPlayers, pin, playerId, targetField, actionList, actionStatus) {
             let hasTargets = false;
             Object.keys(allPlayers).forEach(pKey => {
@@ -608,6 +642,11 @@
                     btn.onclick = (e) => {
                         e.stopPropagation(); set(ref(db, `rooms/${pin}/players/${playerId}/${targetField}`), p.name).then(() => {
                             actionStatus.innerText = `✅ บันทึกคำสั่งใส่ [${p.name}] สำเร็จ!`; actionStatus.classList.remove('hidden');
+                            
+                            // ทริกเกอร์เรียกคำสั่งตรวจสอบผลลัพธ์ทันทีบนหน้าจอเซียร์เมื่อคลิกเลือกชื่อ
+                            if(targetField === "actionTarget" && window.myRole === "seer") {
+                                executeSeerCheckOracleResult(allPlayers, p.name);
+                            }
                         });
                     };
                     actionList.appendChild(btn);
